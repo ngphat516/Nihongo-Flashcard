@@ -16,6 +16,14 @@
 
 ---
 
+## 2026-11-11 — Chuẩn bị PR Trang chủ (H1–H8)
+
+- **Người làm:** Codex, theo yêu cầu người dùng.
+- **Đã xong:** cập nhật H1–H8 thành Xong trong `tasks.md`; xóa 3 screenshot tạm trong `pages/home/screenshots/`; cập nhật ghi chú trạng thái trong `pages/home/REVIEW.md`. Giữ nguyên toàn bộ chức năng và thiết kế Home.
+- **Kiểm tra:** đã fetch `main` mới nhất (`3be1e12`), nhánh Home đã chứa commit này và không xung đột. Chạy lại `npm test`: 43/43 qua; 84 kiểm tra Chromium qua; kiểm tra bổ sung `?seed` → `?reset` ở 375px qua; `git diff --check` sạch.
+- **Tiếp theo:** tạo PR `feature/home` → `main` để nhóm review, không tự merge.
+- **Điểm cần nhóm review:** ghi chú giới hạn 53 tuần/12 tháng lịch và Google Fonts trong `pages/home/REVIEW.md` vẫn được giữ nguyên; không thay đổi logic để tự chốt các điểm này.
+
 ## 2026-11-11 — Trang Tạo thẻ (C1, C2, C3)
 
 - **Người làm:** Leader, cùng Claude (Leader nhận C1–C3 thay Thành viên 3).
