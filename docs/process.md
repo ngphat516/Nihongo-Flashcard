@@ -16,6 +16,16 @@
 
 ---
 
+## 2026-11-11 — Lưới bìa Album (A1, một phần A8)
+
+- **Người làm:** Thành viên 2, cùng Claude.
+- **Đã xong:**
+  - A1: lưới bìa `cover` ở `pages/album/`. Mỗi bìa có chữ đầu tên bộ, tên, mô tả cắt 2 dòng, badge "N cần học" (ẩn khi 0), "N thẻ"; cả bìa là một link tới `routes.album(id)`. Màu bìa lấy theo thứ tự `i % 6` vì chưa có L6.
+  - A8 (phần lưới): chưa có bộ nào thì hiện khối `empty` với nút "+ Tạo bộ thẻ"; nút "+ Tạo bộ mới" ở đầu trang ẩn đi để màn hình chỉ có một nút chính.
+  - Đã thử với `?seed` và `?reset` ở 1280px và 375px: không cuộn ngang, Console không có lỗi.
+  - Nhánh `feature/album`.
+- **Tiếp theo:** A2 + A3 (chi tiết bộ, lưới thẻ lật, badge trạng thái), phần còn lại của A8 (`?deck=` sai id, bộ chưa có thẻ). Khi L6 xong: đổi `COVER_COLORS[i % 6]` trong `album.js` sang `deck.color`.
+
 ## 2026-11-11 — Cột điều hướng và khung Trang chủ (L12)
 
 - **Người làm:** Leader, cùng Claude.

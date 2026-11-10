@@ -27,17 +27,41 @@ startPage(async () => {
   else await showDeckGrid();
 });
 
+// Thứ tự màu bìa (docs/design.md › Màu bìa bộ thẻ). Sau L6 đổi sang deck.color.
+const COVER_COLORS = ['pink', 'peach', 'yellow', 'green', 'sky', 'lavender'];
+
 async function showDeckGrid() {
   $('#grid-view').hidden = false;
   const overview = await getDeckOverview();
 
-  // TODO A1: lưới bìa album vào #deck-grid; bấm một bộ → routes.album(deck.id)
-  // TODO A8: chưa có bộ nào → lời nhắc + nút tạo bộ
+  // A8: chưa có bộ nào. Ẩn nút ở đầu trang để màn hình chỉ có một nút chính.
+  if (overview.length === 0) {
+    $('#new-deck-link').hidden = true;
+    $('#deck-grid').append(
+      h('div', { class: 'empty' },
+        h('p', { class: 'empty-title' }, 'Chưa có bộ thẻ nào'),
+        h('p', { class: 'empty-text' }, 'Tạo bộ đầu tiên để bắt đầu học.'),
+        h('a', { class: 'btn btn-primary', href: routes.create() }, '+ Tạo bộ thẻ'),
+      ),
+    );
+    return;
+  }
 
-  // ---------- DEMO — xóa khi làm thật ----------
+  // A1: lưới bìa, cả bìa là một link tới chi tiết bộ
   $('#deck-grid').append(
-    h('ul', { class: 'demo' },
-      overview.map(({ deck, total }) => h('li', {}, h('a', { href: routes.album(deck.id) }, deck.name), ` — ${total} thẻ`)),
+    h('div', { class: 'album-grid' }, overview.map((item, i) => deckCover(item, COVER_COLORS[i % COVER_COLORS.length]))),
+  );
+}
+
+function deckCover({ deck, total, due }, color) {
+  const dueCount = due.new + due.learning + due.review;
+  return h('a', { class: `cover cover-${color}`, href: routes.album(deck.id) },
+    h('span', { class: 'cover-mark', 'aria-hidden': 'true' }, [...deck.name][0]),
+    h('span', { class: 'cover-title' }, deck.name),
+    deck.description && h('span', { class: 'cover-text' }, deck.description),
+    h('span', { class: 'cover-meta' },
+      dueCount > 0 && h('span', { class: 'cover-badge' }, `${dueCount} cần học`),
+      `${total} thẻ`,
     ),
   );
 }

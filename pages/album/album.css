@@ -2,3 +2,10 @@
    Chỉ viết style riêng của trang này, class bắt đầu bằng "album-" (VD .album-grid, .album-cover).
    Dùng lại class chung trước khi tự viết: .badge .badge-<state>, .flashcard, .dialog, .empty...
    Màu, khoảng cách: biến trong styles/tokens.css. Xem tất cả: pages/styleguide/. */
+
+/* A1: lưới bìa các bộ thẻ */
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
