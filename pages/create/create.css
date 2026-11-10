@@ -1,15 +1,178 @@
-/* Tạo thẻ (pages/create/) — phụ trách: Thành viên 3.
-   Chỉ viết style riêng của trang này, class bắt đầu bằng "create-" (VD .create-layout).
-   Dùng lại class chung: .field .input (C1–C3), .flashcard (C4), .toast "Đã thêm" (C2), .dialog.
-   Màu, khoảng cách: biến trong styles/tokens.css. Xem tất cả: pages/styleguide/. */
+/* Tạo thẻ (pages/create/): trình soạn một bộ thẻ.
+   Khối thông tin bộ → danh sách dòng thẻ → thanh Lưu dính ở đáy màn hình. */
 
-/* Form bên trái, xem trước bên phải trên màn hình rộng */
-.create-layout {
+/* ---------- Thông tin bộ ---------- */
+.create-deck {
   display: grid;
-  gap: 0 var(--space-4);
+  gap: var(--space-4);
 }
-@media (min-width: 800px) {
-  .create-layout {
-    grid-template-columns: 3fr 2fr;
+.create-deck .field + .field {
+  margin-top: 0;
+}
+@media (min-width: 640px) {
+  .create-deck {
+    grid-template-columns: minmax(0, 1fr) 180px;
+  }
+  .create-deck-picker,
+  .create-deck-desc {
+    grid-column: 1 / -1;
+  }
+}
+.create-deck-picker .input {
+  max-width: 420px;
+}
+.create-deck-desc .input {
+  min-height: 64px;
+}
+.create-deck-desc .muted {
+  font-weight: 400;
+}
+
+/* ---------- Danh sách thẻ ----------
+   Điện thoại: số thứ tự + nút xóa trên cùng, mặt trước và mặt sau xếp dọc.
+   Màn hình rộng: một hàng gồm số | mặt trước | mặt sau | nút xóa. */
+.create-cards {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+.create-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'num delete'
+    'front front'
+    'back back';
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.create-card .field + .field {
+  margin-top: 0;
+}
+.create-card-num {
+  grid-area: num;
+  color: var(--muted);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.create-card-front {
+  grid-area: front;
+}
+.create-card-back {
+  grid-area: back;
+  margin-top: var(--space-2);
+}
+.create-card-delete {
+  grid-area: delete;
+  width: 40px;
+  padding: 0;
+}
+.create-card-delete:hover {
+  color: var(--danger);
+}
+@media (min-width: 720px) {
+  .create-card {
+    grid-template-columns: 2rem minmax(0, 1fr) minmax(0, 1fr) 40px;
+    grid-template-areas: 'num front back delete';
+    align-items: start;
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  }
+  .create-card-back {
+    margin-top: 0;
+  }
+  /* Số thứ tự và nút xóa thẳng hàng với ô nhập (ô nhập nằm dưới nhãn của nó) */
+  .create-card-num,
+  .create-card-delete {
+    margin-top: calc(var(--text-sm) * 1.6 + 6px);
+  }
+  .create-card-num {
+    line-height: 40px;
+  }
+}
+
+/* Ô nhập mặt thẻ: một dòng, tự cao lên theo nội dung (create.js đặt chiều cao) */
+textarea.create-card-input {
+  min-height: 40px;
+  overflow: hidden;
+  resize: none;
+}
+
+/* Cảnh báo thẻ trùng: chỉ nhắc, vẫn cho lưu */
+.create-warning {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+.create-warning[hidden] {
+  display: none;
+}
+.create-warning svg {
+  flex: none;
+}
+
+.create-add {
+  width: 100%;
+  border-style: dashed;
+  color: var(--text-2);
+}
+.create-add:hover {
+  color: var(--text);
+}
+
+/* ---------- Thanh Lưu ---------- */
+.create-savebar {
+  position: sticky;
+  bottom: var(--space-3);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+.create-status {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+.create-status.is-dirty {
+  color: var(--text);
+  font-weight: 600;
+}
+.create-savebar .btn-primary {
+  min-width: 96px;
+}
+
+/* Thanh Lưu cao 64px. Toast nằm trên thanh thay vì đè lên nó; khi Tab tới hay focus một ô,
+   trình duyệt cuộn sao cho ô đó không bị thanh che (scroll-padding). */
+.create-toast {
+  bottom: calc(var(--space-3) + 64px + var(--space-3));
+}
+html {
+  scroll-padding-bottom: calc(var(--space-3) + 64px + var(--space-3));
+}
+
+@media (max-width: 767.98px) {
+  .create-savebar {
+    bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom, 0px) + var(--space-2));
+  }
+  .create-toast {
+    bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom, 0px) + var(--space-2) + 64px + var(--space-3));
+  }
+  html {
+    scroll-padding-bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom, 0px) + var(--space-2) + 64px + var(--space-3));
   }
 }
