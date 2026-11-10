@@ -26,7 +26,7 @@
     - [PR #3](https://github.com/ngphat516/Nihongo-Flashcard/pull/3): Tạo thẻ (C1–C3).
 
     Chi tiết từng trang ở 3 mục bên dưới.
-  - Album, Tạo thẻ và Học đã hết khung `.todo` và đoạn `DEMO`. Chỉ Trang chủ còn khung chờ làm.
+  - Album, Tạo thẻ và Học đã hết khung `.todo` và đoạn `DEMO`. Trang chủ (H1–H8) đang chờ review ở [PR #4](https://github.com/ngphat516/Nihongo-Flashcard/pull/4).
   - Chạy thử trên `main` sau khi merge, bắt đầu từ `?reset`:
     - tạo bộ 2 thẻ ở Tạo thẻ;
     - bấm "Học ngay", chấm Tốt: bộ đếm thành 1 Mới, 1 Đang học;
@@ -41,13 +41,13 @@
       - L13 làm được vì Album đã có bìa thật.
     - `architecture.md`: thêm file mới của Album.
     - `product.md`: phần Thẻ tiếng Nhật.
-    - `AGENTS.md`: khung `.todo` giờ chỉ còn ở Trang chủ.
+    - `AGENTS.md`: bỏ câu "mỗi trang có sẵn khung `.todo`", vì trang đã làm không còn khung đó.
 - **Quyết định:** chỗ cần đổi ở mỗi trang khi làm L6 ghi ở đầu mục của trang đó trong `tasks.md`, dòng L6 trỏ tới đó, để người làm trang thấy ngay trong phần việc của mình.
 - **Tiếp theo:**
+  - **Review và merge [PR #4](https://github.com/ngphat516/Nihongo-Flashcard/pull/4)** (Trang chủ H1–H8). PR này cũng thêm một mục vào đầu `process.md`, nên phải merge `main` mới vào nhánh `feature/home` và giữ cả hai mục.
   - **L6** (thẻ tiếng Nhật + màu bìa), sửa luôn B1–B5. Đây là việc đang chặn nhiều nhất:
     - L7, L9, C8 và màu bìa của A5 đều cần L6;
     - sau L6, cả 3 trang phải đổi mặt thẻ.
-  - **Trang chủ H1–H8** (Leader).
   - **L2:** bật bảo vệ `main`, điền `CODEOWNERS`.
   - **Việc "Nên có" / "Nếu kịp" khác:** C4, C5, C7, L13, L8 (cách lưu lịch ôn chưa chốt).
 - **Vướng mắc:**
