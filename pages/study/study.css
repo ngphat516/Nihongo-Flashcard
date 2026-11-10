@@ -1,4 +1,117 @@
-/* Học (pages/study/) — phụ trách: Thành viên 4.
-   Chỉ viết style riêng của trang này, class bắt đầu bằng "study-" (VD .study-bar).
-   Dùng lại class chung: .flashcard (S2, S8), .rate-bar + .btn-again/-hard/-good/-easy (S3),
-   .counts .count-new/-learning/-review (S5), .empty (S6). Xem tất cả: pages/styleguide/. */
+.study-decks {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.study-deck,
+.study-bar,
+.study-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.study-deck,
+.study-bar {
+  justify-content: space-between;
+}
+
+.study-deck {
+  color: var(--text);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.study-deck.is-zero {
+  color: var(--text-2);
+  box-shadow: none;
+}
+
+.study-deck:hover {
+  background: var(--surface-2);
+}
+
+.study-bar h1 {
+  flex: 1 1 10rem;
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.study-card {
+  cursor: auto;
+}
+
+.study-card.is-resetting .flashcard-inner {
+  transition: none;
+}
+
+.study-card .flashcard-face {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.study-card-label {
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+
+.study-card p {
+  margin: 0;
+}
+
+.study-reveal {
+  width: 100%;
+  min-height: 52px;
+}
+
+.study-ratings {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.study-ratings .btn {
+  padding: var(--space-2) var(--space-1);
+  text-align: center;
+}
+
+.study-tools {
+  margin-top: var(--space-3);
+}
+
+.study-shortcuts {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.study-done {
+  max-width: 28rem;
+  margin: clamp(2rem, 12vh, 8rem) auto 0;
+  padding: var(--space-5);
+  text-align: center;
+}
+
+.study-done .study-tools {
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .study-card.is-flipped .flashcard-inner,
+  .study-card .flashcard-back {
+    transform: none;
+  }
+
+  .study-card .flashcard-inner {
+    transition: none;
+  }
+
+  .study-card .flashcard-face[aria-hidden='true'] {
+    visibility: hidden;
+  }
+}
