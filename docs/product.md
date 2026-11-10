@@ -86,10 +86,6 @@ Thay 2 mặt `front` / `back` bằng các trường riêng, để sau này làm 
 - **Vị trí:** ở cuối cột điều hướng; trên điện thoại là ô cuối của thanh tab ở đáy ([design.md › Bố cục khung](design.md#bố-cục-khung)).
 - Trình duyệt nhớ lựa chọn cho lần mở sau.
 
-### Giao diện mới
-
-Header ngang đổi thành cột điều hướng bên trái, Trang chủ chia 2 cột, có thêm biểu đồ lượt ôn theo tháng. Chi tiết: [design.md](design.md). Đã làm: màu và chữ mới (L11), cột điều hướng và khung 2 cột của Trang chủ (L12). Còn: nội dung Trang chủ (H7, H8).
-
 ### Đổi chiều học
 
 Người học đổi được giữa Nhật → Việt và Việt → Nhật.
