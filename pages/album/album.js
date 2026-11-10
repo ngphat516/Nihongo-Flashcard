@@ -4,7 +4,7 @@
  *
  * Trang có 2 chế độ:
  *   pages/album/             → lưới các bộ thẻ (#grid-view)
- *   pages/album/?deck=<id>   → chi tiết một bộ (#detail-view)
+ *   pages/album/?deck=<id>   → chi tiết một bộ (#detail-view), code ở detail.js
  *
  * Hàm core hay dùng:
  *   getDeckOverview()                    → [{ deck, total, due: { new, learning, review } }]
@@ -16,10 +16,10 @@
  *   routes.study(id), routes.create(id)
  * Lỗi nhập liệu từ updateXxx() là ValidationError — hiện err.message cho người dùng.
  */
-import { getCards, getDeck, getDeckOverview } from '../../core/repo.js';
-import { STATE_LABELS, describeDue } from '../../core/queue.js';
+import { getDeckOverview } from '../../core/repo.js';
 import { routes } from '../../core/routes.js';
 import { $, getParam, h, startPage } from '../../core/dom.js';
+import { showDeckDetail } from './detail.js';
 
 startPage(async () => {
   const deckId = getParam('deck');
@@ -62,34 +62,6 @@ function deckCover({ deck, total, due }, color) {
     h('span', { class: 'cover-meta' },
       dueCount > 0 && h('span', { class: 'cover-badge' }, `${dueCount} cần học`),
       `${total} thẻ`,
-    ),
-  );
-}
-
-async function showDeckDetail(deckId) {
-  $('#detail-view').hidden = false;
-  const deck = await getDeck(deckId);
-  if (!deck) {
-    // TODO A8: thông báo đẹp hơn + link về lưới
-    $('#deck-header').append(h('p', { class: 'demo' }, 'Không tìm thấy bộ thẻ này.'));
-    return;
-  }
-  const cards = await getCards(deckId);
-
-  // TODO A2: tiêu đề, mô tả, nút "Học ngay" (routes.study) và "Thêm thẻ" (routes.create)
-  // TODO A2 · A3: lưới thẻ vào #card-list, bấm để lật, badge trạng thái + hạn ôn
-  // TODO A4: sửa / xóa thẻ · A5: sửa / xóa bộ · A6: tìm kiếm, lọc, sắp xếp
-
-  // ---------- DEMO — xóa khi làm thật ----------
-  $('#deck-header').append(h('p', { class: 'demo' }, `${deck.name} — ${cards.length} thẻ`));
-  $('#card-list').append(
-    h('ul', { class: 'demo' },
-      cards.slice(0, 5).map((card) =>
-        h('li', {},
-          h('span', { class: `badge badge-${card.state}` }, STATE_LABELS[card.state]),
-          ` ${card.front} → ${card.back} (${describeDue(card)})`,
-        ),
-      ),
     ),
   );
 }

@@ -16,15 +16,26 @@
 
 ---
 
-## 2026-11-11 — Lưới bìa Album (A1, một phần A8)
+## 2026-11-11 — Trang Album (A1–A8)
 
 - **Người làm:** Thành viên 2, cùng Claude.
 - **Đã xong:**
-  - A1: lưới bìa `cover` ở `pages/album/`. Mỗi bìa có chữ đầu tên bộ, tên, mô tả cắt 2 dòng, badge "N cần học" (ẩn khi 0), "N thẻ"; cả bìa là một link tới `routes.album(id)`. Màu bìa lấy theo thứ tự `i % 6` vì chưa có L6.
-  - A8 (phần lưới): chưa có bộ nào thì hiện khối `empty` với nút "+ Tạo bộ thẻ"; nút "+ Tạo bộ mới" ở đầu trang ẩn đi để màn hình chỉ có một nút chính.
-  - Đã thử với `?seed` và `?reset` ở 1280px và 375px: không cuộn ngang, Console không có lỗi.
+  - A1: lưới bìa `cover`; cả bìa là một link tới `routes.album(id)`. Màu bìa lấy theo thứ tự `i % 6` vì chưa có L6.
+  - A2, A3: trang chi tiết bộ gồm tên, mô tả, bộ đếm Mới / Đang học / Đến hạn hôm nay, nút Học ngay, Thêm thẻ, Sửa bộ, Xóa bộ; lưới thẻ lật (`flashcard`) kèm badge trạng thái và hạn ôn.
+  - A4: sửa thẻ trong dialog (Ctrl+Enter để lưu, lỗi nhập liệu hiện trong dialog), xóa thẻ có hỏi xác nhận.
+  - A5: sửa tên, mô tả, thẻ mới mỗi ngày; xóa bộ có hỏi xác nhận, xóa xong về lưới. Chưa có chọn màu bìa (cần L6).
+  - A6: tìm theo nội dung 2 mặt, gõ không dấu vẫn ra; lọc bằng `chip` (chip "Đang học" gồm cả thẻ Học lại); sắp xếp mới tạo trước / sắp đến hạn trước (thẻ mới xếp cuối).
+  - A7: nút "Học lại từ đầu" (có hỏi xác nhận) ở thẻ đã học.
+  - A8: chưa có bộ nào, `?deck=` sai id, bộ chưa có thẻ.
+  - Chia file: `album.js` (điểm vào + lưới), `detail.js` (chi tiết bộ), `ui.js` (dialog, toast).
+  - Đã thử với `?seed` và `?reset` ở 1280px và 375px: không cuộn ngang, Console không có lỗi. Kịch bản chạy thử bấm qua cả A1–A8 trên Chrome.
   - Nhánh `feature/album`.
-- **Tiếp theo:** A2 + A3 (chi tiết bộ, lưới thẻ lật, badge trạng thái), phần còn lại của A8 (`?deck=` sai id, bộ chưa có thẻ). Khi L6 xong: đổi `COVER_COLORS[i % 6]` trong `album.js` sang `deck.color`.
+- **Quyết định:**
+  - Mỗi màn hình một nút chính: lưới bộ là "+ Tạo bộ mới"; chi tiết bộ là "Học ngay", hoặc "+ Thêm thẻ đầu tiên" khi bộ chưa có thẻ.
+  - Ô thẻ mới mỗi ngày để trống thì trang báo lỗi, không gửi xuống `updateDeck` (tránh lỗi B2).
+  - Xóa thẻ và "Học lại từ đầu" đều hỏi xác nhận, vì không hoàn tác được.
+- **Tiếp theo:** khi L6 xong: đổi `COVER_COLORS[i % 6]` trong `album.js` sang `deck.color`, sửa `cardFront` / `cardBack` ở đầu `detail.js` theo trường mới (gắn `lang="ja"`), thêm chọn màu bìa vào dialog sửa bộ (A5).
+- **Vướng mắc:** `?deck=constructor` vẫn hiện như một bộ có thật cho tới khi Leader sửa lỗi B4 trong `core/storage.js`.
 
 ## 2026-11-11 — Cột điều hướng và khung Trang chủ (L12)
 

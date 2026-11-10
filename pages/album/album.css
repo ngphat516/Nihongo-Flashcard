@@ -9,3 +9,86 @@
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: var(--space-3);
 }
+
+/* A2 · A5: đầu trang chi tiết bộ */
+.album-title {
+  overflow-wrap: anywhere;
+}
+.album-actions {
+  gap: var(--space-2);
+}
+.album-description {
+  margin: 0 0 var(--space-3);
+  color: var(--text-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.album-summary {
+  gap: var(--space-2) var(--space-3);
+}
+.album-danger {
+  color: var(--danger);
+}
+.album-danger:hover {
+  color: var(--danger);
+}
+
+/* A6: tìm, lọc, sắp xếp */
+.album-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+.album-search {
+  flex: 1 1 240px;
+}
+.album-sort {
+  flex: 0 1 200px;
+}
+.album-count {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-sm);
+}
+.album-count + .section {
+  margin-top: var(--space-3);
+}
+.album-no-match {
+  padding: var(--space-5) 0;
+  text-align: center;
+}
+
+/* A2 · A3 · A4: lưới thẻ. Thẻ lật nhỏ hơn thẻ ở trang Học. */
+.album-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.album-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.album-card .flashcard-face {
+  min-height: 140px;
+  padding: var(--space-4);
+  font-size: var(--text-lg);
+  box-shadow: none;
+}
+.album-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-2);
+  font-size: var(--text-sm);
+}
+.album-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-left: calc(-1 * var(--space-3)); /* nút ghost thẳng hàng với mép thẻ */
+}
