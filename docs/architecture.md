@@ -21,7 +21,7 @@ Tài liệu này nói code được tổ chức thế nào. App làm gì xem [pr
 index.html              Trang chủ (để ở gốc để mở / là vào)
 pages/
   home/                 home.js, home.css: code của Trang chủ
-  album/                index.html, album.js, album.css
+  album/                index.html, album.js (+ detail.js, ui.js), album.css
   create/               index.html, create.js (+ card-rows.js, feedback.js), create.css
   study/                index.html, study.js, study.css
   styleguide/           xem mọi biến và class giao diện (công cụ dev, xóa trước khi nộp)
