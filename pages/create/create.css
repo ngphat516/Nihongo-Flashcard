@@ -1,5 +1,7 @@
 /* Tạo thẻ (pages/create/) — phụ trách: Thành viên 3.
-   Chỉ viết style riêng của trang này. Màu, khoảng cách: dùng biến trong styles/base.css. */
+   Chỉ viết style riêng của trang này, class bắt đầu bằng "create-" (VD .create-layout).
+   Dùng lại class chung: .field .input (C1–C3), .flashcard (C4), .toast "Đã thêm" (C2), .dialog.
+   Màu, khoảng cách: biến trong styles/tokens.css. Xem tất cả: pages/styleguide/. */
 
 /* Form bên trái, xem trước bên phải trên màn hình rộng */
 .create-layout {

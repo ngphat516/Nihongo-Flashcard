@@ -53,7 +53,7 @@ export function startPage(init) {
     .then(init)
     .catch((err) => {
       console.error(err);
-      const box = h('div', { class: 'alert alert--error', role: 'alert' }, err?.message ?? String(err));
+      const box = h('div', { class: 'alert alert-error', role: 'alert' }, err?.message ?? String(err));
       document.querySelector('main')?.prepend(box);
     });
 }

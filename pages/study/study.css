@@ -1,4 +1,4 @@
 /* Học (pages/study/) — phụ trách: Thành viên 4.
-   Chỉ viết style riêng của trang này. Màu, khoảng cách: dùng biến trong styles/base.css
-   (4 nút chấm điểm: --rate-again / --rate-hard / --rate-good / --rate-easy;
-    bộ đếm: --state-new / --state-learning / --state-review). */
+   Chỉ viết style riêng của trang này, class bắt đầu bằng "study-" (VD .study-bar).
+   Dùng lại class chung: .flashcard (S2, S8), .rate-bar + .btn-again/-hard/-good/-easy (S3),
+   .counts .count-new/-learning/-review (S5), .empty (S6). Xem tất cả: pages/styleguide/. */

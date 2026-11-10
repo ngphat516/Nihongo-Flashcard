@@ -1,3 +1,4 @@
 /* Album (pages/album/) — phụ trách: Thành viên 2.
-   Chỉ viết style riêng của trang này. Màu, khoảng cách: dùng biến trong styles/base.css
-   (badge trạng thái thẻ đã có sẵn: .badge .badge--new / --learning / --review). */
+   Chỉ viết style riêng của trang này, class bắt đầu bằng "album-" (VD .album-grid, .album-cover).
+   Dùng lại class chung trước khi tự viết: .badge .badge-<state>, .flashcard, .dialog, .empty...
+   Màu, khoảng cách: biến trong styles/tokens.css. Xem tất cả: pages/styleguide/. */

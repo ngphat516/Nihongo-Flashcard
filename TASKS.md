@@ -11,7 +11,7 @@
 
 **Mức ưu tiên:** **Bắt buộc** = phải có để demo · **Nên có** = làm sau khi xong phần bắt buộc · **Nếu kịp** = điểm cộng.
 
-**Xong một task khi:** chạy đúng với dữ liệu mẫu (`?seed`) và khi trống (`?reset`), dùng được trên điện thoại (rộng 375px), đúng ở cả dark mode, Console không có lỗi, đã xóa khung `.todo` và đoạn `DEMO` của phần đó.
+**Xong một task khi:** chạy đúng với dữ liệu mẫu (`?seed`) và khi trống (`?reset`), dùng được trên điện thoại (rộng 375px), Console không có lỗi, đã xóa khung `.todo` và đoạn `DEMO` của phần đó.
 
 Các hàm core nhắc tới bên dưới đều có chú thích ở đầu file `pages/<trang>/<trang>.js` và trong `README.md`.
 
@@ -21,10 +21,10 @@ Các hàm core nhắc tới bên dưới đều có chú thích ở đầu file 
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Ưu tiên |
 |---|---|---|---|
-| L1 | Codebase nền | Cấu trúc thư mục, CSS chung + dark mode, lớp lưu localStorage, thuật toán SM-2 + 37 test, dữ liệu mẫu, khung 4 trang | **Xong** |
+| L1 | Codebase nền | Cấu trúc thư mục, CSS chung, lớp lưu localStorage, thuật toán SM-2 + 37 test, dữ liệu mẫu, khung 4 trang | **Xong** |
 | L2 | Repo GitHub | Tạo repo, push codebase, bật bảo vệ nhánh `main` (bắt buộc qua PR), mời 3 thành viên | Bắt buộc |
 | L3 | Review & merge | Review mọi PR. Thay đổi trong `core/` hoặc `styles/base.css` phải qua leader | Bắt buộc |
-| L4 | Thành phần dùng chung | Khi các trang có bản đầu: gom phần lặp lại (hộp xác nhận, toast, khung thẻ lật, ô thống kê) vào `styles/base.css` + `core/ui.js` | Nên có |
+| L4 | Hệ thống giao diện | `styles/tokens.css` + `styles/components.css` (nút, ô nhập, thống kê, bộ đếm, badge, thẻ lật, dialog, toast, trạng thái rỗng), font Noto Sans JP, trang `pages/styleguide/`. Chỉ CSS, không có `core/ui.js` | **Xong** |
 | L5 | Kiểm thử cuối | `npm test` qua hết, thử luồng tạo bộ → thêm thẻ → học → xem heatmap, thử trên điện thoại, xóa `dev.js` khỏi 4 file HTML | Bắt buộc |
 
 ---
@@ -52,7 +52,7 @@ Mục đích: xem, tìm, sửa các bộ thẻ và thẻ. Trang có 2 chế đ�
 |---|---|---|---|---|
 | A1 | Lưới album | Mỗi bộ là một "bìa album": tên, mô tả (cắt ngắn), tổng số thẻ, số thẻ cần học hôm nay. Bấm vào → `routes.album(id)`. Có nút "+ Tạo bộ mới" | `getDeckOverview()` | Bắt buộc |
 | A2 | Chi tiết bộ | Đầu trang: tên, mô tả, nút "Học ngay" (`routes.study`) và "Thêm thẻ" (`routes.create`). Bên dưới: lưới thẻ, bấm một thẻ thì lật xem mặt sau | `getDeck()`, `getCards(deckId)` | Bắt buộc |
-| A3 | Trạng thái thẻ | Mỗi thẻ có badge Mới / Đang học / Ôn tập và hạn ôn ("Ngày mai", "Sau 5 ngày") | `STATE_LABELS`, `describeDue()`, class `.badge--<state>` | Bắt buộc |
+| A3 | Trạng thái thẻ | Mỗi thẻ có badge Mới / Đang học / Ôn tập và hạn ôn ("Ngày mai", "Sau 5 ngày") | `STATE_LABELS`, `describeDue()`, class `.badge-<state>` | Bắt buộc |
 | A4 | Sửa / xóa thẻ | Sửa mặt trước/sau (tiến độ học giữ nguyên). Xóa có hỏi xác nhận. Lỗi nhập liệu hiện `err.message` | `updateCard()`, `deleteCard()` | Bắt buộc |
 | A5 | Sửa / xóa bộ | Sửa tên, mô tả, số thẻ mới/ngày. Xóa bộ (xóa luôn thẻ, giữ lịch sử ôn) có hỏi xác nhận, xóa xong về lưới | `updateDeck()`, `deleteDeck()` | Bắt buộc |
 | A6 | Tìm & lọc | Ô tìm theo nội dung 2 mặt (gõ "thuat toan" vẫn ra "thuật toán": bỏ dấu bằng `normalize('NFD')`), lọc theo trạng thái, sắp xếp (mới tạo / sắp đến hạn) | — | Nên có |

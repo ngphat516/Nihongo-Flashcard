@@ -1,115 +1,18 @@
 /* ==========================================================================
-   base.css — CSS dùng chung cho cả 4 trang (Leader quản lý, sửa phải qua PR)
-   Style riêng của từng trang viết trong pages/<trang>/<trang>.css
+   base.css — CSS dùng chung cho cả repo (Leader quản lý, sửa phải qua PR).
+   Mỗi trang chỉ cần nạp MỘT file này, rồi tới CSS riêng pages/<trang>/<trang>.css.
 
-   Luôn dùng biến var(--...) thay vì mã màu cứng → dark mode tự chạy.
+     tokens.css       biến: màu, cỡ chữ, khoảng cách, bo góc, chuyển động
+     components.css   nút, ô nhập, panel, ô thống kê, badge, thẻ lật, dialog, toast...
+     (file này)       reset, khung trang (header, container), tiện ích
+
+   Xem mọi thứ trên trang pages/styleguide/ (chỉ dùng lúc dev).
    ========================================================================== */
 
-/* ---------- Biến thiết kế (design tokens) ---------- */
-:root {
-  color-scheme: light;
-
-  /* Mặt nền */
-  --bg: #f7f6f3;
-  --surface: #ffffff;
-  --surface-2: #f0eee9;
-  --border: #e3e0d8;
-
-  /* Chữ */
-  --text: #1c1b19;
-  --text-2: #55534e;
-  --muted: #7d7a72;
-
-  /* Màu chính */
-  --primary: #2a63d4;
-  --primary-hover: #2253b5;
-  --on-primary: #ffffff;
-  --danger: #c92a2a;
-  --success: #2b7a3d;
-
-  /* Trạng thái thẻ — theo quy ước màu của Anki. Luôn đi kèm chữ, không dùng màu một mình. */
-  --state-new: #2a78d6;
-  --state-learning: #eb6834;
-  --state-review: #1baf7a;
-
-  /* 4 nút chấm điểm (nền nút, chữ trắng) */
-  --rate-again: #d03b3b;
-  --rate-hard: #6b6860;
-  --rate-good: #24803a;
-  --rate-easy: #2a6fc9;
-
-  /* Heatmap: 0 = không học, 1 → 4 = ít → nhiều */
-  --heat-0: #ebe9e3;
-  --heat-1: #b7d3f6;
-  --heat-2: #6da7ec;
-  --heat-3: #2a78d6;
-  --heat-4: #184f95;
-
-  /* Kích thước */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 40px;
-  --radius: 14px;
-  --radius-sm: 8px;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.05);
-  --max-width: 1040px;
-  --font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
-/* Dark mode theo cài đặt máy. Muốn làm nút bật/tắt: đặt data-theme="dark|light" lên <html>. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    color-scheme: dark;
-    --bg: #121211;
-    --surface: #1c1c1a;
-    --surface-2: #262624;
-    --border: #34332f;
-    --text: #f0efec;
-    --text-2: #c3c2b7;
-    --muted: #96938a;
-    --primary: #6da7ec;
-    --primary-hover: #86b6ef;
-    --on-primary: #0b1220;
-    --danger: #ff7b7b;
-    --success: #4cc46a;
-    --state-new: #3987e5;
-    --state-learning: #d95926;
-    --state-review: #199e70;
-    --heat-0: #262624;
-    --heat-1: #104281;
-    --heat-2: #1c5cab;
-    --heat-3: #3987e5;
-    --heat-4: #86b6ef;
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
-  }
-}
-:root[data-theme='dark'] {
-  color-scheme: dark;
-  --bg: #121211;
-  --surface: #1c1c1a;
-  --surface-2: #262624;
-  --border: #34332f;
-  --text: #f0efec;
-  --text-2: #c3c2b7;
-  --muted: #96938a;
-  --primary: #6da7ec;
-  --primary-hover: #86b6ef;
-  --on-primary: #0b1220;
-  --danger: #ff7b7b;
-  --success: #4cc46a;
-  --state-new: #3987e5;
-  --state-learning: #d95926;
-  --state-review: #199e70;
-  --heat-0: #262624;
-  --heat-1: #104281;
-  --heat-2: #1c5cab;
-  --heat-3: #3987e5;
-  --heat-4: #86b6ef;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
-}
+/* Noto Sans JP: chữ Nhật + tiếng Việt có dấu. Google tự chia nhỏ font, trình duyệt chỉ tải phần cần. */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+@import url('tokens.css');
+@import url('components.css');
 
 /* ---------- Reset nhẹ ---------- */
 *,
@@ -123,8 +26,8 @@ html {
 body {
   margin: 0;
   font-family: var(--font);
-  font-size: 16px;
-  line-height: 1.55;
+  font-size: var(--text-base);
+  line-height: 1.6;
   color: var(--text);
   background: var(--bg);
 }
@@ -146,7 +49,7 @@ a {
 h1,
 h2,
 h3 {
-  line-height: 1.25;
+  line-height: 1.3;
   margin: 0 0 var(--space-3);
 }
 p {
@@ -164,7 +67,7 @@ p {
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: var(--z-header);
   display: flex;
   align-items: center;
   gap: var(--space-4);
@@ -175,7 +78,7 @@ p {
 }
 .brand {
   font-weight: 700;
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
   color: var(--text);
   text-decoration: none;
   white-space: nowrap;
@@ -188,7 +91,7 @@ p {
 }
 .site-nav a {
   padding: 6px 12px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   color: var(--text-2);
   font-weight: 500;
   text-decoration: none;
@@ -218,7 +121,7 @@ p {
   margin: 0 auto;
   padding: var(--space-5) var(--space-4) var(--space-6);
 }
-.container--narrow {
+.container-narrow {
   max-width: 720px;
 }
 .page-head {
@@ -233,13 +136,13 @@ p {
   margin: 0;
 }
 .page-title {
-  font-size: 1.75rem;
+  font-size: var(--text-2xl);
 }
 .section {
   margin-top: var(--space-5);
 }
 .section-title {
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
 }
 .back-link {
   display: inline-block;
@@ -250,111 +153,6 @@ p {
 .back-link:hover {
   color: var(--text);
 }
-.panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: var(--space-4);
-  box-shadow: var(--shadow);
-}
-
-/* ---------- Nút & ô nhập (bản tối thiểu — thành phần chung sẽ chốt sau, xem TASKS.md L4) ---------- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  min-height: 40px;
-  padding: 0 var(--space-4);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--text);
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
-}
-.btn:hover {
-  background: var(--surface-2);
-}
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.btn--primary {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--on-primary);
-}
-.btn--primary:hover {
-  background: var(--primary-hover);
-}
-.btn--danger {
-  color: var(--danger);
-}
-
-.field {
-  display: grid;
-  gap: 6px;
-}
-.field__label {
-  font-weight: 600;
-  font-size: 0.9375rem;
-}
-.input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-}
-textarea.input {
-  min-height: 96px;
-  resize: vertical;
-}
-.input:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 0;
-}
-
-/* ---------- Badge trạng thái thẻ: chấm màu + chữ ---------- */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8125rem;
-  color: var(--text-2);
-}
-.badge::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--badge-color, var(--muted));
-}
-.badge--new {
-  --badge-color: var(--state-new);
-}
-.badge--learning,
-.badge--relearning {
-  --badge-color: var(--state-learning);
-}
-.badge--review {
-  --badge-color: var(--state-review);
-}
-
-/* ---------- Thông báo ---------- */
-.alert {
-  margin-bottom: var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
-}
-.alert--error {
-  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
-  color: var(--danger);
-}
 
 /* ---------- Khung "chưa làm" của codebase — xóa khỏi HTML khi làm xong phần đó ---------- */
 .todo {
@@ -363,22 +161,22 @@ textarea.input {
   padding: var(--space-4);
   color: var(--muted);
 }
-.todo__label {
+.todo-label {
   margin: 0 0 var(--space-2);
 }
-.todo__label b {
+.todo-label b {
   display: inline-block;
   margin-right: var(--space-2);
   padding: 0 6px;
   border-radius: 4px;
   background: var(--surface-2);
   color: var(--text-2);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
 }
 .demo {
   margin: 0;
   color: var(--text-2);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 .demo li + li {
   margin-top: 2px;
@@ -398,11 +196,15 @@ textarea.input {
   position: absolute !important;
   width: 1px;
   height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
 
+/* Người dùng bật "giảm chuyển động" trong máy → tắt hiệu ứng (lật thẻ hiện ngay, không xoay) */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

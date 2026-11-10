@@ -1,0 +1,85 @@
+/* ==========================================================================
+   tokens.css — biến thiết kế (design tokens) dùng chung. Leader quản lý, sửa phải qua PR.
+
+   Trang chỉ DÙNG các biến này (var(--primary), var(--space-4)...), không viết mã màu cứng.
+   Cần màu / cỡ mới → nhắn Leader thêm vào đây, đừng tự khai báo trong CSS của trang.
+   Xem tất cả trên trang pages/styleguide/.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* ---------- Màu nền & chữ ---------- */
+  --bg: #f7f6f3; /* nền trang */
+  --surface: #ffffff; /* nền khối: panel, thẻ, ô nhập */
+  --surface-2: #f0eee9; /* nền phụ: hover, ô trống */
+  --border: #e3e0d8;
+
+  --text: #1c1b19;
+  --text-2: #55534e; /* chữ phụ */
+  --muted: #6e6b64; /* chữ mờ: gợi ý, chú thích */
+
+  /* ---------- Màu theo nghĩa ---------- */
+  --primary: #2a63d4;
+  --primary-hover: #2253b5;
+  --on-primary: #ffffff; /* chữ trên nền --primary */
+  --danger: #c92a2a;
+  --success: #2b7a3d;
+
+  /* Trạng thái thẻ — theo quy ước màu của Anki. Luôn đi kèm chữ, không dùng màu một mình. */
+  --state-new: #1f6cc7;
+  --state-learning: #c2410c;
+  --state-review: #0f7a55;
+
+  /* 4 nút chấm điểm (nền nút, chữ --on-rate) */
+  --rate-again: #d03b3b;
+  --rate-hard: #6b6860;
+  --rate-good: #24803a;
+  --rate-easy: #2a6fc9;
+  --on-rate: #ffffff;
+
+  /* Heatmap: 0 = không học, 1 → 4 = ít → nhiều */
+  --heat-0: #ebe9e3;
+  --heat-1: #b7d3f6;
+  --heat-2: #6da7ec;
+  --heat-3: #2a78d6;
+  --heat-4: #184f95;
+
+  /* ---------- Chữ ---------- */
+  /* Noto Sans JP có đủ kana/kanji + tiếng Việt có dấu. Mất mạng → font tiếng Nhật có sẵn trên máy. */
+  --font: 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic',
+    Meiryo, system-ui, sans-serif;
+
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.875rem; /* 14px — chú thích, badge */
+  --text-base: 1rem; /* 16px — chữ thường */
+  --text-lg: 1.125rem; /* 18px — tiêu đề mục */
+  --text-xl: 1.5rem; /* 24px — số trong ô thống kê */
+  --text-2xl: 1.75rem; /* 28px — tiêu đề trang */
+  --text-card: 1.75rem; /* chữ trên mặt thẻ flashcard */
+
+  /* ---------- Khoảng cách ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 40px;
+
+  /* ---------- Hình khối ---------- */
+  --radius: 14px;
+  --radius-sm: 8px;
+  --radius-full: 999px;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 8px 32px rgb(0 0 0 / 0.16);
+  --max-width: 1040px;
+
+  /* ---------- Chuyển động (tự tắt khi người dùng bật "giảm chuyển động") ---------- */
+  --duration-fast: 150ms; /* hover, focus */
+  --duration-normal: 400ms; /* lật thẻ */
+
+  /* ---------- Lớp xếp chồng ---------- */
+  --z-header: 10;
+  --z-toast: 50;
+  --z-dialog: 100; /* <dialog> mở bằng showModal() tự nằm trên cùng; biến này cho trường hợp khác */
+}

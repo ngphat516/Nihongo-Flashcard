@@ -1,3 +1,4 @@
 /* Trang chủ (index.html, pages/home/) — phụ trách: Leader.
-   Chỉ viết style riêng của trang này. Màu, khoảng cách: dùng biến trong styles/base.css
-   (heatmap dùng --heat-0 … --heat-4). */
+   Chỉ viết style riêng của trang này, class bắt đầu bằng "home-" (VD .home-heatmap).
+   Dùng lại class chung: .stats .stat (H2), .counts .count (H3), .empty (H4).
+   Heatmap dùng màu --heat-0 … --heat-4. Xem tất cả: pages/styleguide/. */

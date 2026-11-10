@@ -62,7 +62,7 @@ async function showDeckDetail(deckId) {
     h('ul', { class: 'demo' },
       cards.slice(0, 5).map((card) =>
         h('li', {},
-          h('span', { class: `badge badge--${card.state}` }, STATE_LABELS[card.state]),
+          h('span', { class: `badge badge-${card.state}` }, STATE_LABELS[card.state]),
           ` ${card.front} → ${card.back} (${describeDue(card)})`,
         ),
       ),

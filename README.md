@@ -42,6 +42,7 @@ pages/
   album/                index.html, album.js, album.css                    (Thành viên 2)
   create/               index.html, create.js, create.css                  (Thành viên 3)
   study/                index.html, study.js, study.css                    (Thành viên 4)
+  styleguide/           xem mọi màu + class dùng chung (chỉ lúc dev)       (Leader)
 core/                   phần lõi dùng chung — sửa phải qua Leader
   repo.js               ★ API dữ liệu cho các trang (chỉ import file này để đọc/ghi)
   scheduler.js          thuật toán SM-2 (hàm thuần)
@@ -55,7 +56,9 @@ core/                   phần lõi dùng chung — sửa phải qua Leader
 dev/
   dev.js                ?seed / ?reset cho lúc phát triển — xóa khỏi HTML trước khi nộp
 styles/
-  base.css              biến màu, dark mode, header, nút, ô nhập, badge   (Leader)
+  base.css              file duy nhất các trang nạp: @import 2 file dưới + reset, header, khung trang   (Leader)
+  tokens.css            biến: màu, font, cỡ chữ, khoảng cách, bo góc, chuyển động
+  components.css        nút, ô nhập, panel, ô thống kê, bộ đếm, badge, thẻ lật, dialog, toast, trạng thái rỗng
 tests/                  test chạy bằng `npm test`
 ```
 
@@ -76,12 +79,35 @@ Tạo link bằng `routes` (`routes.study(deck.id)`), đừng tự ghép chuỗi
 
 ## Quy ước
 
-1. **Mỗi người chỉ sửa trong folder `pages/<trang>/` của mình.** Cần đổi `core/` hoặc `styles/base.css` thì báo Leader.
+1. **Mỗi người chỉ sửa trong folder `pages/<trang>/` của mình.** Cần đổi `core/` hoặc `styles/` thì báo Leader.
 2. **Không gọi `localStorage` trực tiếp.** Mọi đọc/ghi đi qua `core/repo.js`, sau này đổi sang backend mới không phải sửa trang.
 3. **Không dùng `innerHTML` với dữ liệu người dùng** (tên bộ, nội dung thẻ), vì dễ bị lỗi bảo mật XSS. Dùng `h()` trong `dom.js` hoặc `textContent`.
-4. **Màu và khoảng cách dùng biến CSS** (`var(--primary)`, `var(--space-4)`...), không viết mã màu cứng, để dark mode tự chạy.
-5. Mọi hàm trong `repo.js` đều async, nhớ `await`. Lỗi do người dùng nhập sai có `err.name === 'ValidationError'`, hiện `err.message` cho người dùng.
-6. Bọc code khởi động trang trong `startPage(async () => { ... })` để lỗi hiện lên trang thay vì chỉ nằm trong Console.
+4. **Màu, cỡ chữ, khoảng cách dùng biến CSS** (`var(--primary)`, `var(--text-sm)`, `var(--space-4)`...) trong `styles/tokens.css`, không viết mã màu cứng. Thiếu biến thì báo Leader thêm.
+   **Dùng class chung trước khi tự viết** — xem hết ở `pages/styleguide/` (mục *Giao diện* bên dưới).
+5. **Tên class kiểu Bootstrap:** class chung không tiền tố (`btn btn-primary`, `field-label`); class riêng của trang bắt đầu bằng tên trang (`album-grid`, `study-bar`) và viết trong CSS của trang; class trạng thái do JS bật/tắt bắt đầu bằng `is-` (`is-flipped`, `is-active`).
+6. Mọi hàm trong `repo.js` đều async, nhớ `await`. Lỗi do người dùng nhập sai có `err.name === 'ValidationError'`, hiện `err.message` cho người dùng.
+7. Bọc code khởi động trang trong `startPage(async () => { ... })` để lỗi hiện lên trang thay vì chỉ nằm trong Console.
+
+## Giao diện (`styles/`)
+
+Chỉ có CSS, không có thư viện, không build, không dark mode. Font **Noto Sans JP** (đủ chữ Nhật + tiếng Việt có dấu).
+Mở **`pages/styleguide/`** để xem mọi biến và class kèm mẫu HTML; phần cần JS (lật thẻ, dialog, toast) có mẫu code trong `pages/styleguide/styleguide.js`.
+
+| Class | Dùng cho |
+|---|---|
+| `btn` + `btn-primary` / `btn-danger` / `btn-ghost` / `btn-sm` | nút (dùng được cho `<a>`) |
+| `rate-bar` + `btn btn-again` / `-hard` / `-good` / `-easy` | 4 nút chấm điểm, `<small>` bên trong ghi thời gian |
+| `field` > `field-label`, `input`, `field-hint`, `field-error` | ô nhập; `input` dùng cho cả `<input>`, `<textarea>`, `<select>`; lỗi: thêm `aria-invalid="true"` |
+| `panel` | khối nền trắng, viền, bo góc |
+| `stats` > `stat` > `stat-value`, `stat-label` | ô thống kê |
+| `counts` > `count count-new` / `-learning` / `-review` (số trong `<b>`) | bộ đếm Mới / Đang học / Đến hạn; `is-zero` khi bằng 0 |
+| `badge badge-<card.state>` | trạng thái thẻ (chấm màu + chữ) |
+| `flashcard` > `flashcard-inner` > `flashcard-face flashcard-front` / `-back` | thẻ lật; JS bật `is-flipped` |
+| `<dialog class="dialog">` > `dialog-title`, `dialog-actions` | hộp xác nhận, mở bằng `showModal()` |
+| `toast`, `toast-error` | thông báo nhỏ tự ẩn sau 3 giây |
+| `alert`, `alert-error`, `alert-success` | thông báo nằm trên trang |
+| `empty` > `empty-title`, `empty-text` + nút | trạng thái rỗng |
+| `container`, `container-narrow`, `page-head`, `page-title`, `section`, `section-title`, `back-link`, `row`, `muted`, `visually-hidden` | khung trang, tiện ích |
 
 ## API core (`core/repo.js`)
 
@@ -132,4 +158,5 @@ Ba "bảng" `decks`, `cards`, `reviewLogs` chuyển thẳng thành 3 bảng tron
 
 - Xóa dòng `<script type="module" src="…dev/dev.js">` trong 4 file HTML.
 - Xóa hết khung `.todo` và đoạn `DEMO` còn sót.
+- Xóa folder `pages/styleguide/`.
 - `npm test` qua hết.

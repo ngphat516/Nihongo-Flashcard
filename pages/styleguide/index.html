@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Styleguide · Nhớ Lâu</title>
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="styleguide.css">
+  <script type="module" src="styleguide.js"></script>
+</head>
+<body>
+  <!-- STYLEGUIDE — công cụ dev, không có link trên thanh điều hướng. XÓA folder này trước khi nộp.
+       Mở: pages/styleguide/ · Xem mã HTML của từng mục: chuột phải → Inspect, hoặc đọc file này. -->
+  <header class="site-header">
+    <a class="brand" href="../../">Nhớ Lâu</a>
+    <nav class="site-nav" aria-label="Điều hướng chính">
+      <a href="../../">Trang chủ</a>
+      <a href="../album/">Album</a>
+      <a href="../create/">Tạo thẻ</a>
+      <a href="../study/">Học</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1 class="page-title">Styleguide</h1>
+    <p class="muted">Mọi biến và class dùng chung trong <code>styles/</code>. Tên class kiểu Bootstrap: <code>.btn .btn-primary</code> ·
+      class riêng của trang bắt đầu bằng tên trang (<code>.album-grid</code>) · trạng thái bắt đầu bằng <code>is-</code> (<code>.is-flipped</code>).</p>
+
+    <!-- ===== Màu ===== -->
+    <section class="section">
+      <h2 class="section-title">Màu <span class="muted">· tokens.css</span></h2>
+      <div id="swatches" class="styleguide-swatches"></div>
+    </section>
+
+    <!-- ===== Chữ ===== -->
+    <section class="section">
+      <h2 class="section-title">Chữ <span class="muted">· Noto Sans JP</span></h2>
+      <div class="panel styleguide-type">
+        <p style="font-size: var(--text-2xl)"><code>--text-2xl</code> Tiến độ học tập · 学習の進み具合</p>
+        <p style="font-size: var(--text-xl)"><code>--text-xl</code> 128 lượt ôn · 漢字</p>
+        <p style="font-size: var(--text-lg)"><code>--text-lg</code> Hôm nay cần học · 今日の復習</p>
+        <p style="font-size: var(--text-base)"><code>--text-base</code> Mặt trước: 食べる (たべる) — ăn. Tiếng Việt có dấu: Ắ ặ ễ ở ữ đ.</p>
+        <p style="font-size: var(--text-sm)"><code>--text-sm</code> Chú thích, badge, gợi ý dưới ô nhập</p>
+        <p style="font-size: var(--text-xs)"><code>--text-xs</code> Thời gian trên nút chấm điểm</p>
+        <p class="styleguide-weights"><span style="font-weight: 400">400 ひらがな</span> <span style="font-weight: 500">500 カタカナ</span> <span style="font-weight: 700">700 漢字</span></p>
+      </div>
+    </section>
+
+    <!-- ===== Nút ===== -->
+    <section class="section">
+      <h2 class="section-title">Nút <span class="muted">· .btn</span></h2>
+      <div class="row">
+        <button class="btn" type="button">.btn</button>
+        <button class="btn btn-primary" type="button">.btn-primary</button>
+        <button class="btn btn-danger" type="button">.btn-danger</button>
+        <button class="btn btn-ghost" type="button">.btn-ghost</button>
+        <button class="btn btn-sm" type="button">.btn-sm</button>
+        <button class="btn btn-primary btn-sm" type="button">.btn-primary .btn-sm</button>
+        <button class="btn" type="button" disabled>disabled</button>
+        <a class="btn btn-primary" href="#">thẻ &lt;a&gt; cũng được</a>
+      </div>
+      <h3 class="styleguide-sub">Chấm điểm <span class="muted">· .rate-bar + .btn-again / -hard / -good / -easy</span></h3>
+      <div class="rate-bar">
+        <button class="btn btn-again" type="button">Lại <small>1 phút</small></button>
+        <button class="btn btn-hard" type="button">Khó <small>6 phút</small></button>
+        <button class="btn btn-good" type="button">Tốt <small>10 phút</small></button>
+        <button class="btn btn-easy" type="button">Dễ <small>4 ngày</small></button>
+      </div>
+    </section>
+
+    <!-- ===== Ô nhập ===== -->
+    <section class="section">
+      <h2 class="section-title">Ô nhập <span class="muted">· .field .field-label .input .field-hint .field-error</span></h2>
+      <div class="panel styleguide-form">
+        <label class="field">
+          <span class="field-label">Bộ thẻ</span>
+          <select class="input">
+            <option>JLPT N5 — Từ vựng</option>
+            <option>Kanji cơ bản</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-label">Mặt trước</span>
+          <textarea class="input" placeholder="VD: 食べる"></textarea>
+          <span class="field-hint">Ctrl+Enter để lưu</span>
+        </label>
+        <label class="field">
+          <span class="field-label">Mặt sau</span>
+          <input class="input" aria-invalid="true" value="">
+          <span class="field-error">Mặt sau không được để trống.</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- ===== Thống kê & trạng thái ===== -->
+    <section class="section">
+      <h2 class="section-title">Số liệu <span class="muted">· .stats .stat · .counts .count · .badge</span></h2>
+      <div class="stats">
+        <div class="stat"><span class="stat-value">42</span><span class="stat-label">Lượt ôn hôm nay</span></div>
+        <div class="stat"><span class="stat-value">7 ngày</span><span class="stat-label">Chuỗi ngày học</span></div>
+        <div class="stat"><span class="stat-value">350</span><span class="stat-label">Tổng số thẻ</span></div>
+        <div class="stat"><span class="stat-value">91%</span><span class="stat-label">Tỉ lệ nhớ 30 ngày</span></div>
+      </div>
+      <div class="row styleguide-gap">
+        <div class="counts">
+          <span class="count count-new"><b>12</b> Mới</span>
+          <span class="count count-learning"><b>3</b> Đang học</span>
+          <span class="count count-review"><b>25</b> Đến hạn</span>
+          <span class="count count-review is-zero"><b>0</b> .is-zero</span>
+        </div>
+      </div>
+      <div class="row styleguide-gap">
+        <span class="badge badge-new">Mới</span>
+        <span class="badge badge-learning">Đang học</span>
+        <span class="badge badge-relearning">Học lại</span>
+        <span class="badge badge-review">Ôn tập</span>
+      </div>
+    </section>
+
+    <!-- ===== Thẻ lật ===== -->
+    <section class="section">
+      <h2 class="section-title">Thẻ lật <span class="muted">· .flashcard — bấm để lật (JS bật .is-flipped)</span></h2>
+      <div class="styleguide-card">
+        <button class="flashcard" type="button" id="demo-card">
+          <span class="flashcard-inner">
+            <span class="flashcard-face flashcard-front">食べる</span>
+            <span class="flashcard-face flashcard-back">たべる
+ăn</span>
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== Thông báo ===== -->
+    <section class="section">
+      <h2 class="section-title">Thông báo <span class="muted">· .alert · .toast · .dialog</span></h2>
+      <div class="alert">.alert — thông báo thường</div>
+      <div class="alert alert-success">.alert-success — Đã lưu 12 thẻ.</div>
+      <div class="alert alert-error">.alert-error — Không tìm thấy bộ thẻ.</div>
+      <div class="row">
+        <button class="btn" type="button" id="demo-toast">Hiện .toast</button>
+        <button class="btn" type="button" id="demo-toast-error">Hiện .toast-error</button>
+        <button class="btn btn-danger" type="button" id="demo-dialog">Mở .dialog</button>
+        <span class="muted" id="demo-dialog-result"></span>
+      </div>
+      <dialog class="dialog" id="confirm-delete">
+        <form method="dialog">
+          <h2 class="dialog-title">Xóa bộ thẻ “JLPT N5”?</h2>
+          <p>Toàn bộ 120 thẻ trong bộ sẽ bị xóa. Lịch sử ôn vẫn được giữ.</p>
+          <div class="dialog-actions">
+            <button class="btn" value="cancel">Hủy</button>
+            <button class="btn btn-danger" value="ok">Xóa</button>
+          </div>
+        </form>
+      </dialog>
+    </section>
+
+    <!-- ===== Trạng thái rỗng ===== -->
+    <section class="section">
+      <h2 class="section-title">Trạng thái rỗng <span class="muted">· .empty</span></h2>
+      <div class="empty">
+        <p class="empty-title">Chưa có bộ thẻ nào</p>
+        <p class="empty-text">Tạo bộ đầu tiên để bắt đầu học.</p>
+        <a class="btn btn-primary" href="../create/">+ Tạo bộ thẻ</a>
+      </div>
+    </section>
+
+    <!-- ===== Khung ===== -->
+    <section class="section">
+      <h2 class="section-title">Khung <span class="muted">· .panel · .page-head · .back-link</span></h2>
+      <div class="panel">
+        <a class="back-link" href="#">← .back-link</a>
+        <div class="page-head">
+          <h3 class="page-title">.page-head</h3>
+          <button class="btn btn-primary" type="button">Nút bên phải</button>
+        </div>
+        <p class="muted">.panel — khối nền trắng, viền, bo góc, đổ bóng nhẹ.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

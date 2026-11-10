@@ -1,0 +1,55 @@
+/* Styleguide (pages/styleguide/) — công cụ dev, chỉ dùng cho trang này. */
+
+.styleguide-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+.styleguide-swatch {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: var(--text-xs);
+}
+.styleguide-swatch-color {
+  height: 48px;
+  border-bottom: 1px solid var(--border);
+}
+.styleguide-swatch-name {
+  display: block;
+  padding: var(--space-2) var(--space-2) 0;
+  font-weight: 600;
+}
+.styleguide-swatch-value {
+  display: block;
+  padding: 0 var(--space-2) var(--space-2);
+  color: var(--muted);
+}
+
+.styleguide-type p {
+  margin-bottom: var(--space-2);
+}
+.styleguide-type code {
+  display: inline-block;
+  min-width: 7em;
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+.styleguide-weights span + span {
+  margin-left: var(--space-4);
+}
+
+.styleguide-sub {
+  margin-top: var(--space-5);
+  font-size: var(--text-base);
+}
+.styleguide-form {
+  max-width: 480px;
+}
+.styleguide-gap {
+  margin-top: var(--space-4);
+}
+.styleguide-card {
+  max-width: 420px;
+}
