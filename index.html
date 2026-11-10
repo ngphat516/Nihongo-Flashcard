@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trang chủ · Nhớ Lâu</title>
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="pages/home/home.css">
+  <script type="module" src="pages/home/home.js"></script>
+  <!-- Công cụ dev (?seed, ?reset) — XÓA dòng này trước khi nộp -->
+  <script type="module" src="dev/dev.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./">Nhớ Lâu</a>
+    <nav class="site-nav" aria-label="Điều hướng chính">
+      <a href="./" aria-current="page">Trang chủ</a>
+      <a href="pages/album/">Album</a>
+      <a href="pages/create/">Tạo thẻ</a>
+      <a href="pages/study/">Học</a>
+    </nav>
+  </header>
+
+  <!-- TRANG CHỦ — phụ trách: Leader · việc cần làm: TASKS.md mục H1–H6 -->
+  <main class="container">
+    <h1 class="page-title">Tiến độ học tập</h1>
+
+    <section id="summary" class="section todo" aria-label="Tóm tắt">
+      <p class="todo__label"><b>H2</b>Thẻ tóm tắt: ôn hôm nay · chuỗi ngày · tổng số thẻ · tỉ lệ nhớ</p>
+    </section>
+
+    <section id="heatmap" class="section todo" aria-labelledby="heatmap-title">
+      <h2 id="heatmap-title" class="section-title">Hoạt động 12 tháng qua</h2>
+      <p class="todo__label"><b>H1</b>Heatmap: mỗi ô một ngày, đậm theo số lượt ôn</p>
+    </section>
+
+    <section id="today" class="section todo" aria-labelledby="today-title">
+      <h2 id="today-title" class="section-title">Hôm nay cần học</h2>
+      <p class="todo__label"><b>H3</b>Danh sách bộ còn thẻ cần học + nút Học</p>
+    </section>
+  </main>
+</body>
+</html>

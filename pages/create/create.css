@@ -1,0 +1,13 @@
+/* Tạo thẻ (pages/create/) — phụ trách: Thành viên 3.
+   Chỉ viết style riêng của trang này. Màu, khoảng cách: dùng biến trong styles/base.css. */
+
+/* Form bên trái, xem trước bên phải trên màn hình rộng */
+.create-layout {
+  display: grid;
+  gap: 0 var(--space-4);
+}
+@media (min-width: 800px) {
+  .create-layout {
+    grid-template-columns: 3fr 2fr;
+  }
+}

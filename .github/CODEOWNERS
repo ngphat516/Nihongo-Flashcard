@@ -1,0 +1,12 @@
+# Ai phải duyệt PR đụng vào folder nào (GitHub tự gắn reviewer).
+# Cách bật: thay @leader, @thanhvien2... bằng username GitHub thật, rồi bỏ dấu # ở đầu các dòng dưới.
+# Dòng viết sau được ưu tiên hơn dòng viết trước.
+
+# * @leader
+
+# /pages/album/  @thanhvien2 @leader
+# /pages/create/ @thanhvien3 @leader
+# /pages/study/  @thanhvien4 @leader
+
+# /core/   @leader
+# /styles/ @leader

@@ -1,0 +1,10 @@
+{
+  "name": "nho-lau-flashcard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Flashcard học tập với thuật toán SM-2 (kiểu Anki) — HTML/CSS/JS thuần, lưu localStorage",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}
