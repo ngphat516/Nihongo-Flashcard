@@ -71,7 +71,7 @@ Thay 2 mặt `front` / `back` bằng các trường riêng, để sau này làm 
 | `jlpt` | Không | N5 … N1 |
 
 - **Cú pháp furigana:** viết `漢字[かんじ]` trong `term` và `example`, app hiển thị thành `<ruby>`.
-- Đổi cấu trúc này phải sửa `core/models.js`, `core/repo.js`, dữ liệu mẫu, test và ô nhập của trang Tạo thẻ (đang soạn thẻ 2 mặt). Nên làm trước khi Album làm phần hiện thẻ.
+- Đổi cấu trúc này phải sửa `core/`, dữ liệu mẫu, test và cả 3 trang đang dùng thẻ 2 mặt (Album, Tạo thẻ, Học). Danh sách chỗ cần sửa: [tasks.md › L6](tasks.md#leader-nền-chung).
 
 ### Màu bìa bộ thẻ
 

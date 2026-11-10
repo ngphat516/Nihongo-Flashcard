@@ -16,13 +16,45 @@
 
 ---
 
-## 2026-11-11 — Chuẩn bị PR Trang chủ (H1–H8)
+## 2026-11-11 — Tiến độ sau 3 PR đầu tiên (L3)
 
-- **Người làm:** Codex, theo yêu cầu người dùng.
-- **Đã xong:** cập nhật H1–H8 thành Xong trong `tasks.md`; xóa 3 screenshot tạm trong `pages/home/screenshots/`; cập nhật ghi chú trạng thái trong `pages/home/REVIEW.md`. Giữ nguyên toàn bộ chức năng và thiết kế Home.
-- **Kiểm tra:** đã fetch `main` mới nhất (`3be1e12`), nhánh Home đã chứa commit này và không xung đột. Chạy lại `npm test`: 43/43 qua; 84 kiểm tra Chromium qua; kiểm tra bổ sung `?seed` → `?reset` ở 375px qua; `git diff --check` sạch.
-- **Tiếp theo:** tạo PR `feature/home` → `main` để nhóm review, không tự merge.
-- **Điểm cần nhóm review:** ghi chú giới hạn 53 tuần/12 tháng lịch và Google Fonts trong `pages/home/REVIEW.md` vẫn được giữ nguyên; không thay đổi logic để tự chốt các điểm này.
+- **Người làm:** Leader, cùng Claude.
+- **Đã xong:**
+  - Đã merge vào `main`:
+    - [PR #1](https://github.com/ngphat516/Nihongo-Flashcard/pull/1): trang Học (S1–S8);
+    - [PR #2](https://github.com/ngphat516/Nihongo-Flashcard/pull/2): Album (A1–A8);
+    - [PR #3](https://github.com/ngphat516/Nihongo-Flashcard/pull/3): Tạo thẻ (C1–C3).
+
+    Chi tiết từng trang ở 3 mục bên dưới.
+  - Album, Tạo thẻ và Học đã hết khung `.todo` và đoạn `DEMO`. Trang chủ (H1–H8) đang chờ review ở [PR #4](https://github.com/ngphat516/Nihongo-Flashcard/pull/4).
+  - Chạy thử trên `main` sau khi merge, bắt đầu từ `?reset`:
+    - tạo bộ 2 thẻ ở Tạo thẻ;
+    - bấm "Học ngay", chấm Tốt: bộ đếm thành 1 Mới, 1 Đang học;
+    - mở Album: thấy bộ đó với badge Mới và Đang học;
+    - từ Album bấm "+ Thêm thẻ": mở đúng bộ ở Tạo thẻ.
+
+    Console không có lỗi. `npm test` 37/37.
+  - Cập nhật tài liệu theo code đã merge:
+    - `tasks.md`:
+      - ghi trang nào đã tự tránh lỗi B2, B3, B4;
+      - ghi chỗ mỗi trang phải đổi khi làm L6;
+      - L13 làm được vì Album đã có bìa thật.
+    - `architecture.md`: thêm file mới của Album.
+    - `product.md`: phần Thẻ tiếng Nhật.
+    - `AGENTS.md`: bỏ câu "mỗi trang có sẵn khung `.todo`", vì trang đã làm không còn khung đó.
+- **Quyết định:** chỗ cần đổi ở mỗi trang khi làm L6 ghi ở đầu mục của trang đó trong `tasks.md`, dòng L6 trỏ tới đó, để người làm trang thấy ngay trong phần việc của mình.
+- **Tiếp theo:**
+  - **Review và merge [PR #4](https://github.com/ngphat516/Nihongo-Flashcard/pull/4)** (Trang chủ H1–H8). PR này cũng thêm một mục vào đầu `process.md`, nên phải merge `main` mới vào nhánh `feature/home` và giữ cả hai mục.
+  - **L6** (thẻ tiếng Nhật + màu bìa), sửa luôn B1–B5. Đây là việc đang chặn nhiều nhất:
+    - L7, L9, C8 và màu bìa của A5 đều cần L6;
+    - sau L6, cả 3 trang phải đổi mặt thẻ.
+  - **L2:** bật bảo vệ `main`, điền `CODEOWNERS`.
+  - **Việc "Nên có" / "Nếu kịp" khác:** C4, C5, C7, L13, L8 (cách lưu lịch ôn chưa chốt).
+- **Vướng mắc:**
+  - `main` chưa có bảo vệ. Cả 3 PR đều do chính người mở PR merge, trên GitHub không có lượt review nào (L2, L3).
+  - Lỗi B4 vẫn hiện ra ở 2 trang:
+    - `pages/album/?deck=constructor` hiện một bộ tên "Object";
+    - `pages/study/?deck=constructor` báo "Xong rồi!" thay vì "Không tìm thấy".
 
 ## 2026-11-11 — Trang Tạo thẻ (C1, C2, C3)
 

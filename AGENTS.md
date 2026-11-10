@@ -8,7 +8,7 @@ App web học tiếng Nhật bằng flashcard, lịch ôn theo SM-2 kiểu Anki.
 2. Tìm task trong [`docs/tasks.md`](docs/tasks.md) theo mã (H1, A2, L6, B1…). Mỗi task có tiêu chí xong, hàm core cần dùng và task phải xong trước (VD "Cần L6").
 3. Đọc thêm tài liệu theo loại việc, danh sách ở mục dưới.
 4. Tạo nhánh theo [conventions.md › Nhánh](docs/conventions.md#nhánh-commit-pr). Chạy server, mở trang của task với `?seed`.
-5. Mỗi trang có sẵn khung `.todo` (ghi mã task) và đoạn `// DEMO` trong JS. Thay chúng bằng code thật.
+5. Phần nào còn khung `.todo` (ghi mã task) và đoạn `// DEMO` trong JS thì thay chúng bằng code thật. Phần đã làm thì sửa tiếp trên code hiện có.
 
 ## Tài liệu
 
