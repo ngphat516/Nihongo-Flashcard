@@ -1,5 +1,5 @@
 ## Mã task
-<!-- VD: A2, A3 (xem TASKS.md) -->
+<!-- VD: A2, A3 (xem docs/tasks.md) -->
 
 ## Đã làm gì
 
@@ -12,3 +12,4 @@
 - [ ] Không dùng `innerHTML` với dữ liệu người dùng
 - [ ] Đã thử với dữ liệu mẫu (`?seed`) và khi chưa có dữ liệu (`?reset`)
 - [ ] `npm test` vẫn xanh (nếu có sửa `core/`)
+- [ ] Đã sửa trạng thái trong `docs/tasks.md` và thêm một mục vào `docs/process.md`

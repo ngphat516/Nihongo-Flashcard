@@ -1,6 +1,6 @@
 /**
  * TẠO THẺ (pages/create/) — phụ trách: Thành viên 3
- * Việc cần làm: TASKS.md, mục "Tạo thẻ" (C1–C7).
+ * Việc cần làm: docs/tasks.md, mục "Tạo thẻ" (C1–C7).
  *
  *   pages/create/             → người dùng tự chọn bộ
  *   pages/create/?deck=<id>   → chọn sẵn bộ đó (đến từ nút "Thêm thẻ" ở Album)

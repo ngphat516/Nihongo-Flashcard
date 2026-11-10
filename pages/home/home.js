@@ -1,6 +1,6 @@
 /**
  * TRANG CHỦ (index.html, pages/home/) — phụ trách: Leader
- * Việc cần làm: TASKS.md, mục "Trang chủ" (H1–H6).
+ * Việc cần làm: docs/tasks.md, mục "Trang chủ" (H1–H6).
  *
  * Hàm core hay dùng:
  *   getDeckOverview()  → [{ deck, total, due: { new, learning, review } }]

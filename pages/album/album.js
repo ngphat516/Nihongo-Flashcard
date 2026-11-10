@@ -1,6 +1,6 @@
 /**
  * ALBUM (pages/album/) — phụ trách: Thành viên 2
- * Việc cần làm: TASKS.md, mục "Album" (A1–A8).
+ * Việc cần làm: docs/tasks.md, mục "Album" (A1–A8).
  *
  * Trang có 2 chế độ:
  *   pages/album/             → lưới các bộ thẻ (#grid-view)

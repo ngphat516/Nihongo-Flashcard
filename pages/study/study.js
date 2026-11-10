@@ -1,6 +1,6 @@
 /**
  * HỌC (pages/study/) — phụ trách: Thành viên 4
- * Việc cần làm: TASKS.md, mục "Học" (S1–S9).
+ * Việc cần làm: docs/tasks.md, mục "Học" (S1–S8).
  *
  *   pages/study/             → chọn bộ để học (#deck-picker)
  *   pages/study/?deck=<id>   → buổi học (#session), học xong → #done-screen
