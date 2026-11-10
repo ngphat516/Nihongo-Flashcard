@@ -5,8 +5,8 @@
  *   ./                           Trang chủ (heatmap)
  *   pages/album/                 Lưới các bộ thẻ
  *   pages/album/?deck=<id>       Chi tiết một bộ
- *   pages/create/                Tạo thẻ (tự chọn bộ)
- *   pages/create/?deck=<id>      Tạo thẻ, chọn sẵn bộ
+ *   pages/create/                Tạo thẻ: tạo bộ mới
+ *   pages/create/?deck=<id>      Tạo thẻ: sửa bộ đó, thêm thẻ
  *   pages/study/                 Chọn bộ để học
  *   pages/study/?deck=<id>       Học một bộ
  *
