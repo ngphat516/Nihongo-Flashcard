@@ -41,32 +41,33 @@
     </button>
   </header>
 
+  <!-- Thứ tự DOM theo docs/design.md: tổng quan → cột chính → biểu đồ. -->
   <main class="container home-layout" id="home">
-    <header class="page-head home-heading">
-      <div>
-        <p class="home-eyebrow">MỖI NGÀY MỘT CHÚT, NHỚ LÂU HƠN</p>
-        <h1 class="page-title">Hôm nay ôn gì?</h1>
-        <p class="home-subtitle">Một bước nhỏ hôm nay, thêm một điều nhớ mãi.</p>
-      </div>
-      <time id="home-date" class="home-date"></time>
-    </header>
     <div id="home-status" class="home-status" role="status">Đang tải tiến độ học tập…</div>
-    <div id="home-content" aria-busy="true">
-      <section id="summary" class="stats home-stats" aria-label="Tổng quan học tập">
-        <div class="stat"><span class="stat-value">—</span><span class="stat-label">Lượt ôn hôm nay</span></div>
-        <div class="stat"><span class="stat-value">—</span><span class="stat-label">Chuỗi ngày học</span></div>
-        <div class="stat"><span class="stat-value">—</span><span class="stat-label">Tổng số thẻ</span></div>
-        <div class="stat"><span class="stat-value">—</span><span class="stat-label">Tỉ lệ nhớ 30 ngày</span></div>
-      </section>
-      <div class="home-columns" id="home-details" hidden>
-        <section id="greeting" class="panel home-greeting" aria-label="Lời chào và chuỗi ngày học"></section>
-        <div class="home-main">
-          <section id="today" aria-labelledby="today-title"></section>
-          <section id="heatmap" class="panel home-activity" aria-labelledby="heatmap-title"></section>
+    <div id="home-content" class="home-content" aria-busy="true">
+      <section id="overview" class="home-overview" aria-label="Tổng quan học tập">
+        <section id="greeting" class="panel home-greeting" aria-label="Lời chào và chuỗi ngày học" hidden></section>
+        <div id="summary" class="stats home-stats" role="group" aria-label="Bốn thống kê học tập">
+          <div class="stat"><span class="stat-value">—</span><span class="stat-label">Lượt ôn hôm nay</span></div>
+          <div class="stat"><span class="stat-value">—</span><span class="stat-label">Chuỗi ngày học</span></div>
+          <div class="stat"><span class="stat-value">—</span><span class="stat-label">Tổng số thẻ</span></div>
+          <div class="stat"><span class="stat-value">—</span><span class="stat-label">Tỉ lệ nhớ 30 ngày</span></div>
         </div>
-        <section id="chart" class="panel home-chart" aria-labelledby="chart-title"></section>
-        <section id="forecast" class="panel home-forecast" aria-labelledby="forecast-title"></section>
+      </section>
+      <div class="home-main">
+        <header class="page-head home-heading">
+          <div>
+            <p class="home-eyebrow">MỖI NGÀY MỘT CHÚT, NHỚ LÂU HƠN</p>
+            <h1 class="page-title">Hôm nay ôn gì?</h1>
+            <p class="home-subtitle">Một bước nhỏ hôm nay, thêm một điều nhớ mãi.</p>
+          </div>
+          <time id="home-date" class="home-date"></time>
+        </header>
+        <section id="today" aria-labelledby="today-title" hidden></section>
+        <section id="heatmap" class="panel home-activity" aria-labelledby="heatmap-title" hidden></section>
       </div>
+      <section id="chart" class="panel home-chart" aria-labelledby="chart-title" hidden></section>
+      <section id="forecast" class="panel home-forecast" aria-labelledby="forecast-title" hidden></section>
     </div>
     <noscript><p class="alert">Bật JavaScript để xem tiến độ và các bộ thẻ cần học.</p></noscript>
   </main>

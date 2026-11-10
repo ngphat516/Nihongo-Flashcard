@@ -7,6 +7,7 @@ const dateLabel = (timestamp) => new Intl.DateTimeFormat('vi-VN', {
   weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric',
 }).format(timestamp);
 const tipProps = (label) => ({ 'data-home-tip': label, 'aria-label': label });
+let heatmapResizeObserver;
 
 export function renderActivity(perDay, now) {
   const days = activityDays(perDay, now);
@@ -24,7 +25,11 @@ export function renderActivity(perDay, now) {
     item.days += Number(day.count > 0);
     monthly.set(key, item);
     if (key !== lastMonth) {
-      months.append(h('span', { style: { gridColumn: String(Math.floor(index / 7) + 1) } }, `T${new Date(day.timestamp).getMonth() + 1}`));
+      const column = Math.floor(index / 7) + 1;
+      const previous = months.lastElementChild;
+      // Tháng đầu có thể chỉ còn một ngày; tránh hai nhãn đè lên nhau trong cùng tuần.
+      if (previous && column - Number(previous.style.gridColumn) < 3) previous.remove();
+      months.append(h('span', { style: { gridColumn: String(column), gridRow: '1' } }, `T${new Date(day.timestamp).getMonth() + 1}`));
       lastMonth = key;
     }
   }
@@ -77,8 +82,10 @@ export function renderActivity(perDay, now) {
     h('p', { class: 'home-note home-heat-help' }, total ? 'Rê chuột hoặc dùng phím mũi tên để xem từng ngày.' : 'Chưa có lượt ôn trong khoảng này. Lần học đầu tiên sẽ thắp sáng một ô.'),
     details,
   );
-  // Đợi bỏ hidden ở vùng nội dung trước khi đo kích thước để cuộn tới tuần hiện tại.
-  requestAnimationFrame(() => { scroller.scrollLeft = scroller.scrollWidth; });
+  // Chờ layout thực sau khi bỏ hidden hoặc đổi breakpoint, không đo trong lúc resize chưa xong.
+  heatmapResizeObserver?.disconnect();
+  heatmapResizeObserver = new ResizeObserver(() => { scroller.scrollLeft = scroller.scrollWidth; });
+  heatmapResizeObserver.observe(scroller);
 }
 
 export function renderMonthly(logs, now) {
@@ -138,10 +145,20 @@ export function installTooltips() {
     tooltip.textContent = target.dataset.homeTip;
     tooltip.hidden = false;
     target.setAttribute('aria-describedby', tooltip.id);
-    const bounds = target.getBoundingClientRect();
-    const margin = 12;
+    position();
+  }
+  function position() {
+    if (!owner?.isConnected) return hide();
+    const bounds = owner.getBoundingClientRect();
+    if (bounds.bottom < 0 || bounds.top > innerHeight || bounds.right < 0 || bounds.left > innerWidth) {
+      tooltip.hidden = true;
+      return;
+    }
+    tooltip.hidden = false;
+    const margin = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--space-3'));
     tooltip.style.left = `${Math.max(margin, Math.min(innerWidth - tooltip.offsetWidth - margin, bounds.left + bounds.width / 2 - tooltip.offsetWidth / 2))}px`;
-    tooltip.style.top = `${bounds.top > tooltip.offsetHeight + margin * 2 ? bounds.top - tooltip.offsetHeight - margin : bounds.bottom + margin}px`;
+    const top = bounds.top > tooltip.offsetHeight + margin * 2 ? bounds.top - tooltip.offsetHeight - margin : bounds.bottom + margin;
+    tooltip.style.top = `${Math.max(margin, Math.min(innerHeight - tooltip.offsetHeight - margin, top))}px`;
   }
   document.addEventListener('pointerover', (event) => {
     if (tooltip.contains(event.target)) return clearTimeout(timer);
@@ -149,7 +166,10 @@ export function installTooltips() {
     if (target) show(target);
   });
   document.addEventListener('pointerout', (event) => {
-    if (event.target.closest('[data-home-tip], #home-tooltip')) timer = setTimeout(hide, 150);
+    if (event.target.closest('[data-home-tip], #home-tooltip')) timer = setTimeout(() => {
+      const focused = document.activeElement.closest('[data-home-tip]');
+      if (focused) show(focused); else hide();
+    }, 150);
   });
   document.addEventListener('focusin', (event) => {
     const target = event.target.closest('[data-home-tip]');
@@ -157,6 +177,7 @@ export function installTooltips() {
   });
   document.addEventListener('focusout', (event) => { if (event.target === owner) hide(); });
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape') hide(); });
-  document.addEventListener('scroll', hide, true);
-  window.addEventListener('resize', hide);
+  // Điều hướng Home/End có thể làm heatmap và cả trang cuộn; tooltip vẫn bám ô được focus.
+  document.addEventListener('scroll', () => { if (owner) requestAnimationFrame(position); }, true);
+  window.addEventListener('resize', () => { if (owner) requestAnimationFrame(position); });
 }

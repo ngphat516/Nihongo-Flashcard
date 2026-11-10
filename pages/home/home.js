@@ -5,7 +5,7 @@
 import { getCards, getDeckOverview, getReviewLogs } from '../../core/repo.js';
 import { routes } from '../../core/routes.js';
 import { $, h, startPage } from '../../core/dom.js';
-import { addDays, dayKey, dayStart } from '../../core/date.js';
+import { dayKey } from '../../core/date.js';
 import { dueTotal, hasJapanese, number, summarize } from './analytics.js';
 import { renderActivity, renderMonthly, renderForecast, installTooltips } from './charts.js';
 
@@ -51,7 +51,7 @@ async function loadHome() {
       weekday: 'long', day: 'numeric', month: 'long',
     }).format(now);
     $('#home-date').dateTime = new Date(now).toISOString();
-    $('#home-details').hidden = false;
+    for (const id of ['greeting', 'today', 'heatmap', 'chart', 'forecast']) $(`#${id}`).hidden = false;
     loaded = true;
     status.hidden = true;
   } catch (error) {
@@ -72,16 +72,15 @@ async function loadHome() {
 
 function renderSummary(stats, deckCount) {
   const items = [
-    [number(stats.today), 'Lượt ôn hôm nay', 'Ngày học bắt đầu lúc 4h sáng', '01'],
-    [number(stats.streak), 'Chuỗi ngày học', stats.streak ? 'Ngày liên tiếp, tính tới hôm nay hoặc hôm qua' : 'Bắt đầu từ một lượt ôn', '02'],
-    [number(stats.total), 'Tổng số thẻ', `Trong ${number(deckCount)} bộ thẻ của bạn`, '03'],
+    [number(stats.today), 'Lượt ôn hôm nay', 'Ngày học bắt đầu lúc 4h sáng'],
+    [number(stats.streak), 'Chuỗi ngày học', stats.streak ? 'Ngày liên tiếp, tính tới hôm nay hoặc hôm qua' : 'Bắt đầu từ một lượt ôn'],
+    [number(stats.total), 'Tổng số thẻ', `Trong ${number(deckCount)} bộ thẻ của bạn`],
     [stats.retention === null ? '—' : `${stats.retention}%`, 'Tỉ lệ nhớ 30 ngày',
-      stats.reviewed ? `${number(stats.remembered)}/${number(stats.reviewed)} lượt ôn không bấm “Lại”` : 'Chưa có lượt ôn thẻ Ôn tập', '04'],
+      stats.reviewed ? `${number(stats.remembered)}/${number(stats.reviewed)} lượt ôn không bấm “Lại”` : 'Chưa có lượt ôn thẻ Ôn tập'],
   ];
-  $('#summary').replaceChildren(...items.map(([value, label, detail, index]) =>
+  $('#summary').replaceChildren(...items.map(([value, label, detail]) =>
     h('div', { class: 'stat home-stat' },
-      h('div', { class: 'home-stat-head' }, h('span', { class: 'stat-label' }, label),
-        h('span', { class: 'home-stat-index', 'aria-hidden': 'true' }, index)),
+      h('span', { class: 'stat-label' }, label),
       h('span', { class: 'stat-value' }, value),
       h('span', { class: 'home-stat-detail' }, detail))));
 }
@@ -95,16 +94,6 @@ function renderGreeting(stats, now) {
     h('p', { class: 'home-streak' }, h('strong', {}, number(stats.streak)), h('span', {}, 'ngày liên tiếp')),
     h('p', { class: 'home-note' }, stats.today ? 'Bạn đã dành thời gian cho việc học hôm nay. Cứ tiếp tục nhé.' :
       stats.streak ? 'Một lượt ôn hôm nay sẽ nối dài chuỗi ngày của bạn.' : 'Chỉ một lượt ôn cũng là một khởi đầu tốt.'),
-    h('div', { class: 'home-week', 'aria-label': 'Hoạt động 7 ngày gần nhất' },
-      Array.from({ length: 7 }, (_, index) => {
-        const timestamp = addDays(dayStart(now), -6 + index);
-        const date = new Date(timestamp);
-        const count = stats.perDay.get(dayKey(timestamp)) ?? 0;
-        return h('span', { class: `home-week-day${count ? ' is-active' : ''}`,
-          'aria-label': `${date.toLocaleDateString('vi-VN')}: ${count} lượt ôn` },
-        h('span', {}, ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][date.getDay()]),
-        h('span', { class: 'home-week-dot', 'aria-hidden': 'true' }, count ? '✓' : '·'));
-      })),
   );
 }
 
@@ -145,7 +134,7 @@ function deckCover({ deck, total, due, color }) {
     h('span', { class: 'cover-title', lang: hasJapanese(deck.name) ? 'ja' : null }, deck.name),
     deck.description && h('span', { class: 'cover-text', lang: hasJapanese(deck.description) ? 'ja' : null }, deck.description),
     h('span', { class: 'counts home-cover-counts' }, Object.entries(countLabels).map(([state, label]) =>
-      h('span', { class: `count count-${state}${due[state] ? '' : ' is-zero'}` }, h('b', {}, number(due[state])), h('span', {}, label)))),
+      h('span', { class: `count${due[state] ? '' : ' is-zero'}` }, h('b', {}, number(due[state])), h('span', {}, label)))),
     h('span', { class: 'cover-meta' }, `${number(total)} thẻ`,
       h('span', { class: 'home-cover-action' }, 'Học', arrow())),
   );
