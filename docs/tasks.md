@@ -29,7 +29,7 @@ Bảng này là **trạng thái hiện tại**: còn việc gì, ai làm. Lịch
 | L3 | Review & merge | Review mọi PR. Thay đổi trong phần chung phải qua Leader | Bắt buộc | Đang làm |
 | L4 | Hệ thống giao diện | `styles/tokens.css` + `styles/components.css` (nút, ô nhập, thống kê, bộ đếm, badge, thẻ lật, dialog, toast, trạng thái rỗng), font Noto Sans JP, trang `pages/styleguide/`. Chỉ CSS, không có JS cho component | Nên có | Xong |
 | L5 | Kiểm thử cuối | `npm test` qua hết, thử luồng tạo bộ → thêm thẻ → học → xem heatmap, thử trên điện thoại, làm hết mục [Trước khi nộp](conventions.md#trước-khi-nộp--deploy) | Bắt buộc | Chưa làm |
-| L6 | Thẻ tiếng Nhật + màu bìa | Đổi `Card` từ `front`/`back` sang `term`, `meaning`, `reading`, `example`, `jlpt` + cú pháp furigana `漢字[かんじ]` (chi tiết: [product.md](product.md#thẻ-tiếng-nhật)). Thêm `Deck.color` ([product.md](product.md#màu-bìa-bộ-thẻ)): `DECK_COLORS` trong `models.js` theo thứ tự ở [design.md](design.md#màu-bìa-bộ-thẻ), `createDeck` không truyền màu thì lấy màu kế tiếp, `updateDeck` đổi được màu, màu lạ báo `ValidationError`, bộ cũ chưa có màu thì đọc ra theo thứ tự. Sửa `models.js`, `repo.js`, `seed.js`, test, chú thích đầu file các trang | Bắt buộc | Chưa làm |
+| L6 | Thẻ tiếng Nhật + màu bìa | Đổi `Card` từ `front`/`back` sang `term`, `meaning`, `reading`, `example`, `jlpt` + cú pháp furigana `漢字[かんじ]` (chi tiết: [product.md](product.md#thẻ-tiếng-nhật)). Thêm `Deck.color` ([product.md](product.md#màu-bìa-bộ-thẻ)): `DECK_COLORS` trong `models.js` theo thứ tự ở [design.md](design.md#màu-bìa-bộ-thẻ), `createDeck` không truyền màu thì lấy màu kế tiếp, `updateDeck` đổi được màu, màu lạ báo `ValidationError`, bộ cũ chưa có màu thì đọc ra theo thứ tự. Sửa `models.js`, `repo.js`, `seed.js`, test, chú thích đầu file các trang, và ô nhập mỗi dòng thẻ ở trang Tạo thẻ (`pages/create/`) | Bắt buộc | Chưa làm |
 | L7 | Furigana bật/tắt | Nút bật/tắt furigana chung cho cả web ([product.md](product.md#furigana-bậttắt)): nút đã có sẵn ở cuối cột điều hướng (`.rail-furigana`, L12); L7 viết JS bật/tắt `aria-pressed` ở cả 4 trang và lưu lựa chọn qua một hàm mới trong `core/`. Cần L6 trước | Nên có | Chưa làm |
 | L8 | Đổi chiều học | Nhật → Việt / Việt → Nhật ([product.md](product.md#đổi-chiều-học)). Cách lưu lịch ôn chưa chốt | Nên có | Chưa làm |
 | L9 | Dữ liệu mẫu tiếng Nhật | Thay 3 bộ mẫu trong `core/seed.js` bằng bộ tiếng Nhật. Làm sau L6 | Nên có | Chưa làm |
@@ -44,7 +44,7 @@ Tìm được khi review ngày 10/11/2026, đã chạy thử và xác nhận. Đ
 
 | Mã | Lỗi | Chỗ sửa | Trạng thái |
 |---|---|---|---|
-| B1 | `h('select', { value })` không chọn sẵn được option, vì `value` được gán trước khi thêm `<option>`. Làm hỏng C1 (chọn sẵn bộ theo `?deck=`) | `core/dom.js` `h()`: gán `value`/`checked` sau `append` | Để sau |
+| B1 | `h('select', { value })` không chọn sẵn được option, vì `value` được gán trước khi thêm `<option>`. C1 đã tránh bằng cách gán `select.value` sau khi thêm option | `core/dom.js` `h()`: gán `value`/`checked` sau `append` | Để sau |
 | B2 | Ô "số thẻ mới/ngày" để trống thì âm thầm thành 0 (`Number('') === 0`), bộ đó không bao giờ có thẻ mới | `core/models.js` `makeDeck`, `core/repo.js` `updateDeck`: tạo bộ thì `''`/`null` → 20; sửa bộ thì báo `ValidationError` | Để sau |
 | B3 | Hoàn tác có thể hiện thẻ khác thay vì thẻ vừa hoàn tác (khi có thẻ đang học khác vừa đến giờ) | `undo()` trả về thẻ đã khôi phục; trang Học hiện thẳng thẻ đó (gợi ý vòng học ở đầu `pages/study/study.js`) | Để sau |
 | B4 | `getDeck('constructor')` trả về một hàm thay vì `null`, nên `?deck=constructor` không báo "Không tìm thấy" | `core/storage.js` `get()`: `Object.hasOwn(map, id) ? map[id] : null` | Để sau |
@@ -90,18 +90,18 @@ Mục đích: xem, tìm, sửa các bộ thẻ và thẻ. Trang có 2 chế đ�
 
 ## Tạo thẻ: `pages/create/` (Thành viên 3)
 
-Mục đích: tạo bộ mới và thêm thẻ thật nhanh. `pages/create/?deck=<id>` thì chọn sẵn bộ đó.
+Mục đích: soạn một bộ thẻ. `pages/create/` tạo bộ mới; `pages/create/?deck=<id>` mở bộ đó để sửa và thêm thẻ (nút "Thêm thẻ" ở Album dẫn tới đây).
 
-> Cấu trúc thẻ sắp đổi sang thẻ tiếng Nhật (L6): form sẽ có các ô `term`, `meaning`, `reading`, `example`, `jlpt` thay cho 2 ô mặt trước/mặt sau. C2–C5 nên làm sau L6. C1 cần sửa lỗi B1 trước.
+> Thẻ đang có 2 mặt `front`/`back`. Khi làm L6, mỗi dòng thẻ đổi sang các ô của thẻ tiếng Nhật (`term`, `meaning`, `reading`, `example`, `jlpt`).
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Hàm core | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
-| C1 | Chọn / tạo bộ | Dropdown chọn bộ có sẵn (chọn sẵn theo `?deck=`). Hoặc form tạo bộ mới: tên (bắt buộc), mô tả, số thẻ mới/ngày (mặc định 20). Tạo xong thì tự chọn bộ đó | `getDecks()`, `createDeck()` | Bắt buộc | Chưa làm |
-| C2 | Thêm từng thẻ | Các ô nhập nội dung thẻ. Lưu bằng nút hoặc **Ctrl+Enter**. Lưu xong xóa form, đưa con trỏ về ô đầu, báo "Đã thêm" | `createCard()` | Bắt buộc | Chưa làm |
-| C3 | Kiểm tra dữ liệu | Không cho lưu khi thiếu trường bắt buộc (báo ngay dưới ô). Cảnh báo nếu thẻ trùng với thẻ đã có trong bộ (vẫn cho lưu nếu người dùng đồng ý). Hiện `err.message` của ValidationError | `getCards(deckId)` | Bắt buộc | Chưa làm |
-| C4 | Xem trước | Khung thẻ cập nhật theo lúc gõ, bấm để lật, nhìn giống trang Học | — | Nên có | Chưa làm |
-| C5 | Nhập nhiều thẻ | Ô dán văn bản, mỗi dòng một thẻ, các trường cách nhau bằng `\|` hoặc Tab (copy từ Excel / Quizlet). Có bảng xem trước, dòng lỗi tô đỏ, bỏ chọn được từng dòng, rồi lưu một lần | `createCards()` | Nên có | Chưa làm |
-| C6 | Thẻ vừa thêm | Danh sách thẻ đã thêm trong phiên này, nút xóa nhanh nếu thêm nhầm, link "Xem trong album" → `routes.album(id)` | `deleteCard()`, `routes` | Nên có | Chưa làm |
+| C1 | Chọn / tạo bộ | Dropdown "Bộ thẻ" gồm "+ Bộ mới" và các bộ có sẵn (ẩn khi chưa có bộ nào), chọn sẵn theo `?deck=`. Đổi bộ thì cập nhật `?deck=`, còn thay đổi chưa lưu thì hỏi trước. Ô tên (bắt buộc), mô tả, số thẻ mới/ngày (mặc định 20). `?deck=` sai id thì báo rồi chuyển sang tạo bộ mới. Lưu bộ mới xong thì trang chuyển sang sửa bộ đó, có link "Xem trong album" và "Học ngay" | `getDecks()`, `createDeck()`, `updateDeck()` | Bắt buộc | Xong |
+| C2 | Soạn thẻ | Mỗi dòng một thẻ: mặt trước, mặt sau (ô tự cao theo nội dung), nút xóa. Bộ mới có sẵn 3 dòng trống; nút "Thêm thẻ"; Tab ở mặt sau dòng cuối thì thêm dòng. Lưu một lần bằng nút trên thanh dính ở đáy hoặc **Ctrl+Enter**, báo bằng toast. Sửa thẻ giữ nguyên tiến độ học. Xóa thẻ đã lưu (thùng rác hoặc xóa trắng 2 mặt) thì hỏi xác nhận lúc lưu. Rời trang khi chưa lưu thì trình duyệt hỏi | `getCards()`, `createCards()`, `updateCard()`, `deleteCard()` | Bắt buộc | Xong |
+| C3 | Kiểm tra dữ liệu | Thiếu tên bộ, số thẻ mới/ngày sai, dòng thiếu một mặt: báo ngay dưới ô, không lưu gì, đưa con trỏ tới ô sai đầu tiên. Mặt trước trùng một thẻ phía trên (không phân biệt hoa thường): nhắc dưới ô, vẫn cho lưu. Lỗi từ repo hiện `err.message` bằng toast | — | Bắt buộc | Xong |
+| C4 | Xem trước | Khung thẻ cập nhật theo lúc gõ, bấm để lật, nhìn giống trang Học | — | Nên có | Để sau |
+| C5 | Nhập nhiều thẻ | Ô dán văn bản, mỗi dòng một thẻ, các trường cách nhau bằng `\|` hoặc Tab (copy từ Excel / Quizlet). Có bảng xem trước, dòng lỗi tô đỏ, bỏ chọn được từng dòng, rồi thêm thành các dòng thẻ của C2 | — | Nên có | Để sau |
+| C6 | Thẻ vừa thêm | Bỏ: danh sách thẻ của C2 hiện mọi thẻ trong bộ, xóa được từng thẻ, có link "Xem trong album" | — | Nên có | Bỏ |
 | C7 | Xuất / nhập file | Xuất một bộ ra file `.json` hoặc `.csv` và nhập lại | `getCards()`, `createCards()` | Nếu kịp | Chưa làm |
 | C8 | Chọn màu bìa | Trong form tạo bộ: 6 ô màu (radio, có tên màu cho trình đọc màn hình), chọn sẵn màu kế tiếp ([design.md](design.md#màu-bìa-bộ-thẻ)). Cần L6 | `createDeck({ color })` | Nên có | Chưa làm |
 
