@@ -48,26 +48,95 @@
     <section id="grid-view" hidden>
       <div class="page-head">
         <h1 class="page-title">Album thẻ</h1>
-        <a class="btn btn-primary" href="../create/">+ Tạo bộ mới</a>
+        <a id="new-deck-link" class="btn btn-primary" href="../create/">+ Tạo bộ mới</a>
       </div>
-      <div id="deck-grid" class="todo">
-        <p class="todo-label"><b>A1</b>Lưới "bìa album": tên, mô tả, số thẻ, số thẻ cần học</p>
-      </div>
+      <div id="deck-grid"></div>
     </section>
 
     <!-- Chế độ 2 — pages/album/?deck=<id>: chi tiết một bộ -->
     <section id="detail-view" hidden>
       <a class="back-link" href="./">← Tất cả bộ thẻ</a>
-      <div id="deck-header" class="todo">
-        <p class="todo-label"><b>A2 · A5</b>Tên + mô tả bộ · nút Học ngay / Thêm thẻ / Sửa / Xóa bộ</p>
+      <div id="deck-header"></div>
+      <div id="card-toolbar" class="section album-toolbar" hidden>
+        <label class="album-search">
+          <span class="visually-hidden">Tìm thẻ</span>
+          <input id="card-search" class="input" type="search" placeholder="Tìm theo nội dung thẻ">
+        </label>
+        <div id="state-filter" class="chips" role="group" aria-label="Lọc theo trạng thái">
+          <button class="chip" type="button" aria-pressed="true" data-filter="all">Tất cả</button>
+          <button class="chip" type="button" aria-pressed="false" data-filter="new">Mới</button>
+          <button class="chip" type="button" aria-pressed="false" data-filter="learning">Đang học</button>
+          <button class="chip" type="button" aria-pressed="false" data-filter="review">Ôn tập</button>
+        </div>
+        <label class="album-sort">
+          <span class="visually-hidden">Sắp xếp</span>
+          <select id="card-sort" class="input">
+            <option value="created">Mới tạo trước</option>
+            <option value="due">Sắp đến hạn trước</option>
+          </select>
+        </label>
       </div>
-      <div id="card-toolbar" class="section todo">
-        <p class="todo-label"><b>A6</b>Tìm kiếm · lọc theo trạng thái · sắp xếp</p>
-      </div>
-      <div id="card-list" class="section todo">
-        <p class="todo-label"><b>A2 · A3 · A4</b>Lưới thẻ (bấm để lật) · trạng thái + hạn ôn · sửa / xóa thẻ</p>
-      </div>
+      <p id="card-count" class="muted album-count" aria-live="polite" hidden></p>
+      <div id="card-list" class="section"></div>
     </section>
   </main>
+
+  <!-- A4 · A5 · A7: hộp xác nhận dùng chung, tiêu đề và nội dung do JS điền -->
+  <dialog class="dialog" id="confirm-dialog">
+    <form method="dialog">
+      <h2 class="dialog-title" id="confirm-title"></h2>
+      <p id="confirm-text"></p>
+      <div class="dialog-actions">
+        <button class="btn" value="cancel">Hủy</button>
+        <button class="btn btn-danger" value="ok" id="confirm-ok">Xóa</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- A4: sửa thẻ -->
+  <dialog class="dialog" id="card-dialog" aria-labelledby="card-dialog-title">
+    <form>
+      <h2 class="dialog-title" id="card-dialog-title">Sửa thẻ</h2>
+      <p class="alert alert-error" role="alert" hidden></p>
+      <label class="field">
+        <span class="field-label">Mặt trước</span>
+        <textarea class="input" name="front"></textarea>
+      </label>
+      <label class="field">
+        <span class="field-label">Mặt sau</span>
+        <textarea class="input" name="back"></textarea>
+        <span class="field-hint">Tiến độ học của thẻ giữ nguyên. Ctrl+Enter để lưu.</span>
+      </label>
+      <div class="dialog-actions">
+        <button class="btn" type="button" value="cancel">Hủy</button>
+        <button class="btn btn-primary" type="submit">Lưu</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- A5: sửa bộ thẻ (màu bìa thêm sau L6) -->
+  <dialog class="dialog" id="deck-dialog" aria-labelledby="deck-dialog-title">
+    <form>
+      <h2 class="dialog-title" id="deck-dialog-title">Sửa bộ thẻ</h2>
+      <p class="alert alert-error" role="alert" hidden></p>
+      <label class="field">
+        <span class="field-label">Tên bộ thẻ</span>
+        <input class="input" name="name" maxlength="80">
+      </label>
+      <label class="field">
+        <span class="field-label">Mô tả</span>
+        <textarea class="input" name="description" maxlength="300"></textarea>
+      </label>
+      <label class="field">
+        <span class="field-label">Thẻ mới mỗi ngày</span>
+        <input class="input" name="newPerDay" type="number" min="0" max="999" step="1" inputmode="numeric">
+        <span class="field-hint">Số thẻ mới tối đa được học mỗi ngày trong bộ này.</span>
+      </label>
+      <div class="dialog-actions">
+        <button class="btn" type="button" value="cancel">Hủy</button>
+        <button class="btn btn-primary" type="submit">Lưu</button>
+      </div>
+    </form>
+  </dialog>
 </body>
 </html>
