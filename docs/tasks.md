@@ -109,16 +109,16 @@ Mục đích: tạo bộ mới và thêm thẻ thật nhanh. `pages/create/?deck
 
 ## Học: `pages/study/` (Thành viên 4)
 
-Mục đích: học theo thuật toán SM-2. `pages/study/` để chọn bộ, `pages/study/?deck=<id>` để học. Có sẵn "Gợi ý vòng học" ở đầu `pages/study/study.js`.
+Mục đích: học theo thuật toán SM-2. `pages/study/` để chọn bộ, `pages/study/?deck=<id>` để học.
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Hàm core | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
-| S1 | Chọn bộ | Không có `?deck=` thì hiện danh sách bộ kèm số thẻ cần học, bấm để vào học. Bộ hết thẻ thì mờ đi | `getDeckOverview()` | Bắt buộc | Chưa làm |
-| S2 | Hiện thẻ | Hiện mặt trước. Nút "Hiện đáp án" (phím **Space**) lật ra mặt sau | `getStudyQueue(deckId)` | Bắt buộc | Chưa làm |
-| S3 | 4 nút chấm điểm | Lại / Khó / Tốt / Dễ, mỗi nút ghi thời gian lần ôn tới ("10 phút", "4 ngày"). Chỉ hiện sau khi lật. Phím **1–4** | `previewRatings(card)`, `RATING_LABELS` | Bắt buộc | Chưa làm |
-| S4 | Lưu & sang thẻ sau | Bấm nút: lưu kèm `timeMs` (từ lúc hiện thẻ tới lúc chấm), rồi lấy thẻ tiếp với `lastCardId` | `reviewCard()`, `getStudyQueue(deckId, { lastCardId })` | Bắt buộc | Chưa làm |
-| S5 | Bộ đếm | Thanh trên: tên bộ · **Mới** (xanh dương) · **Đang học** (cam) · **Đến hạn** (xanh lá), cập nhật sau mỗi lần chấm · nút Thoát | `counts` trong kết quả `getStudyQueue` | Bắt buộc | Chưa làm |
-| S6 | Màn hoàn thành | Hết thẻ: "Xong rồi!" + số thẻ đã học + thời gian học. Còn thẻ đang học hẹn sau: "Quay lại lúc 14:32" và tự tải lại khi tới giờ | `nextLearningAt` | Bắt buộc | Chưa làm |
-| S7 | Hoàn tác | Nút / phím **Z** hoàn tác lần chấm vừa rồi, thẻ đó hiện lại (lưu ý lỗi B3) | `undo()` trả về từ `reviewCard` | Nên có | Chưa làm |
-| S8 | Hiệu ứng lật | Lật 3D bằng CSS, tắt khi người dùng bật giảm chuyển động. Nút to, dễ bấm trên điện thoại | — | Nên có | Chưa làm |
+| S1 | Chọn bộ | Không có `?deck=` thì hiện danh sách bộ kèm số thẻ cần học, bấm để vào học. Bộ hết thẻ thì mờ đi | `getDeckOverview()` | Bắt buộc | Xong |
+| S2 | Hiện thẻ | Hiện mặt trước. Nút "Hiện đáp án" (phím **Space**) lật ra mặt sau | `getStudyQueue(deckId)` | Bắt buộc | Xong |
+| S3 | 4 nút chấm điểm | Lại / Khó / Tốt / Dễ, mỗi nút ghi thời gian lần ôn tới ("10 phút", "4 ngày"). Chỉ hiện sau khi lật. Phím **1–4** | `previewRatings(card)`, `RATING_LABELS` | Bắt buộc | Xong |
+| S4 | Lưu & sang thẻ sau | Bấm nút: lưu kèm `timeMs` (từ lúc hiện thẻ tới lúc chấm), rồi lấy thẻ tiếp với `lastCardId` | `reviewCard()`, `getStudyQueue(deckId, { lastCardId })` | Bắt buộc | Xong |
+| S5 | Bộ đếm | Thanh trên: tên bộ · **Mới** (xanh dương) · **Đang học** (cam) · **Đến hạn** (xanh lá), cập nhật sau mỗi lần chấm · nút Thoát | `counts` trong kết quả `getStudyQueue` | Bắt buộc | Xong |
+| S6 | Màn hoàn thành | Hết thẻ: "Xong rồi!" + số thẻ đã học + thời gian học. Còn thẻ đang học hẹn sau: "Quay lại lúc 14:32" và tự tải lại khi tới giờ | `nextLearningAt` | Bắt buộc | Xong |
+| S7 | Hoàn tác | Nút / phím **Z** hoàn tác lần chấm vừa rồi, thẻ đó hiện lại (lưu ý lỗi B3) | `undo()` trả về từ `reviewCard` | Nên có | Xong |
+| S8 | Hiệu ứng lật | Lật 3D bằng CSS, tắt khi người dùng bật giảm chuyển động. Nút to, dễ bấm trên điện thoại | — | Nên có | Xong |
 | S9 | Phát âm | Nút đọc mặt trước bằng `speechSynthesis` | — | — | Bỏ: app không có âm thanh ([product.md](product.md#không-làm)) |

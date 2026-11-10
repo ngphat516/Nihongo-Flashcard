@@ -37,6 +37,13 @@
 - **Tiếp theo:** khi L6 xong: đổi `COVER_COLORS[i % 6]` trong `album.js` sang `deck.color`, sửa `cardFront` / `cardBack` ở đầu `detail.js` theo trường mới (gắn `lang="ja"`), thêm chọn màu bìa vào dialog sửa bộ (A5).
 - **Vướng mắc:** `?deck=constructor` vẫn hiện như một bộ có thật cho tới khi Leader sửa lỗi B4 trong `core/storage.js`.
 
+## 2026-11-11 — Trang Học (S1–S8)
+
+- **Người làm:** AT, cùng Codex.
+- **Đã xong:** luồng chọn bộ, lật thẻ, chấm điểm, xem kết quả và tiếp tục khi thẻ đến hạn. Hoàn tác hiện lại đúng thẻ vừa chấm kể cả khi thẻ khác đến hạn. Dùng các thành phần chung của styleguide, bỏ nút phát âm theo phạm vi sản phẩm. Bản triển khai ở nhánh `feature/study`.
+- **Kiểm tra:** 37 test qua. Đã thử trên Edge với `?seed`, `?reset`, mã bộ sai, phím tắt, hoàn tác, tự tiếp tục, chế độ giảm chuyển động và màn hình 375px.
+- **Tiếp theo:** mở PR cho Leader review. Khi L6 xong, cập nhật mặt thẻ theo cấu trúc thẻ tiếng Nhật.
+
 ## 2026-11-11 — Cột điều hướng và khung Trang chủ (L12)
 
 - **Người làm:** Leader, cùng Claude.

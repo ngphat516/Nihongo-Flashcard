@@ -41,32 +41,52 @@
     </button>
   </header>
 
-  <!-- HỌC — phụ trách: Thành viên 4 · việc cần làm: docs/tasks.md mục S1–S8 -->
   <main class="container container-narrow">
-
-    <!-- pages/study/ (không có ?deck): chọn bộ để học -->
     <section id="deck-picker" hidden>
       <h1 class="page-title">Chọn bộ để học</h1>
-      <div id="deck-list" class="todo">
-        <p class="todo-label"><b>S1</b>Danh sách bộ còn thẻ cần học</p>
-      </div>
+      <div id="deck-list"></div>
     </section>
 
-    <!-- pages/study/?deck=<id>: buổi học -->
+    <p id="study-error" class="alert alert-error" role="alert" hidden></p>
+    <button id="retry-queue" class="btn" type="button" hidden>Thử lại</button>
+
     <section id="session" hidden>
-      <div id="study-bar" class="todo">
-        <p class="todo-label"><b>S5</b>Tên bộ · Mới · Đang học · Đến hạn · nút Thoát</p>
+      <div class="study-bar">
+        <h1 id="deck-name" class="page-title"></h1>
+        <div id="study-counts" class="counts" aria-live="polite"></div>
+        <a id="exit-session" class="btn btn-ghost" href="./">Thoát</a>
       </div>
-      <div id="card-stage" class="section todo">
-        <p class="todo-label"><b>S2 · S8</b>Thẻ: mặt trước → "Hiện đáp án" (Space) → mặt sau</p>
+      <div id="card-stage" class="flashcard study-card section" aria-live="polite">
+        <div class="flashcard-inner">
+          <div id="card-front" class="flashcard-face flashcard-front">
+            <span class="study-card-label">Mặt trước</span>
+            <p></p>
+          </div>
+          <div id="card-back" class="flashcard-face flashcard-back" aria-hidden="true">
+            <span class="study-card-label">Mặt sau</span>
+            <p></p>
+          </div>
+        </div>
       </div>
-      <div id="answer-bar" class="section todo">
-        <p class="todo-label"><b>S3 · S4 · S7</b>4 nút Lại / Khó / Tốt / Dễ kèm thời gian (phím 1–4) · hoàn tác (Z)</p>
+      <div class="section">
+        <button id="reveal-card" class="btn btn-primary study-reveal" type="button"
+          aria-keyshortcuts="Space">Hiện đáp án</button>
+        <div id="rating-buttons" class="rate-bar study-ratings" role="group" aria-label="Chấm điểm" hidden></div>
       </div>
+      <div class="study-tools">
+        <button id="undo-session" class="btn" type="button" aria-keyshortcuts="Z" hidden>Hoàn tác</button>
+      </div>
+      <p class="study-shortcuts muted">Space để lật · 1–4 để chấm · Z để hoàn tác</p>
     </section>
 
-    <section id="done-screen" class="todo" hidden>
-      <p class="todo-label"><b>S6</b>Màn hoàn thành: số thẻ đã học, thời gian, "Quay lại lúc…"</p>
+    <section id="done-screen" class="empty study-done" hidden>
+      <h1 id="done-title" class="empty-title" tabindex="-1">Xong rồi!</h1>
+      <p id="session-summary" class="empty-text"></p>
+      <p id="return-time" class="empty-text" hidden></p>
+      <div class="study-tools">
+        <a id="done-home" class="btn btn-primary" href="../../">Về Trang chủ</a>
+        <button id="undo-done" class="btn" type="button" aria-keyshortcuts="Z" hidden>Hoàn tác</button>
+      </div>
     </section>
   </main>
 </body>
