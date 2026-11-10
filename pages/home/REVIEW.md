@@ -47,4 +47,4 @@ Code hiện **giữ 53×7 như task quy định**, không tự đổi bố cục
 
 Cần Leader chốt ưu tiên giữ cố định 53 tuần hay cho phép 54 cột để bao trọn 12 tháng lịch trong mọi trường hợp. Chưa sửa định nghĩa hoặc `analytics.js` theo một giả định mới. Vì điểm này và hạn chế xác minh Google Fonts, **báo cáo không xác nhận “hoàn tất 100%, không còn điểm chưa xác minh”**.
 
-`docs/tasks.md` vẫn ghi H1–H8 “Chưa làm”; `docs/product.md` còn các mục đã chốt/chưa làm ở cấp toàn dự án. Không tự cập nhật tài liệu ngoài phạm vi được giao. Báo cáo này là bằng chứng triển khai để Leader cập nhật sau review.
+Tại lần rà soát `c1ca050`, `docs/tasks.md` còn ghi H1–H8 “Chưa làm”. Khi chuẩn bị PR theo yêu cầu người dùng, H1–H8 đã được cập nhật thành **Xong** và nhật ký được bổ sung vào `docs/process.md`; không thay đổi chức năng hoặc thiết kế Home. Các điểm cần chốt và giới hạn xác minh ghi ở trên vẫn được giữ lại để nhóm review.
