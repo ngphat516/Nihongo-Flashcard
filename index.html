@@ -11,32 +11,65 @@
   <script type="module" src="dev/dev.js"></script>
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="./">Nhớ Lâu</a>
-    <nav class="site-nav" aria-label="Điều hướng chính">
-      <a href="./" aria-current="page">Trang chủ</a>
-      <a href="pages/album/">Album</a>
-      <a href="pages/create/">Tạo thẻ</a>
-      <a href="pages/study/">Học</a>
+  <!-- Cột điều hướng (L12): giống nhau ở 4 trang, chỉ khác đường dẫn và aria-current. Sửa thì sửa cả 4 file.
+       Icon chép từ Lucide (lucide.dev, giấy phép ISC). Xem docs/design.md › Bố cục khung. -->
+  <header class="rail">
+    <a class="rail-brand" href="./" aria-label="Nhớ Lâu"><span lang="ja">覚</span></a>
+    <nav class="rail-nav" aria-label="Điều hướng chính">
+      <a class="rail-link" href="./" aria-current="page">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span class="rail-label">Trang chủ</span>
+      </a>
+      <a class="rail-link" href="pages/album/">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="18" x="3" y="3" rx="1"/><path d="M7 3v18"/><path d="M20.4 18.9c.2.5-.1 1.1-.6 1.3l-1.9.7c-.5.2-1.1-.1-1.3-.6L11.1 5.1c-.2-.5.1-1.1.6-1.3l1.9-.7c.5-.2 1.1.1 1.3.6Z"/></svg>
+        <span class="rail-label">Album</span>
+      </a>
+      <a class="rail-link" href="pages/create/">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+        <span class="rail-label">Tạo thẻ</span>
+      </a>
+      <a class="rail-link" href="pages/study/">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
+        <span class="rail-label">Học</span>
+      </a>
     </nav>
+    <!-- L7: nút bật/tắt furigana, chưa có tác dụng. L7 nối nút với hàm lưu lựa chọn trong core/. -->
+    <button class="rail-link rail-furigana" type="button" aria-pressed="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+      <span class="rail-label">Furigana</span>
+      <span class="rail-switch" aria-hidden="true"></span>
+    </button>
   </header>
 
-  <!-- TRANG CHỦ — phụ trách: Leader · việc cần làm: docs/tasks.md mục H1–H6 -->
-  <main class="container">
-    <h1 class="page-title">Tiến độ học tập</h1>
-
-    <section id="summary" class="section todo" aria-label="Tóm tắt">
-      <p class="todo-label"><b>H2</b>Thẻ tóm tắt: ôn hôm nay · chuỗi ngày · tổng số thẻ · tỉ lệ nhớ</p>
+  <!-- TRANG CHỦ — phụ trách: Leader · việc cần làm: docs/tasks.md mục H1–H8
+       Bố cục 2 cột (H7) ở pages/home/home.css. Thứ tự trong HTML là thứ tự trên điện thoại:
+       tổng quan → cột chính → biểu đồ. Màn hình rộng: tổng quan và biểu đồ nằm ở panel phải. -->
+  <main class="container home-layout">
+    <section id="overview" class="home-overview" aria-label="Tổng quan">
+      <div id="greeting" class="todo">
+        <p class="todo-label"><b>H7</b>Lời chào theo giờ ("Chào buổi sáng"…) · chuỗi ngày học, chữ to</p>
+      </div>
+      <div id="summary" class="section todo">
+        <p class="todo-label"><b>H2</b>4 ô thống kê: lượt ôn hôm nay · chuỗi ngày · tổng số thẻ · tỉ lệ nhớ 30 ngày</p>
+      </div>
     </section>
 
-    <section id="heatmap" class="section todo" aria-labelledby="heatmap-title">
-      <h2 id="heatmap-title" class="section-title">Hoạt động 12 tháng qua</h2>
-      <p class="todo-label"><b>H1</b>Heatmap: mỗi ô một ngày, đậm theo số lượt ôn</p>
-    </section>
+    <div class="home-main">
+      <h1 class="page-title">Hôm nay ôn gì?</h1>
 
-    <section id="today" class="section todo" aria-labelledby="today-title">
-      <h2 id="today-title" class="section-title">Hôm nay cần học</h2>
-      <p class="todo-label"><b>H3</b>Danh sách bộ còn thẻ cần học + nút Học</p>
+      <section id="today" class="todo" aria-label="Bộ cần học hôm nay">
+        <p class="todo-label"><b>H3 · H4</b>Lưới bìa các bộ cần học, cả bìa là link sang trang Học · chưa có bộ nào thì hiện trạng thái rỗng</p>
+      </section>
+
+      <section id="heatmap" class="section todo" aria-labelledby="heatmap-title">
+        <h2 id="heatmap-title" class="section-title">Hoạt động 12 tháng qua</h2>
+        <p class="todo-label"><b>H1 · H5</b>Heatmap: mỗi ô một ngày, đậm theo số lượt ôn · chú giải Ít → Nhiều</p>
+      </section>
+    </div>
+
+    <section id="chart" class="home-chart todo" aria-labelledby="chart-title">
+      <h2 id="chart-title" class="section-title">Lượt ôn 6 tháng</h2>
+      <p class="todo-label"><b>H8</b>Biểu đồ cột chồng: Học mới · Ôn lại</p>
     </section>
   </main>
 </body>

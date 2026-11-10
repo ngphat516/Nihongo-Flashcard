@@ -34,6 +34,7 @@ npm test
 | File | Nội dung |
 |---|---|
 | [docs/product.md](docs/product.md) | App làm gì, từ ngữ của dự án, phạm vi, lộ trình |
+| [docs/design.md](docs/design.md) | Giao diện: màu, chữ, bố cục, thành phần, icon |
 | [docs/architecture.md](docs/architecture.md) | Cấu trúc thư mục, 4 trang, API dữ liệu, thuật toán SM-2 |
 | [docs/conventions.md](docs/conventions.md) | Luật code, CSS và tên class, nhánh/PR, trước khi nộp |
 | [docs/tasks.md](docs/tasks.md) | Phân việc, mã task, trạng thái |

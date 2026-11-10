@@ -12,7 +12,7 @@ Tài liệu này nói code được tổ chức thế nào. App làm gì xem [pr
 
 - ES modules không chạy khi mở file trực tiếp (`file://`), phải mở qua server cục bộ (xem [README](../README.md#chạy-thử)).
 - Cần trình duyệt mới: ES modules, thẻ `<dialog>`, CSS `@import`.
-- Font Noto Sans JP tải từ Google Fonts. Không có mạng thì rơi về font tiếng Nhật có sẵn trên máy (Hiragino, Yu Gothic, Meiryo).
+- Font Plus Jakarta Sans và Noto Sans JP tải từ Google Fonts. Không có mạng thì rơi về font có sẵn trên máy (Hiragino, Yu Gothic, Meiryo, font hệ thống).
 - Node 20 trở lên chỉ để chạy test; app không cần Node.
 
 ## Cấu trúc thư mục
@@ -38,9 +38,9 @@ core/                   phần lõi dùng chung
 dev/
   dev.js                ?seed / ?reset lúc phát triển (xóa trước khi nộp)
 styles/
-  base.css              file CSS duy nhất các trang nạp: @import 2 file dưới + reset, header, khung trang
+  base.css              file CSS duy nhất các trang nạp: @import 2 file dưới + reset, cột điều hướng, khung trang
   tokens.css            biến: màu, font, cỡ chữ, khoảng cách, bo góc, chuyển động, z-index
-  components.css        class dùng chung: nút, ô nhập, badge, thẻ lật, dialog, toast, …
+  components.css        class dùng chung: nút, ô nhập, badge, chip, bìa bộ thẻ, thẻ lật, dialog, toast, …
 tests/                  test chạy bằng `npm test`
 docs/                   tài liệu (file này)
 ```
@@ -60,7 +60,7 @@ Mỗi file HTML nạp `styles/base.css`, CSS riêng của trang, `dev/dev.js` v�
 
 ## Liên kết giữa các trang
 
-- **Thanh điều hướng:** thẻ `<a>` với đường dẫn tương đối, viết sẵn trong cả 4 file HTML. Header vẫn hiện khi JS lỗi.
+- **Cột điều hướng** (`<header class="rail">`): thẻ `<a>` với đường dẫn tương đối, viết sẵn trong cả 4 file HTML, nên vẫn hiện khi JS lỗi.
 - **Link tạo trong JS:** dùng `routes` (`core/routes.js`), VD `routes.study(deck.id)`. `routes` tính đường dẫn từ gốc project nên vẫn đúng khi app nằm dưới thư mục con, VD GitHub Pages `/Nihongo-Flashcard/`.
 - **Truyền dữ liệu giữa trang:** chỉ qua tham số URL khai báo trong `routes` (hiện chỉ có `?deck=<id>`). Trang mới mở ra tự đọc lại dữ liệu qua `repo.js`.
 

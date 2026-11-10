@@ -53,3 +53,8 @@
 .styleguide-card {
   max-width: 420px;
 }
+.styleguide-covers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-3);
+}

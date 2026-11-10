@@ -11,22 +11,42 @@
   <script type="module" src="../../dev/dev.js"></script>
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="../../">Nhớ Lâu</a>
-    <nav class="site-nav" aria-label="Điều hướng chính">
-      <a href="../../">Trang chủ</a>
-      <a href="../album/">Album</a>
-      <a href="./" aria-current="page">Tạo thẻ</a>
-      <a href="../study/">Học</a>
+  <!-- Cột điều hướng (L12): giống nhau ở 4 trang, chỉ khác đường dẫn và aria-current. Sửa thì sửa cả 4 file.
+       Icon chép từ Lucide (lucide.dev, giấy phép ISC). Xem docs/design.md › Bố cục khung. -->
+  <header class="rail">
+    <a class="rail-brand" href="../../" aria-label="Nhớ Lâu"><span lang="ja">覚</span></a>
+    <nav class="rail-nav" aria-label="Điều hướng chính">
+      <a class="rail-link" href="../../">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span class="rail-label">Trang chủ</span>
+      </a>
+      <a class="rail-link" href="../album/">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="18" x="3" y="3" rx="1"/><path d="M7 3v18"/><path d="M20.4 18.9c.2.5-.1 1.1-.6 1.3l-1.9.7c-.5.2-1.1-.1-1.3-.6L11.1 5.1c-.2-.5.1-1.1.6-1.3l1.9-.7c.5-.2 1.1.1 1.3.6Z"/></svg>
+        <span class="rail-label">Album</span>
+      </a>
+      <a class="rail-link" href="./" aria-current="page">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+        <span class="rail-label">Tạo thẻ</span>
+      </a>
+      <a class="rail-link" href="../study/">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
+        <span class="rail-label">Học</span>
+      </a>
     </nav>
+    <!-- L7: nút bật/tắt furigana, chưa có tác dụng. L7 nối nút với hàm lưu lựa chọn trong core/. -->
+    <button class="rail-link rail-furigana" type="button" aria-pressed="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+      <span class="rail-label">Furigana</span>
+      <span class="rail-switch" aria-hidden="true"></span>
+    </button>
   </header>
 
-  <!-- TẠO THẺ — phụ trách: Thành viên 3 · việc cần làm: docs/tasks.md mục C1–C7 -->
+  <!-- TẠO THẺ — phụ trách: Thành viên 3 · việc cần làm: docs/tasks.md mục C1–C8 -->
   <main class="container">
     <h1 class="page-title">Tạo flashcard</h1>
 
     <section id="deck-picker" class="section todo">
-      <p class="todo-label"><b>C1</b>Chọn bộ có sẵn (chọn sẵn theo ?deck=) hoặc tạo bộ mới</p>
+      <p class="todo-label"><b>C1 · C8</b>Chọn bộ có sẵn (chọn sẵn theo ?deck=) hoặc tạo bộ mới, chọn màu bìa</p>
     </section>
 
     <div class="create-layout">

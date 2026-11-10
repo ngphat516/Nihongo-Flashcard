@@ -11,14 +11,34 @@
 <body>
   <!-- STYLEGUIDE — công cụ dev, không có link trên thanh điều hướng. XÓA folder này trước khi nộp.
        Mở: pages/styleguide/ · Xem mã HTML của từng mục: chuột phải → Inspect, hoặc đọc file này. -->
-  <header class="site-header">
-    <a class="brand" href="../../">Nhớ Lâu</a>
-    <nav class="site-nav" aria-label="Điều hướng chính">
-      <a href="../../">Trang chủ</a>
-      <a href="../album/">Album</a>
-      <a href="../create/">Tạo thẻ</a>
-      <a href="../study/">Học</a>
+  <!-- Cột điều hướng (L12): giống nhau ở 4 trang, chỉ khác đường dẫn và aria-current. Sửa thì sửa cả 4 file.
+       Icon chép từ Lucide (lucide.dev, giấy phép ISC). Xem docs/design.md › Bố cục khung. -->
+  <header class="rail">
+    <a class="rail-brand" href="../../" aria-label="Nhớ Lâu"><span lang="ja">覚</span></a>
+    <nav class="rail-nav" aria-label="Điều hướng chính">
+      <a class="rail-link" href="../../">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span class="rail-label">Trang chủ</span>
+      </a>
+      <a class="rail-link" href="../album/">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="18" x="3" y="3" rx="1"/><path d="M7 3v18"/><path d="M20.4 18.9c.2.5-.1 1.1-.6 1.3l-1.9.7c-.5.2-1.1-.1-1.3-.6L11.1 5.1c-.2-.5.1-1.1.6-1.3l1.9-.7c.5-.2 1.1.1 1.3.6Z"/></svg>
+        <span class="rail-label">Album</span>
+      </a>
+      <a class="rail-link" href="../create/">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+        <span class="rail-label">Tạo thẻ</span>
+      </a>
+      <a class="rail-link" href="../study/">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
+        <span class="rail-label">Học</span>
+      </a>
     </nav>
+    <!-- L7: nút bật/tắt furigana, chưa có tác dụng. L7 nối nút với hàm lưu lựa chọn trong core/. -->
+    <button class="rail-link rail-furigana" type="button" aria-pressed="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+      <span class="rail-label">Furigana</span>
+      <span class="rail-switch" aria-hidden="true"></span>
+    </button>
   </header>
 
   <main class="container">
@@ -34,7 +54,7 @@
 
     <!-- ===== Chữ ===== -->
     <section class="section">
-      <h2 class="section-title">Chữ <span class="muted">· Noto Sans JP</span></h2>
+      <h2 class="section-title">Chữ <span class="muted">· Plus Jakarta Sans + Noto Sans JP</span></h2>
       <div class="panel styleguide-type">
         <p style="font-size: var(--text-2xl)"><code>--text-2xl</code> Tiến độ học tập · 学習の進み具合</p>
         <p style="font-size: var(--text-xl)"><code>--text-xl</code> 128 lượt ôn · 漢字</p>
@@ -42,7 +62,8 @@
         <p style="font-size: var(--text-base)"><code>--text-base</code> Mặt trước: 食べる (たべる) — ăn. Tiếng Việt có dấu: Ắ ặ ễ ở ữ đ.</p>
         <p style="font-size: var(--text-sm)"><code>--text-sm</code> Chú thích, badge, gợi ý dưới ô nhập</p>
         <p style="font-size: var(--text-xs)"><code>--text-xs</code> Thời gian trên nút chấm điểm</p>
-        <p class="styleguide-weights"><span style="font-weight: 400">400 ひらがな</span> <span style="font-weight: 500">500 カタカナ</span> <span style="font-weight: 700">700 漢字</span></p>
+        <p class="styleguide-weights"><span style="font-weight: 400">400 Ôn tập ひらがな</span> <span style="font-weight: 500">500 Ôn tập カタカナ</span> <span style="font-weight: 600">600 Ôn tập</span> <span style="font-weight: 700">700 Ôn tập 漢字</span></p>
+        <p><code>lang="ja"</code> <span lang="ja">毎朝パンを食べる。「JLPT N5」</span> <span class="muted">← cả câu dùng Noto Sans JP</span></p>
       </div>
     </section>
 
@@ -117,6 +138,30 @@
       </div>
     </section>
 
+    <!-- ===== Chip ===== -->
+    <section class="section">
+      <h2 class="section-title">Chip <span class="muted">· .chips .chip — bấm để chọn (JS đổi aria-pressed)</span></h2>
+      <div class="chips" role="group" aria-label="Lọc theo trạng thái" id="demo-chips">
+        <button class="chip" type="button" aria-pressed="true">Tất cả</button>
+        <button class="chip" type="button" aria-pressed="false">Mới</button>
+        <button class="chip" type="button" aria-pressed="false">Đang học</button>
+        <button class="chip" type="button" aria-pressed="false">Ôn tập</button>
+      </div>
+    </section>
+
+    <!-- ===== Bìa bộ thẻ ===== -->
+    <section class="section">
+      <h2 class="section-title">Bìa bộ thẻ <span class="muted">· .cover .cover-&lt;deck.color&gt;</span></h2>
+      <div class="styleguide-covers">
+        <a class="cover cover-pink" href="#"><span class="cover-mark" aria-hidden="true">J</span><span class="cover-title">JLPT N5 – Từ vựng</span><span class="cover-text">800 từ vựng cơ bản cho kỳ thi N5, chia theo chủ đề: gia đình, thời gian, đồ ăn, đi lại.</span><span class="cover-meta"><span class="cover-badge">12 cần học</span> 48 thẻ</span></a>
+        <a class="cover cover-peach" href="#"><span class="cover-mark" aria-hidden="true">食</span><span class="cover-title">食べ物 – Đồ ăn</span><span class="cover-text">Tên món ăn và động từ ăn uống.</span><span class="cover-meta"><span class="cover-badge">3 cần học</span> 20 thẻ</span></a>
+        <a class="cover cover-yellow" href="#"><span class="cover-mark" aria-hidden="true">K</span><span class="cover-title">Kanji N4</span><span class="cover-meta">120 thẻ</span></a>
+        <a class="cover cover-green" href="#"><span class="cover-mark" aria-hidden="true">動</span><span class="cover-title">動詞 – Động từ nhóm 1</span><span class="cover-text">Chia thể て, thể ない.</span><span class="cover-meta"><span class="cover-badge">40 cần học</span> 64 thẻ</span></a>
+        <a class="cover cover-sky" href="#"><span class="cover-mark" aria-hidden="true">カ</span><span class="cover-title">Katakana</span><span class="cover-text">46 chữ cái và âm ghép.</span><span class="cover-meta">46 thẻ</span></a>
+        <a class="cover cover-lavender" href="#"><span class="cover-mark" aria-hidden="true">文</span><span class="cover-title">文法 – Ngữ pháp N5</span><span class="cover-meta"><span class="cover-badge">5 cần học</span> 30 thẻ</span></a>
+      </div>
+    </section>
+
     <!-- ===== Thẻ lật ===== -->
     <section class="section">
       <h2 class="section-title">Thẻ lật <span class="muted">· .flashcard — bấm để lật (JS bật .is-flipped)</span></h2>
@@ -163,6 +208,13 @@
         <p class="empty-text">Tạo bộ đầu tiên để bắt đầu học.</p>
         <a class="btn btn-primary" href="../create/">+ Tạo bộ thẻ</a>
       </div>
+    </section>
+
+    <!-- ===== Cột điều hướng ===== -->
+    <section class="section">
+      <h2 class="section-title">Cột điều hướng <span class="muted">· .rail · base.css</span></h2>
+      <p class="muted">Chính là cột bên trái trang này; dưới 768px thành thanh tab ở đáy. Viết sẵn trong HTML của cả 4 trang, chỉ khác đường dẫn và
+        <code>aria-current="page"</code>. Nút furigana: <code>aria-pressed="true"</code> thì công tắc bật. Chi tiết: <code>docs/design.md</code> › Bố cục khung.</p>
     </section>
 
     <!-- ===== Khung ===== -->

@@ -1,6 +1,6 @@
 /**
  * TRANG CHỦ (index.html, pages/home/) — phụ trách: Leader
- * Việc cần làm: docs/tasks.md, mục "Trang chủ" (H1–H6).
+ * Việc cần làm: docs/tasks.md, mục "Trang chủ" (H1–H8).
  *
  * Hàm core hay dùng:
  *   getDeckOverview()  → [{ deck, total, due: { new, learning, review } }]
@@ -17,10 +17,12 @@ import { $, h, startPage } from '../../core/dom.js';
 startPage(async () => {
   const [overview, logs] = await Promise.all([getDeckOverview(), getReviewLogs()]);
 
-  // TODO H1: vẽ heatmap 12 tháng vào #heatmap (gom `logs` theo dayKey(log.reviewedAt))
-  // TODO H2: thẻ tóm tắt vào #summary
-  // TODO H3: danh sách bộ cần học vào #today
+  // TODO H7: lời chào theo giờ + chuỗi ngày học vào #greeting
+  // TODO H2: 4 ô thống kê vào #summary
+  // TODO H3: lưới bìa các bộ cần học vào #today
   // TODO H4: trạng thái rỗng khi overview.length === 0
+  // TODO H1, H5: heatmap 12 tháng + chú giải vào #heatmap (gom `logs` theo dayKey(log.reviewedAt))
+  // TODO H8: biểu đồ lượt ôn 6 tháng vào #chart
 
   // ---------- DEMO — xóa khi làm thật: chứng minh dữ liệu đã đọc được ----------
   const perDay = new Map();

@@ -7,10 +7,11 @@ import { $, h } from '../../core/dom.js';
 // ---------- Bảng màu: đọc thẳng giá trị từ tokens.css ----------
 const COLOR_TOKENS = [
   'bg', 'surface', 'surface-2', 'border', 'text', 'text-2', 'muted',
-  'primary', 'primary-hover', 'danger', 'success',
+  'primary', 'primary-hover', 'primary-soft', 'primary-strong', 'danger', 'success',
   'state-new', 'state-learning', 'state-review',
   'rate-again', 'rate-hard', 'rate-good', 'rate-easy',
-  'heat-0', 'heat-1', 'heat-2', 'heat-3', 'heat-4',
+  'heat-0', 'heat-1', 'heat-2', 'heat-3', 'heat-4', 'chart-new', 'chart-review',
+  'deck-pink', 'deck-peach', 'deck-yellow', 'deck-green', 'deck-sky', 'deck-lavender',
 ];
 const styles = getComputedStyle(document.documentElement);
 $('#swatches').append(
@@ -26,6 +27,16 @@ $('#swatches').append(
 // ---------- Mẫu: lật thẻ ----------
 const card = $('#demo-card');
 card.addEventListener('click', () => card.classList.toggle('is-flipped'));
+
+// ---------- Mẫu: chip lọc (chọn một trong nhóm) ----------
+const chips = $('#demo-chips');
+chips.addEventListener('click', (event) => {
+  const chip = event.target.closest('.chip');
+  if (!chip) return;
+  for (const other of chips.querySelectorAll('.chip')) {
+    other.setAttribute('aria-pressed', String(other === chip));
+  }
+});
 
 // ---------- Mẫu: toast ----------
 function toast(message, { error = false } = {}) {

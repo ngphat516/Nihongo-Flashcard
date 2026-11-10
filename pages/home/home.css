@@ -1,4 +1,32 @@
 /* Trang chủ (index.html, pages/home/) — phụ trách: Leader.
    Chỉ viết style riêng của trang này, class bắt đầu bằng "home-" (VD .home-heatmap).
-   Dùng lại class chung: .stats .stat (H2), .counts .count (H3), .empty (H4).
+   Dùng lại class chung: .stats .stat (H2), .cover (H3), .empty (H4).
    Heatmap dùng màu --heat-0 … --heat-4. Xem tất cả: pages/styleguide/. */
+
+/* ---------- H7: bố cục 2 cột ----------
+   HTML xếp theo thứ tự trên điện thoại: .home-overview → .home-main → .home-chart.
+   Từ 1024px: .home-main bên trái; panel phải (300px) gồm .home-overview rồi .home-chart. */
+.home-layout {
+  display: grid;
+  gap: var(--space-5);
+}
+@media (min-width: 1024px) {
+  .home-layout {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      'main overview'
+      'main chart'
+      'main .';
+    align-items: start;
+  }
+  .home-main {
+    grid-area: main;
+  }
+  .home-overview {
+    grid-area: overview;
+  }
+  .home-chart {
+    grid-area: chart;
+  }
+}

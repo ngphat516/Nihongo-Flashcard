@@ -9,24 +9,31 @@
 :root {
   color-scheme: light;
 
-  /* ---------- Màu nền & chữ ---------- */
-  --bg: #f7f6f3; /* nền trang */
+  /* Bảng màu sinh từ màu chính matcha (skill ui-color-palette), nền chỉ ánh xanh rất nhẹ.
+     Dùng màu nào ở đâu và độ tương phản: docs/design.md › Màu. */
+
+  /* ---------- Màu nền & chữ (xám ánh lục) ---------- */
+  --bg: #f2f3f1; /* nền trang */
   --surface: #ffffff; /* nền khối: panel, thẻ, ô nhập */
-  --surface-2: #f0eee9; /* nền phụ: hover, ô trống */
-  --border: #e3e0d8;
+  --surface-2: #ebede8; /* nền phụ: hover, ô trống */
+  --border: #e3e5e1;
 
-  --text: #1c1b19;
-  --text-2: #55534e; /* chữ phụ */
-  --muted: #6e6b64; /* chữ mờ: gợi ý, chú thích */
+  --text: #191b18; /* 17:1 trên nền trắng */
+  --text-2: #4a5045; /* chữ phụ, 8:1 */
+  --muted: #595f54; /* chữ mờ: gợi ý, chú thích. Đạt 5.9:1 trên --bg; đừng dùng màu nhạt hơn cho chữ */
 
-  /* ---------- Màu theo nghĩa ---------- */
-  --primary: #2a63d4;
-  --primary-hover: #2253b5;
+  /* ---------- Màu chính: xanh matcha. Chỉ cho hành động (khoảng 10% giao diện) ---------- */
+  --primary: #527a2e; /* nút chính, link, focus. Chữ trắng 5:1 */
+  --primary-hover: #406024;
+  --primary-soft: #edf3e7; /* nền nhạt: rê chuột trên cột điều hướng */
+  --primary-strong: #3e5c23; /* chữ / icon trên --primary-soft (6.7:1), nhãn mục đang chọn trên thanh tab */
   --on-primary: #ffffff; /* chữ trên nền --primary */
+
+  /* ---------- Màu theo nghĩa. Luôn đi kèm chữ, không dùng màu một mình ---------- */
   --danger: #c92a2a;
   --success: #2b7a3d;
 
-  /* Trạng thái thẻ — theo quy ước màu của Anki. Luôn đi kèm chữ, không dùng màu một mình. */
+  /* Trạng thái thẻ — theo quy ước màu của Anki, không đổi theo màu chính. */
   --state-new: #1f6cc7;
   --state-learning: #c2410c;
   --state-review: #0f7a55;
@@ -38,17 +45,41 @@
   --rate-easy: #2a6fc9;
   --on-rate: #ffffff;
 
-  /* Heatmap: 0 = không học, 1 → 4 = ít → nhiều */
-  --heat-0: #ebe9e3;
-  --heat-1: #b7d3f6;
-  --heat-2: #6da7ec;
-  --heat-3: #2a78d6;
-  --heat-4: #184f95;
+  /* ---------- Dữ liệu ---------- */
+  /* Heatmap: 0 = không học, 1 → 4 = ít → nhiều (cùng sắc matcha, đậm dần) */
+  --heat-0: #ebede8;
+  --heat-1: #b0d194;
+  --heat-2: #77b143;
+  --heat-3: #4a6f2a;
+  --heat-4: #2d4319;
+
+  /* Biểu đồ cột lượt ôn: phần "Học mới" và phần "Ôn lại" */
+  --chart-new: var(--heat-2);
+  --chart-review: var(--primary);
+
+  /* ---------- Màu bìa bộ thẻ: nền pastel + màu đậm cùng sắc (chữ đầu, badge) ---------- */
+  /* Tên màu (pink, peach…) là giá trị của deck.color. Dùng qua class .cover-<màu>, không dùng thẳng. */
+  --deck-pink: #f9dce3;
+  --deck-pink-ink: #7a1f36;
+  --deck-peach: #fbe6da;
+  --deck-peach-ink: #7a401f;
+  --deck-yellow: #fcf4d9;
+  --deck-yellow-ink: #6b5915;
+  --deck-green: #e9f4e1;
+  --deck-green-ink: #476f2a;
+  --deck-sky: #dcedf9;
+  --deck-sky-ink: #1f547a;
+  --deck-lavender: #e7def7;
+  --deck-lavender-ink: #401f7a;
 
   /* ---------- Chữ ---------- */
-  /* Noto Sans JP có đủ kana/kanji + tiếng Việt có dấu. Mất mạng → font tiếng Nhật có sẵn trên máy. */
-  --font: 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic',
-    Meiryo, system-ui, sans-serif;
+  /* Plus Jakarta Sans vẽ chữ Latin + tiếng Việt; kana/kanji không có trong font này nên trình duyệt
+     tự lấy từ Noto Sans JP. Mất mạng → font có sẵn trên máy. */
+  --font: 'Plus Jakarta Sans', 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
+    'Yu Gothic UI', 'Yu Gothic', Meiryo, system-ui, sans-serif;
+  /* Chữ tiếng Nhật (phần tử có lang="ja"): Noto Sans JP vẽ cả dấu câu và chữ Latin xen trong câu Nhật */
+  --font-ja: 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic',
+    Meiryo, sans-serif;
 
   --text-xs: 0.75rem; /* 12px */
   --text-sm: 0.875rem; /* 14px — chú thích, badge */
@@ -73,13 +104,15 @@
   --shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.05);
   --shadow-lg: 0 8px 32px rgb(0 0 0 / 0.16);
   --max-width: 1040px;
+  --rail-width: 72px; /* cột điều hướng nổi bên trái (cách mép --space-3), màn hình từ 768px */
+  --tabbar-height: 64px; /* thanh tab ở đáy, màn hình dưới 768px */
 
   /* ---------- Chuyển động (tự tắt khi người dùng bật "giảm chuyển động") ---------- */
   --duration-fast: 150ms; /* hover, focus */
   --duration-normal: 400ms; /* lật thẻ */
 
   /* ---------- Lớp xếp chồng ---------- */
-  --z-header: 10;
+  --z-nav: 10; /* cột điều hướng / thanh tab */
   --z-toast: 50;
   --z-dialog: 100; /* <dialog> mở bằng showModal() tự nằm trên cùng; biến này cho trường hợp khác */
 }

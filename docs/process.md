@@ -16,6 +16,48 @@
 
 ---
 
+## 2026-11-11 — Cột điều hướng và khung Trang chủ (L12)
+
+- **Người làm:** Leader, cùng Claude.
+- **Đã xong:**
+  - Thay header ngang bằng cột điều hướng ở cả 4 trang và styleguide, làm giống cột icon trong mẫu: cột nổi bo góc, logo, 4 nút tròn chỉ có icon Lucide (rê chuột hoặc Tab tới thì hiện tên), nút furigana ở đáy. Dưới 768px thành thanh tab 5 ô ở đáy, có nhãn chữ.
+  - Thêm biến `--rail-width`, `--tabbar-height`; đổi `--z-header` thành `--z-nav`; toast nằm giữa phần nội dung và nổi trên thanh tab.
+  - Mục đang chọn (cột điều hướng và chip) đổi từ nền xanh nhạt sang xanh matcha đậm, chữ trắng.
+  - Dựng khung 2 cột Trang chủ (`pages/home/home.css`), mỗi khối là một ô `.todo` ghi mã task: `#greeting` (H7), `#summary` (H2), `#today` (H3, H4), `#heatmap` (H1, H5), `#chart` (H8). Trang khác giữ nguyên ô `.todo`.
+  - Đã thử ở 375px, 800px, 1024px, 1280px: không cuộn ngang, Console không có lỗi.
+  - Nhánh `styles/giao-dien-matcha`.
+- **Quyết định:**
+  - Làm thẳng, không qua prototype. Đã chốt: cột rộng 72px, thanh tab cao 64px, panel phải 300px, logo chữ 覚.
+  - Leader xem bản đầu, thấy chưa giống mẫu, nên chốt lại 2 quyết định của vòng hỏi đáp trước:
+    - Bỏ nhãn chữ trên cột ở màn hình rộng, thay bằng tooltip; điện thoại vẫn có nhãn.
+    - Mục đang chọn dùng xanh matcha đậm thay cho xanh nhạt (mẫu dùng màu đen).
+  - Trang chủ chia 2 cột từ 1024px chứ không phải 768px, vì ở 768px cột chính còn quá hẹp ([design.md › Trang chủ](design.md#trang-chủ)).
+  - Bo góc, bóng, cỡ tiêu đề để sau, thành task L13.
+  - H7 còn lời chào và chuỗi ngày, vì khung đã làm trong L12.
+- **Tiếp theo:**
+  - Thành viên làm trang của mình trên khung mới: thay ô `.todo` và đoạn `DEMO`.
+  - L6 (thẻ tiếng Nhật + `Deck.color`), rồi L7 nối nút furigana.
+
+## 2026-11-11 — Màu và chữ mới, tài liệu giao diện (L11)
+
+- **Người làm:** Leader, cùng Claude.
+- **Đã xong:**
+  - Học theo một mẫu dashboard giáo dục, chốt qua 2 vòng hỏi đáp.
+  - Đổi `styles/tokens.css`: màu chính xanh matcha `#527a2e`, nền xám ánh lục, heatmap xanh, 6 màu bìa pastel, biến cho biểu đồ.
+  - Font Plus Jakarta Sans + Noto Sans JP; chữ có `lang="ja"` dùng Noto Sans JP.
+  - Thêm class `chip` và `cover` vào `components.css`, cập nhật styleguide.
+  - Viết `docs/design.md`; sửa product, conventions, tasks, `AGENTS.md`.
+  - Nhánh `styles/giao-dien-matcha`.
+- **Quyết định:** chi tiết ở [design.md](design.md) và [product.md](product.md#đã-chốt-chưa-làm).
+  - Bố cục: cột icon bên trái (điện thoại: thanh tab ở đáy); Trang chủ 2 cột với panel phải gồm lời chào, chuỗi ngày, 4 ô thống kê, biểu đồ lượt ôn 6 tháng.
+  - Màu chính chỉ cho hành động; màu trạng thái và chấm điểm giữ theo Anki.
+  - Bộ thẻ có màu bìa (`deck.color`, làm cùng L6).
+  - Nút furigana ở cuối cột điều hướng, trình duyệt nhớ lựa chọn.
+  - Bỏ các phần xã hội của mẫu (bạn bè, đánh giá sao, xếp hạng…).
+  - Icon dùng Lucide, chép SVG vào HTML.
+  - Thêm task L11, L12, H7, H8, C8.
+- **Tiếp theo:** L6 (thẻ tiếng Nhật + `Deck.color`); L12 làm prototype trên `prototype/giao-dien-moi` để chốt bo góc, bóng, cỡ tiêu đề, rồi làm cột điều hướng.
+
 ## 2026-11-11 — Bộ tài liệu `docs/` (L10)
 
 - **Người làm:** Leader, cùng Claude.

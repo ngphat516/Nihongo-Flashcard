@@ -5,8 +5,8 @@ Luật chung cho cả nhóm và cho agent. Kiến trúc xem [architecture.md](ar
 ## Ai sửa gì
 
 - **Mỗi người chỉ sửa trong folder `pages/<trang>/` của mình** (bảng phân việc ở [tasks.md](tasks.md#phân-việc)).
-- **Phần chung thuộc Leader:** `core/`, `styles/`, `dev/`, thanh điều hướng trong 4 file HTML, và `docs/product.md`, `docs/architecture.md`, `docs/conventions.md`. Cần đổi thì nhắn Leader hoặc mở PR riêng cho phần đó, không sửa lẫn trong PR của trang.
-- **Sửa thanh điều hướng thì sửa cả 4 file HTML** trong cùng một PR, vì header được viết sẵn ở từng file.
+- **Phần chung thuộc Leader:** `core/`, `styles/`, `dev/`, cột điều hướng trong 4 file HTML, và `docs/product.md`, `docs/design.md`, `docs/architecture.md`, `docs/conventions.md`. Cần đổi thì nhắn Leader hoặc mở PR riêng cho phần đó, không sửa lẫn trong PR của trang.
+- **Sửa cột điều hướng thì sửa cả 4 file HTML** (và trang styleguide) trong cùng một PR, vì cột được viết sẵn ở từng file.
 
 ## Code
 
@@ -21,9 +21,12 @@ Luật chung cho cả nhóm và cho agent. Kiến trúc xem [architecture.md](ar
 
 ## Giao diện (CSS)
 
-Chỉ có CSS tự viết: không thư viện, không build, không dark mode. Mỗi trang nạp `styles/base.css` (CSS chung) và `pages/<trang>/<trang>.css` (CSS riêng).
+Chỉ có CSS tự viết: không thư viện, không build, không dark mode. Mỗi trang nạp `styles/base.css` (CSS chung) và `pages/<trang>/<trang>.css` (CSS riêng). Màu nào dùng ở đâu, font, bố cục, icon: xem [design.md](design.md).
 
 - **Màu, cỡ chữ, khoảng cách, bo góc dùng biến** trong `styles/tokens.css` (`var(--primary)`, `var(--text-sm)`, `var(--space-4)`), không viết mã màu hay số cứng. Thiếu biến thì báo Leader thêm.
+- **Màu chính `--primary` chỉ dành cho hành động** (nút chính, link, mục đang chọn). Trạng thái thẻ và chấm điểm dùng `--state-*`, `--rate-*` ([design.md › Màu](design.md#màu-nào-dùng-ở-đâu)).
+- **Chữ tiếng Nhật gắn `lang="ja"`**, VD `h('span', { lang: 'ja' }, card.term)`.
+- **Icon là SVG của Lucide chép thẳng vào HTML**, có `aria-hidden="true"` và luôn có chữ đi kèm ([design.md › Icon](design.md#icon)).
 - **Dùng class chung trước khi tự viết.** Mở `pages/styleguide/` để xem mọi biến và class kèm mẫu HTML; phần cần JS (lật thẻ, dialog, toast) có mẫu code trong `pages/styleguide/styleguide.js`.
 - **Tên class kiểu Bootstrap**, gạch ngang đơn:
   - Class chung không có tiền tố: `btn btn-primary`, `field-label`, `badge-new`.
@@ -42,11 +45,14 @@ Chỉ có CSS tự viết: không thư viện, không build, không dark mode. M
 | `stats` > `stat` > `stat-value`, `stat-label` | ô thống kê |
 | `counts` > `count count-new` / `-learning` / `-review` (số trong `<b>`) | bộ đếm Mới / Đang học / Đến hạn; `is-zero` khi bằng 0 |
 | `badge badge-<card.state>` | trạng thái thẻ (chấm màu + chữ) |
+| `chips` > `chip` (`<button aria-pressed>`) | nút lọc bật/tắt; đang chọn: `aria-pressed="true"` |
+| `cover cover-<deck.color>` > `cover-mark`, `cover-title`, `cover-text`, `cover-meta` > `cover-badge` | bìa bộ thẻ màu pastel; cả bìa là một link |
 | `flashcard` > `flashcard-inner` > `flashcard-face flashcard-front` / `-back` | thẻ lật; JS bật `is-flipped` |
 | `<dialog class="dialog">` > `dialog-title`, `dialog-actions` | hộp xác nhận, mở bằng `showModal()`; xóa `returnValue` trước mỗi lần mở |
 | `toast`, `toast-error` | thông báo nhỏ tự ẩn sau 3 giây |
 | `alert`, `alert-error`, `alert-success` | thông báo nằm trên trang |
 | `empty` > `empty-title`, `empty-text` + nút | trạng thái rỗng |
+| `rail` > `rail-brand`, `rail-nav` > `rail-link` > `rail-label`; `rail-link rail-furigana` > `rail-switch` | cột điều hướng, viết sẵn trong HTML; chỉ Leader sửa ([design.md](design.md#bố-cục-khung)) |
 | `container`, `container-narrow`, `page-head`, `page-title`, `section`, `section-title`, `back-link`, `row`, `muted`, `visually-hidden` | khung trang, tiện ích |
 
 Thêm hoặc đổi class chung thì sửa cả bảng này và trang styleguide.
@@ -73,6 +79,7 @@ Mỗi thông tin chỉ ghi ở **một** file; file khác thì trỏ link sang.
 | Thông tin | Ghi ở |
 |---|---|
 | App làm gì, từ ngữ, phạm vi, quyết định sản phẩm | [product.md](product.md) |
+| Giao diện: màu, chữ, bố cục, thành phần, icon | [design.md](design.md) |
 | Cấu trúc code, API, dữ liệu, SM-2 | [architecture.md](architecture.md) |
 | Luật code, CSS, git, định nghĩa xong, trước khi nộp | file này |
 | Việc cần làm và trạng thái | [tasks.md](tasks.md) |
