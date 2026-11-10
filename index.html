@@ -41,36 +41,34 @@
     </button>
   </header>
 
-  <!-- TRANG CHỦ — phụ trách: Leader · việc cần làm: docs/tasks.md mục H1–H8
-       Bố cục 2 cột (H7) ở pages/home/home.css. Thứ tự trong HTML là thứ tự trên điện thoại:
-       tổng quan → cột chính → biểu đồ. Màn hình rộng: tổng quan và biểu đồ nằm ở panel phải. -->
-  <main class="container home-layout">
-    <section id="overview" class="home-overview" aria-label="Tổng quan">
-      <div id="greeting" class="todo">
-        <p class="todo-label"><b>H7</b>Lời chào theo giờ ("Chào buổi sáng"…) · chuỗi ngày học, chữ to</p>
+  <main class="container home-layout" id="home">
+    <header class="page-head home-heading">
+      <div>
+        <p class="home-eyebrow">MỖI NGÀY MỘT CHÚT, NHỚ LÂU HƠN</p>
+        <h1 class="page-title">Hôm nay ôn gì?</h1>
+        <p class="home-subtitle">Một bước nhỏ hôm nay, thêm một điều nhớ mãi.</p>
       </div>
-      <div id="summary" class="section todo">
-        <p class="todo-label"><b>H2</b>4 ô thống kê: lượt ôn hôm nay · chuỗi ngày · tổng số thẻ · tỉ lệ nhớ 30 ngày</p>
+      <time id="home-date" class="home-date"></time>
+    </header>
+    <div id="home-status" class="home-status" role="status">Đang tải tiến độ học tập…</div>
+    <div id="home-content" aria-busy="true">
+      <section id="summary" class="stats home-stats" aria-label="Tổng quan học tập">
+        <div class="stat"><span class="stat-value">—</span><span class="stat-label">Lượt ôn hôm nay</span></div>
+        <div class="stat"><span class="stat-value">—</span><span class="stat-label">Chuỗi ngày học</span></div>
+        <div class="stat"><span class="stat-value">—</span><span class="stat-label">Tổng số thẻ</span></div>
+        <div class="stat"><span class="stat-value">—</span><span class="stat-label">Tỉ lệ nhớ 30 ngày</span></div>
+      </section>
+      <div class="home-columns" id="home-details" hidden>
+        <section id="greeting" class="panel home-greeting" aria-label="Lời chào và chuỗi ngày học"></section>
+        <div class="home-main">
+          <section id="today" aria-labelledby="today-title"></section>
+          <section id="heatmap" class="panel home-activity" aria-labelledby="heatmap-title"></section>
+        </div>
+        <section id="chart" class="panel home-chart" aria-labelledby="chart-title"></section>
+        <section id="forecast" class="panel home-forecast" aria-labelledby="forecast-title"></section>
       </div>
-    </section>
-
-    <div class="home-main">
-      <h1 class="page-title">Hôm nay ôn gì?</h1>
-
-      <section id="today" class="todo" aria-label="Bộ cần học hôm nay">
-        <p class="todo-label"><b>H3 · H4</b>Lưới bìa các bộ cần học, cả bìa là link sang trang Học · chưa có bộ nào thì hiện trạng thái rỗng</p>
-      </section>
-
-      <section id="heatmap" class="section todo" aria-labelledby="heatmap-title">
-        <h2 id="heatmap-title" class="section-title">Hoạt động 12 tháng qua</h2>
-        <p class="todo-label"><b>H1 · H5</b>Heatmap: mỗi ô một ngày, đậm theo số lượt ôn · chú giải Ít → Nhiều</p>
-      </section>
     </div>
-
-    <section id="chart" class="home-chart todo" aria-labelledby="chart-title">
-      <h2 id="chart-title" class="section-title">Lượt ôn 6 tháng</h2>
-      <p class="todo-label"><b>H8</b>Biểu đồ cột chồng: Học mới · Ôn lại</p>
-    </section>
+    <noscript><p class="alert">Bật JavaScript để xem tiến độ và các bộ thẻ cần học.</p></noscript>
   </main>
 </body>
 </html>
