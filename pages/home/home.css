@@ -1,32 +1,111 @@
-/* Trang chủ (index.html, pages/home/) — phụ trách: Leader.
-   Chỉ viết style riêng của trang này, class bắt đầu bằng "home-" (VD .home-heatmap).
-   Dùng lại class chung: .stats .stat (H2), .cover (H3), .empty (H4).
-   Heatmap dùng màu --heat-0 … --heat-4. Xem tất cả: pages/styleguide/. */
-
-/* ---------- H7: bố cục 2 cột ----------
-   HTML xếp theo thứ tự trên điện thoại: .home-overview → .home-main → .home-chart.
-   Từ 1024px: .home-main bên trái; panel phải (300px) gồm .home-overview rồi .home-chart. */
-.home-layout {
-  display: grid;
-  gap: var(--space-5);
-}
+/* H1–H8 theo docs/design.md: cột chính và panel phải 300px từ 1024px.
+   DOM giữ thứ tự một cột: tổng quan → bộ thẻ, heatmap → biểu đồ. */
+.home-layout { padding-top: var(--space-6); }
+.home-heading { align-items: flex-end; margin-bottom: 0; }
+.home-eyebrow { margin: 0 0 var(--space-2); font-size: var(--text-xs); font-weight: 600; letter-spacing: .06em; color: var(--muted); }
+.home-subtitle { margin: var(--space-2) 0 0; color: var(--text-2); font-size: var(--text-sm); }
+.home-date { padding-bottom: var(--space-1); color: var(--muted); font-size: var(--text-xs); }
+.home-status { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+.home-status p { margin: var(--space-1) 0 0; font-size: var(--text-sm); overflow-wrap: anywhere; }
+.home-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+.home-stat { min-width: 0; padding: var(--space-3); gap: var(--space-2); align-content: start; }
+.home-stat-detail { color: var(--muted); font-size: var(--text-xs); line-height: 1.5; }
+.home-content { display: grid; gap: var(--space-5); }
+.home-overview { display: grid; align-content: start; gap: var(--space-4); min-width: 0; }
+.home-main { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--space-5); }
+.home-main > section { min-width: 0; }
+.home-greeting { background: var(--surface-2); border-color: transparent; box-shadow: none; padding: var(--space-5); }
+.home-greeting .section-title { font-size: var(--text-base); }
+.home-streak { display: flex; align-items: baseline; gap: var(--space-2); margin: var(--space-4) 0; }
+.home-streak strong { font-size: var(--text-2xl); font-weight: 700; line-height: 1; }
+.home-streak span { color: var(--text-2); font-size: var(--text-sm); }
+.home-note { margin: 0; font-size: var(--text-xs); color: var(--muted); line-height: 1.6; }
+.home-section-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); }
+.home-section-head .section-title { margin: 0 0 var(--space-1); }
+.home-section-head .btn { flex: none; font-size: var(--text-sm); }
+.home-decks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+.home-cover { gap: var(--space-2); padding: var(--space-4); }
+.home-cover-top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-2); margin-bottom: var(--space-2); }
+.home-cover-top .cover-mark { margin: 0; }
+.home-cover-done { color: var(--muted); font-size: var(--text-xs); }
+.home-cover-counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-1); margin-top: var(--space-3); padding: var(--space-3) var(--space-2); border-radius: var(--radius-sm); background: var(--surface); }
+.home-cover-counts .count { display: grid; justify-items: center; gap: var(--space-1); font-size: var(--text-xs); }
+.home-cover-counts .count b { font-size: var(--text-base); color: var(--cover-ink); }
+.home-cover .cover-meta { padding-top: var(--space-2); justify-content: space-between; }
+.home-cover-action { display: inline-flex; align-items: center; gap: var(--space-1); color: var(--text); font-weight: 600; }
+.home-cover-action span { display: inline; }
+.home-album-link { display: inline-flex; align-items: center; gap: var(--space-1); margin-top: var(--space-4); font-size: var(--text-xs); text-underline-offset: var(--space-1); }
+.home-empty { padding: var(--space-6) var(--space-5); }
+.home-empty-mark { display: block; margin-bottom: var(--space-4); font-size: var(--text-2xl); color: var(--text-2); }
+.home-complete p { margin: var(--space-1) 0 0; font-size: var(--text-sm); }
+.home-activity, .home-chart, .home-forecast { padding: var(--space-5); box-shadow: none; }
+.home-activity-summary { font-size: var(--text-xs); color: var(--text-2); margin: 0 0 var(--space-4); }
+.home-heat-scroll { overflow-x: auto; padding: var(--space-1); margin: calc(-1 * var(--space-1)); scrollbar-width: thin; }
+.home-heat-calendar { min-width: max-content; }
+.home-heat-months { display: grid; grid-template-columns: repeat(53, var(--space-3)); gap: var(--space-1); padding-left: calc(var(--space-5) + var(--space-2)); margin-bottom: var(--space-2); font-size: var(--text-xs); color: var(--muted); }
+.home-heat-months span { white-space: nowrap; }
+.home-heat-body { display: flex; gap: var(--space-2); }
+.home-heat-weekdays { display: grid; grid-template-rows: repeat(7, var(--space-3)); gap: var(--space-1); width: var(--space-5); flex: none; font-size: var(--text-xs); line-height: 1; color: var(--muted); }
+.home-heat-grid { display: grid; grid-auto-flow: column; grid-template-columns: repeat(53, var(--space-3)); grid-template-rows: repeat(7, var(--space-3)); gap: var(--space-1); }
+.home-heat-cell, .home-heat-blank, .home-legend-cell { width: var(--space-3); height: var(--space-3); border-radius: calc(var(--radius-sm) / 4); }
+.home-heat-cell { display: block; padding: 0; border: 0; cursor: pointer; }
+.home-heat-cell:hover { outline: 1px solid var(--text); outline-offset: 1px; }
+.home-heat-cell.is-today { box-shadow: inset 0 0 0 1px var(--muted); }
+.home-heat-0 { background: var(--heat-0); }
+.home-heat-1 { background: var(--heat-1); }
+.home-heat-2 { background: var(--heat-2); }
+.home-heat-3 { background: var(--heat-3); }
+.home-heat-4 { background: var(--heat-4); }
+.home-heat-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-2); margin-top: var(--space-4); }
+.home-legend { display: flex; align-items: center; gap: var(--space-1); color: var(--muted); font-size: var(--text-xs); }
+.home-heat-help { margin-top: var(--space-3); }
+.home-data { margin-top: var(--space-4); border-top: 1px solid var(--border); padding-top: var(--space-3); font-size: var(--text-xs); }
+.home-data summary { cursor: pointer; color: var(--primary); padding: var(--space-1) 0; }
+.home-table { width: 100%; border-collapse: collapse; margin-top: var(--space-3); font-variant-numeric: tabular-nums; }
+.home-table th, .home-table td { padding: var(--space-2); border-bottom: 1px solid var(--border); text-align: right; }
+.home-table th:first-child { text-align: left; }
+.home-table tbody th { font-weight: 400; }
+.home-chart-total { font-size: var(--text-xs); color: var(--muted); }
+.home-chart-total strong { font-size: var(--text-xl); color: var(--text); }
+.home-monthly-bars { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-2); }
+.home-monthly-column, .home-forecast-column { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 0; border: 0; background: transparent; cursor: pointer; border-radius: calc(var(--radius-sm) / 2); }
+.home-monthly-column:hover, .home-forecast-column:hover { background: var(--surface-2); }
+.home-monthly-track { display: flex; align-items: flex-end; width: 100%; height: calc(var(--space-6) * 3); background: repeating-linear-gradient(to top, var(--border) 0 1px, transparent 1px 25%); }
+.home-monthly-stack { display: flex; flex-direction: column; width: 100%; margin: 0 var(--space-1); overflow: hidden; border-radius: calc(var(--radius-sm) / 2) calc(var(--radius-sm) / 2) 0 0; }
+.home-monthly-stack > span { min-height: 0; }
+.home-bar-new { background: var(--chart-new); }
+.home-bar-review { background: var(--chart-review); }
+.home-month-label { margin-top: var(--space-2); color: var(--muted); font-size: var(--text-xs); }
+.home-chart-legend { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); color: var(--muted); font-size: var(--text-xs); }
+.home-chart-legend > span { display: flex; align-items: center; gap: var(--space-1); }
+.home-chart-legend i { width: var(--space-2); height: var(--space-2); border-radius: calc(var(--radius-sm) / 4); }
+.home-forecast-bars { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: var(--space-1); height: calc(var(--space-6) * 2); margin-top: var(--space-4); border-bottom: 1px solid var(--border); }
+.home-forecast-fill { display: block; width: 100%; background: var(--chart-review); border-radius: calc(var(--radius-sm) / 4) calc(var(--radius-sm) / 4) 0 0; }
+.home-forecast-labels { display: flex; justify-content: space-between; font-size: var(--text-xs); color: var(--muted); margin-top: var(--space-2); }
+.home-forecast-note { margin-top: var(--space-3); }
+.home-tooltip { position: fixed; z-index: var(--z-toast); max-width: calc(100vw - var(--space-5)); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); background: var(--text); color: var(--surface); box-shadow: var(--shadow); font-size: var(--text-xs); }
 @media (min-width: 1024px) {
-  .home-layout {
-    grid-template-columns: minmax(0, 1fr) 300px;
-    grid-template-rows: auto auto 1fr;
-    grid-template-areas:
-      'main overview'
-      'main chart'
-      'main .';
-    align-items: start;
-  }
-  .home-main {
-    grid-area: main;
-  }
-  .home-overview {
-    grid-area: overview;
-  }
-  .home-chart {
-    grid-area: chart;
-  }
+  .home-content { grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: auto auto auto 1fr; grid-template-areas: 'main overview' 'main chart' 'main forecast' 'main .'; align-items: start; }
+  .home-main { grid-area: main; }
+  .home-overview { grid-area: overview; }
+  .home-chart { grid-area: chart; }
+  .home-forecast { grid-area: forecast; }
+  .home-heat-months, .home-heat-grid { grid-template-columns: repeat(53, var(--space-2)); column-gap: calc(var(--space-1) * .75); }
+  .home-heat-grid, .home-heat-weekdays { grid-template-rows: repeat(7, var(--space-2)); row-gap: calc(var(--space-1) * .75); }
+  .home-heat-cell, .home-heat-blank { width: var(--space-2); height: var(--space-2); }
+}
+@media (max-width: 767.98px) {
+  .home-layout { padding-top: var(--space-5); }
+  .home-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-stat { gap: var(--space-2); }
+  .home-date { width: 100%; }
+  .home-greeting { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-2) var(--space-3); padding: var(--space-4); }
+  .home-greeting .home-eyebrow, .home-greeting .section-title { margin: 0; }
+  .home-greeting .home-note { grid-column: 1; }
+  .home-streak { grid-column: 2; grid-row: 1 / span 3; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); margin: 0; }
+  .home-streak span { font-size: var(--text-xs); }
+  .home-decks { grid-template-columns: minmax(0, 1fr); }
+  .home-section-head { align-items: flex-start; }
+  .home-section-head .btn { padding: 0 var(--space-3); }
+  .home-activity, .home-chart, .home-forecast { padding: var(--space-4); }
 }

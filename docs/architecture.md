@@ -20,7 +20,7 @@ Tài liệu này nói code được tổ chức thế nào. App làm gì xem [pr
 ```
 index.html              Trang chủ (để ở gốc để mở / là vào)
 pages/
-  home/                 home.js, home.css: code của Trang chủ
+  home/                 home.js (+ analytics.js, charts.js), home.css, analytics.test.js: code của Trang chủ
   album/                index.html, album.js (+ detail.js, ui.js), album.css
   create/               index.html, create.js (+ card-rows.js, feedback.js), create.css
   study/                index.html, study.js, study.css
@@ -145,7 +145,12 @@ Thông số nằm ở `DEFAULT_CONFIG` trong `core/scheduler.js`. Test ở `test
 
 ## Test
 
-`npm test` chạy `node --test` trên thư mục `tests/`: thuật toán SM-2, thứ tự chọn thẻ, ngày học, lớp dữ liệu (`repo.js` chạy trên một localStorage giả trong bộ nhớ, `tests/helpers/memory-storage.js`). Giao diện các trang chưa có test tự động.
+`npm test` chạy `node --test`, Node tự tìm mọi file `*.test.js`:
+
+- `tests/`: thuật toán SM-2, thứ tự chọn thẻ, ngày học, lớp dữ liệu (`repo.js` chạy trên một localStorage giả trong bộ nhớ, `tests/helpers/memory-storage.js`).
+- `pages/home/analytics.test.js`: phần tính số liệu của Trang chủ (lượt ôn, chuỗi ngày, tỉ lệ nhớ, ô heatmap, cột tháng).
+
+Giao diện các trang chưa có test tự động.
 
 ## Thêm backend (sau này)
 
