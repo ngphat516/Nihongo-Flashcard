@@ -51,7 +51,7 @@ App có 4 trang. Danh sách việc chi tiết và tiêu chí xong nằm trong [t
 |---|---|
 | **Trang chủ** | Xem lời chào và chuỗi ngày học, thẻ tóm tắt (ôn hôm nay, chuỗi ngày, tổng thẻ, tỉ lệ nhớ), bìa các bộ cần học hôm nay, heatmap 12 tháng, biểu đồ lượt ôn 6 tháng |
 | **Album** | Xem lưới bìa các bộ; vào một bộ để xem, tìm, lọc, sửa, xóa thẻ; xem trạng thái và hạn ôn từng thẻ |
-| **Tạo thẻ** | Tạo bộ mới (chọn màu bìa), thêm từng thẻ hoặc dán nhiều thẻ một lần |
+| **Tạo thẻ** | Tạo bộ mới hoặc mở một bộ có sẵn; thêm, sửa, xóa thẻ rồi lưu một lần |
 | **Học** | Học một bộ: xem mặt trước → lật → chấm Lại/Khó/Tốt/Dễ; bộ đếm Mới/Đang học/Đến hạn; hoàn tác |
 
 ## Đã chốt, chưa làm
@@ -71,7 +71,7 @@ Thay 2 mặt `front` / `back` bằng các trường riêng, để sau này làm 
 | `jlpt` | Không | N5 … N1 |
 
 - **Cú pháp furigana:** viết `漢字[かんじ]` trong `term` và `example`, app hiển thị thành `<ruby>`.
-- Đổi cấu trúc này phải sửa `core/models.js`, `core/repo.js`, dữ liệu mẫu và test, nên phải làm xong trước khi trang Tạo thẻ và Album làm phần nhập/hiện thẻ.
+- Đổi cấu trúc này phải sửa `core/models.js`, `core/repo.js`, dữ liệu mẫu, test và ô nhập của trang Tạo thẻ (đang soạn thẻ 2 mặt). Nên làm trước khi Album làm phần hiện thẻ.
 
 ### Màu bìa bộ thẻ
 

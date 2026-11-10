@@ -16,6 +16,23 @@
 
 ---
 
+## 2026-11-11 — Trang Tạo thẻ (C1, C2, C3)
+
+- **Người làm:** Leader, cùng Claude (Leader nhận C1–C3 thay Thành viên 3).
+- **Đã xong:**
+  - Trang Tạo thẻ thành nơi soạn một bộ thẻ: `pages/create/` tạo bộ mới, `?deck=<id>` sửa bộ đó. Dropdown chọn bộ, ô tên / số thẻ mới mỗi ngày / mô tả, danh sách dòng thẻ 2 mặt có nút xóa, nút "Thêm thẻ", thanh Lưu dính ở đáy (Ctrl+Enter cũng lưu).
+  - Kiểm tra mọi ô trước khi ghi; nhắc thẻ trùng mặt trước; hỏi xác nhận khi xóa thẻ đã lưu, khi đổi bộ lúc còn thay đổi chưa lưu, và khi rời trang.
+  - Xóa khung `.todo` và đoạn `DEMO` của trang. Tách `card-rows.js` (dòng thẻ) và `feedback.js` (báo lỗi, toast, hộp xác nhận) để `create.js` không quá dài.
+  - Đã thử với `?seed`, `?reset`, `?deck=` sai id, ở 375px, 800px, 1280px: không cuộn ngang, Console không có lỗi. Sửa thẻ đã ôn vẫn giữ nguyên tiến độ SM-2. `npm test` 37/37.
+  - Nhánh `feature/create`.
+- **Quyết định:**
+  - Làm bản đơn giản theo yêu cầu của Leader: thẻ giữ 2 mặt `front`/`back`, không chờ L6; khi làm L6 thì đổi ô nhập của mỗi dòng.
+  - Một trang vừa tạo vừa sửa bộ, lưu một lần cho cả bộ, thay cho form thêm từng thẻ.
+  - Bỏ C6 (danh sách thẻ đã thay nó); C4, C5 để sau; C8 vẫn chờ L6.
+  - Cảnh báo thẻ trùng dùng chữ phụ `--text-2` kèm icon `triangle-alert`, không dùng màu vàng, vì `tokens.css` chưa có màu cảnh báo.
+  - Trang chỉ đổi tham số `deck` trên URL, giữ nguyên tham số khác, để `?seed` / `?reset` của `dev.js` vẫn chạy.
+- **Tiếp theo:** L6 (thẻ tiếng Nhật), rồi đổi ô nhập của trang Tạo thẻ.
+
 ## 2026-11-11 — Trang Album (A1–A8)
 
 - **Người làm:** Thành viên 2, cùng Claude.

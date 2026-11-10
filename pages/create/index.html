@@ -41,30 +41,90 @@
     </button>
   </header>
 
-  <!-- TẠO THẺ — phụ trách: Thành viên 3 · việc cần làm: docs/tasks.md mục C1–C8 -->
   <main class="container">
-    <h1 class="page-title">Tạo flashcard</h1>
+    <form class="create-editor" id="editor" novalidate>
+      <div class="page-head">
+        <h1 class="page-title" id="page-title">Bộ thẻ mới</h1>
+        <div class="row" id="deck-links" hidden>
+          <a class="btn" id="link-album" href="../album/">Xem trong album</a>
+          <a class="btn" id="link-study" href="../study/">Học ngay</a>
+        </div>
+      </div>
 
-    <section id="deck-picker" class="section todo">
-      <p class="todo-label"><b>C1 · C8</b>Chọn bộ có sẵn (chọn sẵn theo ?deck=) hoặc tạo bộ mới, chọn màu bìa</p>
-    </section>
+      <p class="alert" id="notice" role="status" hidden></p>
 
-    <div class="create-layout">
-      <section id="card-form" class="section todo">
-        <p class="todo-label"><b>C2 · C3</b>Form mặt trước / mặt sau · Ctrl+Enter để lưu · kiểm tra dữ liệu</p>
+      <section class="panel create-deck" aria-label="Thông tin bộ thẻ">
+        <div class="field create-deck-picker" id="deck-picker" hidden>
+          <label class="field-label" for="deck-select">Bộ thẻ</label>
+          <select class="input" id="deck-select">
+            <option value="">+ Bộ mới</option>
+          </select>
+        </div>
+        <div class="field create-deck-name">
+          <label class="field-label" for="deck-name">Tên bộ</label>
+          <input class="input" id="deck-name" maxlength="80" autocomplete="off" required aria-describedby="deck-name-error">
+          <span class="field-error" id="deck-name-error" hidden></span>
+        </div>
+        <div class="field create-deck-limit">
+          <label class="field-label" for="deck-limit">Thẻ mới mỗi ngày</label>
+          <input class="input" id="deck-limit" type="number" inputmode="numeric" min="0" max="999" step="1" value="20" aria-describedby="deck-limit-error">
+          <span class="field-error" id="deck-limit-error" hidden></span>
+        </div>
+        <div class="field create-deck-desc">
+          <label class="field-label" for="deck-desc">Mô tả <span class="muted">(không bắt buộc)</span></label>
+          <textarea class="input" id="deck-desc" maxlength="300" rows="2"></textarea>
+        </div>
       </section>
-      <section id="card-preview" class="section todo">
-        <p class="todo-label"><b>C4</b>Xem trước thẻ (bấm để lật)</p>
+
+      <section class="section" aria-labelledby="cards-title">
+        <h2 class="section-title" id="cards-title">Thẻ</h2>
+        <ol class="create-cards" id="cards"></ol>
+        <button class="btn create-add" id="add-card" type="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          Thêm thẻ
+        </button>
       </section>
-    </div>
 
-    <section id="bulk-import" class="section todo">
-      <p class="todo-label"><b>C5</b>Dán nhiều thẻ một lúc (mỗi dòng: trước | sau)</p>
-    </section>
+      <div class="create-savebar">
+        <p class="create-status" id="status"></p>
+        <button class="btn btn-primary" id="save" type="submit" title="Lưu (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">Lưu</button>
+      </div>
+    </form>
 
-    <section id="recent-cards" class="section todo">
-      <p class="todo-label"><b>C6</b>Thẻ vừa thêm trong phiên này</p>
-    </section>
+    <!-- Một dòng thẻ. create.js nhân bản, gán id cho từng ô và điền nội dung bằng .value. -->
+    <template id="card-template">
+      <li class="create-card">
+        <span class="create-card-num" aria-hidden="true"></span>
+        <div class="field create-card-front">
+          <label class="field-label">Mặt trước</label>
+          <textarea class="input create-card-input" data-face="front" rows="1" maxlength="2000"></textarea>
+          <span class="field-error" hidden></span>
+          <span class="create-warning" hidden>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            <span class="create-warning-text"></span>
+          </span>
+        </div>
+        <div class="field create-card-back">
+          <label class="field-label">Mặt sau</label>
+          <textarea class="input create-card-input" data-face="back" rows="1" maxlength="2000"></textarea>
+          <span class="field-error" hidden></span>
+        </div>
+        <button class="btn btn-ghost create-card-delete" type="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+        </button>
+      </li>
+    </template>
+
+    <dialog class="dialog" id="confirm" aria-labelledby="confirm-title">
+      <form method="dialog">
+        <h2 class="dialog-title" id="confirm-title"></h2>
+        <p id="confirm-text"></p>
+        <div class="dialog-actions">
+          <button class="btn" value="cancel">Hủy</button>
+          <button class="btn btn-danger" id="confirm-ok" value="ok"></button>
+        </div>
+      </form>
+    </dialog>
   </main>
 </body>
 </html>

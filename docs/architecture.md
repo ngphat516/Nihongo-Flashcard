@@ -22,7 +22,7 @@ index.html              Trang chủ (để ở gốc để mở / là vào)
 pages/
   home/                 home.js, home.css: code của Trang chủ
   album/                index.html, album.js, album.css
-  create/               index.html, create.js, create.css
+  create/               index.html, create.js (+ card-rows.js, feedback.js), create.css
   study/                index.html, study.js, study.css
   styleguide/           xem mọi biến và class giao diện (công cụ dev, xóa trước khi nộp)
 core/                   phần lõi dùng chung
@@ -53,7 +53,7 @@ Ai phụ trách folder nào: xem [tasks.md](tasks.md#phân-việc).
 |---|---|---|
 | Trang chủ | `index.html` + `pages/home/` | `./` |
 | Album | `pages/album/` | `pages/album/` (lưới bộ) · `pages/album/?deck=<id>` (chi tiết bộ) |
-| Tạo thẻ | `pages/create/` | `pages/create/` · `pages/create/?deck=<id>` (chọn sẵn bộ) |
+| Tạo thẻ | `pages/create/` | `pages/create/` (tạo bộ mới) · `pages/create/?deck=<id>` (sửa bộ đó, thêm thẻ) |
 | Học | `pages/study/` | `pages/study/` (chọn bộ) · `pages/study/?deck=<id>` (buổi học) |
 
 Mỗi file HTML nạp `styles/base.css`, CSS riêng của trang, `dev/dev.js` và đúng **một** file JS làm điểm vào (`pages/<trang>/<trang>.js`).
