@@ -1,4 +1,4 @@
-# Nhớ Lâu — học tiếng Nhật bằng flashcard
+# Học tiếng Nhật bằng flashcard
 
 Web app giúp học từ vựng và kanji tiếng Nhật bằng flashcard. Lịch ôn do thuật toán lặp lại ngắt quãng **SM-2 kiểu Anki** tính, để mỗi thẻ quay lại đúng lúc sắp quên.
 HTML / CSS / JavaScript thuần (không framework, không build), dữ liệu lưu trong trình duyệt (`localStorage`).
