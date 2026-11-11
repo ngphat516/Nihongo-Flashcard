@@ -14,7 +14,7 @@ Luật chung cho cả nhóm và cho agent. Kiến trúc xem [architecture.md](ar
 2. **Đưa dữ liệu người dùng vào trang bằng `h()` (trong `core/dom.js`) hoặc `textContent`.** Không dùng `innerHTML` với tên bộ, nội dung thẻ hay bất cứ thứ gì người dùng gõ, vì dễ bị lỗi bảo mật XSS.
 3. **Mọi hàm trong `repo.js` đều async**, nhớ `await`. Lỗi do người dùng nhập sai có `err.name === 'ValidationError'`: hiện `err.message` cho người dùng; lỗi khác thì `throw` tiếp.
 4. **Bọc code khởi động trang trong `startPage(async () => { ... })`**, để lỗi hiện lên trang thay vì chỉ nằm trong Console.
-5. **Đường dẫn luôn tương đối** (`../../core/repo.js`, `styles/base.css`). Đường dẫn bắt đầu bằng `/` sẽ hỏng khi deploy lên GitHub Pages, vì app nằm dưới `/Nihongo-Flashcard/`.
+5. **Đường dẫn luôn tương đối** (`../../core/repo.js`, `styles/base.css`). Đường dẫn bắt đầu bằng `/` sẽ hỏng khi app nằm dưới thư mục con, VD Live Server mở cả thư mục cha hoặc GitHub Pages `/Nihongo-Flashcard/`.
 6. **Link giữa các trang tạo bằng `routes`** (`routes.study(deck.id)`), không tự ghép chuỗi. Truyền dữ liệu sang trang khác chỉ bằng tham số URL khai báo trong `core/routes.js`; cần tham số mới thì báo Leader thêm.
 7. **Chia file trong trang:** `<trang>.js` là điểm vào. File dài quá khoảng 300 dòng thì tách module trong cùng folder (VD `pages/study/session.js`). Module của trang nào chỉ import trong folder đó; trang này không import file của trang khác.
 8. **Chữ trên giao diện bằng tiếng Việt**, dùng đúng các từ trong [product.md › Từ ngữ](product.md#từ-ngữ-của-dự-án).
@@ -91,9 +91,19 @@ Mỗi thông tin chỉ ghi ở **một** file; file khác thì trỏ link sang.
 
 ## Trước khi nộp / deploy
 
-App deploy bằng **GitHub Pages** từ nhánh `main` (chưa bật). Lúc deploy, `main` phải sạch các công cụ dev.
+App chạy trên **Vercel**, project `nho-lau` của Leader. Link ở [README](../README.md).
 
-**Dọn code:**
+**Deploy lại** sau mỗi lần merge vào `main`. Vercel chưa nối với GitHub, nên merge không tự cập nhật bản đang chạy. Leader chạy ở gốc repo, cần [Vercel CLI](https://vercel.com/docs/cli) đã đăng nhập:
+
+```bash
+vercel link --yes --project nho-lau   # chỉ lần đầu trên một máy
+vercel deploy --prod
+```
+
+- `.vercelignore` bỏ tài liệu, test, `pages/styleguide/` và `package.json`, để Vercel coi đây là web tĩnh và không chạy npm.
+- Deploy xong, mở link, thử cả 4 trang và xem Console không có lỗi 404.
+
+**Dọn code trước khi nộp.** Bản đang chạy còn giữ `dev/dev.js` để demo bằng `?seed` (Leader chốt ngày 2026-11-11). Lúc nộp thì:
 - Xóa dòng `<script type="module" src="…dev/dev.js">` trong 4 file HTML. Nếu còn, ai mở link có `?reset` sẽ mất sạch dữ liệu, `?seed` sẽ thêm dữ liệu giả.
 - Xóa folder `pages/styleguide/`.
 - Xóa hết khung `.todo` và đoạn `DEMO` còn sót.
@@ -101,5 +111,3 @@ App deploy bằng **GitHub Pages** từ nhánh `main` (chưa bật). Lúc deploy
 - `npm test` qua hết.
 
 **Kiểm tra cuối:** luồng tạo bộ → thêm thẻ → học → xem heatmap, trên máy tính và điện thoại.
-
-**Bật GitHub Pages:** repo trên GitHub → *Settings* → *Pages* → *Build and deployment* → *Source*: **Deploy from a branch** → nhánh `main`, thư mục `/ (root)` → *Save*. Vài phút sau app chạy ở `https://ngphat516.github.io/Nihongo-Flashcard/`. Mở link đó, thử cả 4 trang và xem Console không có lỗi 404.

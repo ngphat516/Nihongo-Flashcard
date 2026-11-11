@@ -16,6 +16,20 @@
 
 ---
 
+## 2026-11-11 — Deploy lên Vercel
+
+- **Người làm:** Leader, cùng Claude.
+- **Đã xong:**
+  - Deploy `main` lên Vercel bằng CLI, project `nho-lau`. Link ghi trong README.
+  - Thêm `.vercelignore`, để không đưa tài liệu, test, `pages/styleguide/` và `package.json` lên Vercel.
+  - Đã thử trên link thật với `?seed`. Cả 4 trang nạp đủ file, không file nào 404, Console không có lỗi.
+- **Quyết định:**
+  - Deploy trên Vercel thay cho GitHub Pages.
+  - Tạm giữ `dev/dev.js` để demo bằng `?seed`.
+  - Cách deploy lại và việc dọn code trước khi nộp ghi ở [conventions.md › Trước khi nộp](conventions.md#trước-khi-nộp--deploy).
+- **Tiếp theo:** mỗi lần merge vào `main` thì Leader chạy `vercel deploy --prod`. Lúc nộp bài thì dọn code (L5).
+- **Vướng mắc:** chưa nối được Vercel với repo GitHub: app Vercel trên GitHub chưa có quyền vào repo. Muốn merge xong tự deploy thì cấp quyền trong GitHub › Settings › Applications › Vercel, rồi chạy `vercel git connect`.
+
 ## 2026-11-11 — Tiến độ sau 4 PR đầu tiên (L3)
 
 - **Người làm:** Leader, cùng Claude.
