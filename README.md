@@ -3,6 +3,8 @@
 Web app giúp học từ vựng và kanji tiếng Nhật bằng flashcard. Lịch ôn do thuật toán lặp lại ngắt quãng **SM-2 kiểu Anki** tính, để mỗi thẻ quay lại đúng lúc sắp quên.
 HTML / CSS / JavaScript thuần (không framework, không build), dữ liệu lưu trong trình duyệt (`localStorage`).
 
+**Dùng thử:** https://nho-lau-gamma.vercel.app. Mở [link có `?seed`](https://nho-lau-gamma.vercel.app/?seed) để có sẵn 3 bộ thẻ mẫu.
+
 Đồ án nhóm 4 người, đang làm giai đoạn 1 (flashcard). Tiến độ: [docs/process.md](docs/process.md).
 
 ## Chạy thử

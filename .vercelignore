@@ -1,0 +1,12 @@
+# File không đưa lên Vercel: chỉ cần index.html, pages/, core/, styles/, dev/.
+# Bỏ package.json để Vercel coi đây là web tĩnh, không chạy npm.
+.claude/
+.github/
+.vscode/
+docs/
+tests/
+pages/styleguide/
+*.test.js
+*.md
+package.json
+.editorconfig
