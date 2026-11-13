@@ -111,13 +111,13 @@ Mục đích: soạn một bộ thẻ. `pages/create/` tạo bộ mới; `pages/
 
 Mục đích: học theo thuật toán SM-2. `pages/study/` để chọn bộ, `pages/study/?deck=<id>` để học.
 
-> Thẻ đang có 2 mặt `front`/`back`. Khi làm L6: đổi nội dung 2 mặt thẻ trong `showFront()` và `reveal()` của `study.js` sang thẻ tiếng Nhật (gắn `lang="ja"`).
+> Thẻ đang có 2 mặt `front`/`back`. Khi làm L6: đổi nội dung 2 mặt thẻ trong `showFront()` của `study.js` sang thẻ tiếng Nhật (gắn `lang="ja"`).
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Hàm core | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
 | S1 | Chọn bộ | Không có `?deck=` thì hiện danh sách bộ kèm số thẻ cần học, bấm để vào học. Bộ hết thẻ thì mờ đi | `getDeckOverview()` | Bắt buộc | Xong |
-| S2 | Hiện thẻ | Hiện mặt trước. Nút "Hiện đáp án" (phím **Space**) lật ra mặt sau | `getStudyQueue(deckId)` | Bắt buộc | Xong |
-| S3 | 4 nút chấm điểm | Lại / Khó / Tốt / Dễ, mỗi nút ghi thời gian lần ôn tới ("10 phút", "4 ngày"). Chỉ hiện sau khi lật. Phím **1–4** | `previewRatings(card)`, `RATING_LABELS` | Bắt buộc | Xong |
+| S2 | Hiện thẻ | Bấm thẻ hoặc nhấn **Space** để lật qua lại. Gợi ý phím nằm ở đáy thẻ. **← / →** chuyển giữa các thẻ có thể học theo lịch của bộ và dừng ở hai đầu | `getStudyQueue(deckId)`, `getCards(deckId)` | Bắt buộc | Xong |
+| S3 | 4 nút chấm điểm | Luôn hiện Lại / Khó / Tốt / Dễ và thời gian lần ôn tới, kể cả ở mặt trước. Phím **1–4** dùng để chấm | `previewRatings(card)`, `RATING_LABELS` | Bắt buộc | Xong |
 | S4 | Lưu & sang thẻ sau | Bấm nút: lưu kèm `timeMs` (từ lúc hiện thẻ tới lúc chấm), rồi lấy thẻ tiếp với `lastCardId` | `reviewCard()`, `getStudyQueue(deckId, { lastCardId })` | Bắt buộc | Xong |
 | S5 | Bộ đếm | Thanh trên: tên bộ · **Mới** (xanh dương) · **Đang học** (cam) · **Đến hạn** (xanh lá), cập nhật sau mỗi lần chấm · nút Thoát | `counts` trong kết quả `getStudyQueue` | Bắt buộc | Xong |
 | S6 | Màn hoàn thành | Hết thẻ: "Xong rồi!" + số thẻ đã học + thời gian học. Còn thẻ đang học hẹn sau: "Quay lại lúc 14:32" và tự tải lại khi tới giờ | `nextLearningAt` | Bắt buộc | Xong |
