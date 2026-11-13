@@ -41,45 +41,69 @@
     </button>
   </header>
 
-  <main class="container container-narrow">
+  <main class="container study-main">
     <section id="deck-picker" hidden>
-      <h1 class="page-title">Chọn bộ để học</h1>
+      <div class="study-heading">
+        <h1 class="page-title">Chọn bộ để học</h1>
+        <p class="muted">Chọn một bộ thẻ để bắt đầu học từ mới hoặc ôn thẻ đến hạn.</p>
+      </div>
       <div id="deck-list"></div>
     </section>
 
     <p id="study-error" class="alert alert-error" role="alert" hidden></p>
     <button id="retry-queue" class="btn" type="button" hidden>Thử lại</button>
 
-    <section id="session" hidden>
+    <section id="session" class="study-session" hidden>
       <div class="study-bar">
         <h1 id="deck-name" class="page-title"></h1>
-        <div id="study-counts" class="counts" aria-live="polite"></div>
-        <a id="exit-session" class="btn btn-ghost" href="./">Thoát</a>
+        <a id="exit-session" class="btn" href="./">Thoát phiên</a>
       </div>
-      <div id="card-stage" class="flashcard study-card section" aria-live="polite">
-        <div class="flashcard-inner">
-          <div id="card-front" class="flashcard-face flashcard-front">
-            <span class="study-card-label">Mặt trước</span>
-            <p></p>
-          </div>
-          <div id="card-back" class="flashcard-face flashcard-back" aria-hidden="true">
-            <span class="study-card-label">Mặt sau</span>
-            <p></p>
-          </div>
+      <section class="panel study-queue" aria-labelledby="queue-title">
+        <h2 id="queue-title">Cần học trong bộ</h2>
+        <div id="study-counts" class="counts study-queue-counts" aria-live="polite"></div>
+      </section>
+      <div class="study-workspace">
+        <div class="study-card-nav" aria-label="Duyệt thẻ" role="group">
+          <button id="previous-card" class="btn" type="button" aria-label="Thẻ trước" aria-keyshortcuts="ArrowLeft">←</button>
+          <p id="card-position" aria-live="polite"></p>
+          <button id="next-card" class="btn" type="button" aria-label="Thẻ sau" aria-keyshortcuts="ArrowRight">→</button>
         </div>
+        <button id="card-stage" class="flashcard study-card" type="button"
+          aria-keyshortcuts="Space" aria-live="polite">
+          <span class="flashcard-inner">
+            <span id="card-front" class="flashcard-face flashcard-front">
+              <span class="study-card-label">Mặt trước</span>
+              <span class="study-card-text"></span>
+              <span class="study-card-hint">Hiện mặt sau</span>
+            </span>
+            <span id="card-back" class="flashcard-face flashcard-back" aria-hidden="true">
+              <span class="study-card-label">Mặt sau</span>
+              <span class="study-card-text"></span>
+              <span class="study-card-hint">Về mặt trước</span>
+            </span>
+          </span>
+        </button>
+        <section class="panel study-rate-panel" aria-labelledby="rating-title">
+          <div class="study-rate-heading">
+            <h2 id="rating-title">Bạn nhớ thẻ này đến đâu?</h2>
+            <p class="muted">Thời gian trên mỗi nút là lịch ôn tiếp theo.</p>
+          </div>
+          <div id="rating-buttons" class="rate-bar study-ratings" role="group" aria-labelledby="rating-title"></div>
+          <button id="undo-session" class="btn btn-ghost" type="button" aria-keyshortcuts="Z" hidden>Hoàn tác lượt chấm</button>
+        </section>
       </div>
-      <div class="section">
-        <button id="reveal-card" class="btn btn-primary study-reveal" type="button"
-          aria-keyshortcuts="Space">Hiện đáp án</button>
-        <div id="rating-buttons" class="rate-bar study-ratings" role="group" aria-label="Chấm điểm" hidden></div>
-      </div>
-      <div class="study-tools">
-        <button id="undo-session" class="btn" type="button" aria-keyshortcuts="Z" hidden>Hoàn tác</button>
-      </div>
-      <p class="study-shortcuts muted">Space để lật · 1–4 để chấm · Z để hoàn tác</p>
+      <section class="panel study-shortcuts" aria-labelledby="shortcuts-title">
+        <h2 id="shortcuts-title">Phím tắt</h2>
+        <dl>
+          <div><dt>Lật thẻ</dt><dd><kbd>Space</kbd></dd></div>
+          <div><dt>Đổi thẻ</dt><dd><kbd>←</kbd> <kbd>→</kbd></dd></div>
+          <div><dt>Chấm điểm</dt><dd><kbd>1</kbd>–<kbd>4</kbd></dd></div>
+          <div><dt>Hoàn tác</dt><dd><kbd>Z</kbd></dd></div>
+        </dl>
+      </section>
     </section>
 
-    <section id="done-screen" class="empty study-done" hidden>
+    <section id="done-screen" class="panel study-done" hidden>
       <h1 id="done-title" class="empty-title" tabindex="-1">Xong rồi!</h1>
       <p id="session-summary" class="empty-text"></p>
       <p id="return-time" class="empty-text" hidden></p>

@@ -16,6 +16,17 @@
 
 ---
 
+## 2026-11-13 — Thiết kế lại trang Học (S1–S8)
+
+- **Đã xong:** bố cục chọn bộ, phiên ôn và màn hoàn thành. Thêm nút duyệt thẻ trên màn hình và hiển thị vị trí trong hàng đợi.
+- **Quyết định:** dùng bảng màu và thành phần của Nhớ Lâu. Giữ lịch ôn, cách tính bộ đếm và phím tắt hiện có.
+- **Kiểm tra:** 43 test hiện có đã qua.
+
+## 2026-11-13 — Thao tác với flashcard (S2–S3)
+
+- **Người làm:** AT, cùng Codex.
+- **Đã xong:** lật qua lại bằng Space hoặc bấm thẻ, đặt gợi ý phím ở đáy thẻ, hiện bốn nút chấm ngay và hỗ trợ phím mũi tên để xem thẻ trước hoặc sau trong hàng đợi.
+- **Kiểm tra:** 37 test qua. Edge xác nhận Space không chấm điểm kể cả khi nút chấm đang được focus, mũi tên dừng ở hai đầu và bốn nút vẫn nằm trên một hàng ở 375 px.
 ## 2026-11-11 — Deploy lên Vercel
 
 - **Người làm:** Leader, cùng Claude.

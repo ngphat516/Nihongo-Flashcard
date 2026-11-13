@@ -1,6 +1,7 @@
 import { $, getParam, h, startPage } from '../../core/dom.js';
 import { NotFoundError } from '../../core/models.js';
-import { getDeckOverview, getStudyQueue, reviewCard } from '../../core/repo.js';
+import { LEARN_AHEAD_MS, isLearning } from '../../core/queue.js';
+import { getCards, getDeckOverview, getStudyQueue, reviewCard } from '../../core/repo.js';
 import { routes } from '../../core/routes.js';
 import { Rating, RATINGS, RATING_LABELS, previewRatings } from '../../core/scheduler.js';
 
@@ -24,15 +25,29 @@ function countItems(counts) {
   return Object.entries(countLabels).map(([state, label]) => {
     const count = counts[state];
     return h('span', { class: `count count-${state}${count === 0 ? ' is-zero' : ''}` },
-      h('b', {}, count), ` ${label}`);
+      h('b', {}, count), h('span', {}, label));
   });
 }
 
 function setCardText(face, text) {
-  const content = $('p', face);
+  const content = $('.study-card-text', face);
   content.textContent = text;
   if (japaneseText.test(text)) content.lang = 'ja';
   else content.removeAttribute('lang');
+}
+
+function browsableCards(cards, newLimit, now, lastCardId) {
+  const learning = cards.filter(isLearning).sort((a, b) => a.due - b.due);
+  const reviews = cards.filter((card) => card.state === 'review' && card.due <= now);
+  reviews.sort((a, b) => a.due - b.due);
+
+  return [
+    ...learning.filter((card) => card.due <= now),
+    ...reviews,
+    ...cards.filter((card) => card.state === 'new').slice(0, newLimit),
+    ...learning.filter((card) =>
+      card.due > now && card.due <= now + LEARN_AHEAD_MS && card.id !== lastCardId),
+  ];
 }
 
 async function showDeckPicker() {
@@ -47,11 +62,16 @@ async function showDeckPicker() {
   } else {
     list.replaceChildren(h('ul', { class: 'study-decks' }, overview.map(({ deck, due }) => {
       const hasCards = Object.values(due).some((count) => count > 0);
+      const total = Object.values(due).reduce((sum, count) => sum + count, 0);
       return h('li', {}, h('a', {
         class: hasCards ? 'panel study-deck' : 'panel study-deck is-zero',
         href: routes.study(deck.id),
       },
-      h('strong', {}, deck.name),
+      h('span', { class: 'study-deck-heading' },
+        h('strong', {}, deck.name),
+        h('span', { class: 'study-deck-arrow', 'aria-hidden': 'true' }, '→')),
+      h('span', { class: 'study-deck-total' },
+        total ? `${total} thẻ cần học` : 'Không có thẻ cần học'),
       h('span', { class: 'counts' }, countItems(due))));
     })));
   }
@@ -65,8 +85,10 @@ async function startSession(deckId) {
   const stage = $('#card-stage');
   const front = $('#card-front');
   const back = $('#card-back');
-  const revealButton = $('#reveal-card');
   const ratings = $('#rating-buttons');
+  const previousCard = $('#previous-card');
+  const nextCard = $('#next-card');
+  const cardPosition = $('#card-position');
   const undoButtons = [$('#undo-session'), $('#undo-done')];
   const errorBox = $('#study-error');
   const retryButton = $('#retry-queue');
@@ -76,6 +98,8 @@ async function startSession(deckId) {
   const reviewedCards = new Set();
   let studyMs = 0;
   let current = null;
+  let cardsToBrowse = [];
+  let cardIndex = 0;
   let shownAt = 0;
   let revealed = false;
   let lastReview = null;
@@ -100,36 +124,44 @@ async function startSession(deckId) {
     stage.classList.remove('is-flipped');
     stage.classList.add('is-resetting');
     setCardText(front, card.front);
-    setCardText(back, '');
+    setCardText(back, card.back);
     front.removeAttribute('aria-hidden');
     back.setAttribute('aria-hidden', 'true');
-    ratings.hidden = true;
-    revealButton.hidden = false;
+    cardPosition.textContent = `Thẻ ${cardIndex + 1} / ${cardsToBrowse.length}`;
+    previousCard.disabled = cardIndex === 0;
+    nextCard.disabled = cardIndex === cardsToBrowse.length - 1;
+    renderRatings(card);
     done.hidden = true;
     session.hidden = false;
-    revealButton.focus();
+    stage.focus({ preventScroll: true });
   }
 
-  function reveal() {
-    if (!current || revealed || busy) return;
-    const preview = previewRatings(current);
-    setCardText(back, current.back);
+  function flipCard() {
+    if (!current || busy) return;
+    revealed = !revealed;
     stage.classList.remove('is-resetting');
-    stage.classList.add('is-flipped');
-    front.setAttribute('aria-hidden', 'true');
-    back.removeAttribute('aria-hidden');
+    stage.classList.toggle('is-flipped', revealed);
+    front.setAttribute('aria-hidden', String(revealed));
+    back.setAttribute('aria-hidden', String(!revealed));
+  }
+
+  function renderRatings(card) {
+    const preview = previewRatings(card);
     ratings.replaceChildren(...RATINGS.map((rating) => h('button', {
       class: `btn ${ratingClasses[rating]}`,
       type: 'button',
       'aria-keyshortcuts': String(rating),
       onClick: () => answer(rating),
     },
-    h('small', {}, preview[rating].label),
-    h('span', {}, RATING_LABELS[rating]))));
-    revealed = true;
-    revealButton.hidden = true;
-    ratings.hidden = false;
-    ratings.firstElementChild.focus();
+    h('span', {}, RATING_LABELS[rating]),
+    h('small', {}, preview[rating].label))));
+  }
+
+  function moveCard(offset) {
+    const nextIndex = cardIndex + offset;
+    if (busy || !current || nextIndex < 0 || nextIndex >= cardsToBrowse.length) return;
+    cardIndex = nextIndex;
+    showFront(cardsToBrowse[cardIndex]);
   }
 
   function showDone(nextLearningAt) {
@@ -156,10 +188,20 @@ async function startSession(deckId) {
     clearTimeout(wakeTimer);
     current = null;
     try {
-      const queue = await getStudyQueue(deckId, { lastCardId });
+      const now = Date.now();
+      const queue = await getStudyQueue(deckId, { now, lastCardId });
+      const card = restoredCard ?? queue.card;
+      if (card) {
+        const cards = await getCards(deckId);
+        cardsToBrowse = browsableCards(cards, queue.counts.new, now, lastCardId);
+        cardIndex = cardsToBrowse.findIndex((item) => item.id === card.id);
+        if (cardIndex === -1) {
+          cardsToBrowse.unshift(card);
+          cardIndex = 0;
+        }
+      }
       $('#deck-name').textContent = queue.deck.name;
       $('#study-counts').replaceChildren(...countItems(queue.counts));
-      const card = restoredCard ?? queue.card;
       restoredCard = null;
       if (card) showFront(card);
       else showDone(queue.nextLearningAt);
@@ -197,7 +239,7 @@ async function startSession(deckId) {
   }
 
   function answer(rating) {
-    if (!current || !revealed) return;
+    if (!current) return;
     return run(async () => {
       const card = current;
       const timeMs = Math.round(performance.now() - shownAt);
@@ -226,20 +268,28 @@ async function startSession(deckId) {
     });
   }
 
-  revealButton.addEventListener('click', reveal);
+  stage.addEventListener('click', flipCard);
+  previousCard.addEventListener('click', () => moveCard(-1));
+  nextCard.addEventListener('click', () => moveCard(1));
   retryButton.addEventListener('click', reloadQueue);
   for (const button of undoButtons) button.addEventListener('click', undoLast);
 
   document.addEventListener('keydown', (event) => {
-    if (event.defaultPrevented || event.repeat || event.isComposing || busy ||
+    if (event.defaultPrevented || event.isComposing ||
         event.altKey || event.ctrlKey || event.metaKey) return;
     if (event.target.closest('input, textarea, select, [contenteditable]')) return;
 
-    if (event.key === ' ' && current && !revealed) {
-      if (event.target !== revealButton && event.target.closest('button, a')) return;
+    if (event.key === ' ' && !session.hidden) {
       event.preventDefault();
-      reveal();
-    } else if (current && revealed && RATINGS.includes(Number(event.key))) {
+      if (!event.repeat) flipCard();
+      return;
+    }
+    if (event.repeat || busy) return;
+
+    if (current && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+      event.preventDefault();
+      moveCard(event.key === 'ArrowLeft' ? -1 : 1);
+    } else if (current && RATINGS.includes(Number(event.key))) {
       event.preventDefault();
       answer(Number(event.key));
     } else if (event.key.toLowerCase() === 'z' && lastReview) {
