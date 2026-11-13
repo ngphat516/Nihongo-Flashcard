@@ -6,6 +6,8 @@ import { routes } from '../../core/routes.js';
 import { Rating, RATINGS, RATING_LABELS, previewRatings } from '../../core/scheduler.js';
 
 const countLabels = { new: 'Mới', learning: 'Đang học', review: 'Đến hạn' };
+// Cùng thứ tự với Album cho tới khi L6 lưu màu trên từng bộ thẻ.
+const COVER_COLORS = ['pink', 'peach', 'yellow', 'green', 'sky', 'lavender'];
 const ratingClasses = {
   [Rating.AGAIN]: 'btn-again',
   [Rating.HARD]: 'btn-hard',
@@ -60,11 +62,11 @@ async function showDeckPicker() {
       h('a', { class: 'btn btn-primary', href: routes.create() }, 'Tạo bộ thẻ'),
     ));
   } else {
-    list.replaceChildren(h('ul', { class: 'study-decks' }, overview.map(({ deck, due }) => {
-      const hasCards = Object.values(due).some((count) => count > 0);
+    list.replaceChildren(h('ul', { class: 'study-decks' }, overview.map(({ deck, due }, index) => {
+      const color = COVER_COLORS[index % COVER_COLORS.length];
       const total = Object.values(due).reduce((sum, count) => sum + count, 0);
       return h('li', {}, h('a', {
-        class: hasCards ? 'panel study-deck' : 'panel study-deck is-zero',
+        class: `cover cover-${color} study-deck${total === 0 ? ' is-zero' : ''}`,
         href: routes.study(deck.id),
       },
       h('span', { class: 'study-deck-heading' },

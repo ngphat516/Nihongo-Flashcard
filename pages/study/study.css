@@ -27,12 +27,10 @@
   gap: var(--space-3);
   padding: var(--space-5);
   color: var(--text);
-  text-decoration: none;
   overflow-wrap: anywhere;
 }
 
 .study-deck:hover {
-  background: var(--primary-soft);
   color: var(--text);
   text-decoration: none;
 }
@@ -56,7 +54,7 @@
 }
 
 .study-deck-arrow {
-  color: var(--primary-strong);
+  color: var(--cover-ink);
 }
 
 .study-deck-total,
@@ -67,11 +65,16 @@
 
 .study-deck .counts {
   padding-top: var(--space-3);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid color-mix(in srgb, var(--cover-ink) 14%, transparent);
 }
 
 .study-deck .count b {
   margin-inline-end: var(--space-1);
+  color: var(--cover-ink);
+}
+
+.study-deck .count.is-zero b {
+  color: var(--text-2);
 }
 
 .study-session,

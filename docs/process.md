@@ -16,6 +16,10 @@
 
 ---
 
+## 2026-11-13 — Đồng bộ màu bìa trang Học (S1)
+
+- Bìa trên màn chọn bộ dùng cùng bảng màu và thứ tự với Album, kể cả bộ chưa có thẻ cần học.
+
 ## 2026-11-13 — Thiết kế lại trang Học (S1–S8)
 
 - **Đã xong:** bố cục chọn bộ, phiên ôn và màn hoàn thành. Thêm nút duyệt thẻ trên màn hình và hiển thị vị trí trong hàng đợi.
