@@ -9,6 +9,11 @@
  * Thẻ đã lưu bị xóa (bấm thùng rác hoặc xóa trắng cả 2 mặt) thì hỏi xác nhận một lần trước khi lưu.
  *
  * Module trong folder: card-rows.js (các dòng thẻ), feedback.js (báo lỗi, toast, hộp xác nhận).
+ *
+ * Thẻ tiếng Nhật (L6): createCards / updateCard nhận { term, meaning, reading, example, jlpt };
+ * { front, back } vẫn được nhận tạm như term / meaning cho tới L6b. Bộ mới tự lấy màu kế tiếp,
+ * muốn cho chọn màu thì truyền createDeck({ color }) với một giá trị trong DECK_COLORS (C8).
+ * So trùng thẻ nên dùng plainFurigana(term) (furigana.js) để 約束[やくそく] trùng với 約束.
  */
 import {
   createCards,

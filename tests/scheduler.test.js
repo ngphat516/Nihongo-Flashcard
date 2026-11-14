@@ -9,7 +9,7 @@ const daysFrom = (n, from = NOW) => addDays(dayStart(from), n);
 
 function newCard(extra = {}) {
   return {
-    id: 'card-1', deckId: 'deck-1', front: 'f', back: 'b',
+    id: 'card-1', deckId: 'deck-1', term: 'f', meaning: 'b', reading: '', example: '', jlpt: '',
     state: 'new', due: 0, interval: 0, ease: 0, step: 0, reps: 0, lapses: 0, lastReview: null,
     createdAt: 0, updatedAt: 0,
     ...extra,

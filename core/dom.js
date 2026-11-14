@@ -18,6 +18,7 @@
  */
 export function h(tag, props, ...children) {
   const el = document.createElement(tag);
+  const properties = [];
   for (const [key, value] of Object.entries(props ?? {})) {
     if (value == null || value === false) continue;
     if (key === 'class') el.className = value;
@@ -25,7 +26,7 @@ export function h(tag, props, ...children) {
     else if (key === 'style' && typeof value === 'object') Object.assign(el.style, value);
     else if (key.startsWith('on') && typeof value === 'function') {
       el.addEventListener(key.slice(2).toLowerCase(), value);
-    } else if (key === 'value' || key === 'checked') el[key] = value;
+    } else if (key === 'value' || key === 'checked') properties.push([key, value]);
     else el.setAttribute(key, value === true ? '' : String(value));
   }
   const nodes = children
@@ -33,6 +34,8 @@ export function h(tag, props, ...children) {
     .filter((c) => c != null && c !== false)
     .map((c) => (c instanceof Node ? c : String(c)));
   el.append(...nodes);
+  // Gán value/checked sau khi đã có con: <select> chỉ chọn được option đã nằm trong nó (lỗi B1)
+  for (const [key, value] of properties) el[key] = value;
   return el;
 }
 

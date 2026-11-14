@@ -29,7 +29,9 @@ core/                   phần lõi dùng chung
   repo.js               ★ API dữ liệu cho các trang
   scheduler.js          thuật toán SM-2 (hàm thuần)
   queue.js              chọn thẻ tiếp theo, đếm thẻ cần học, nhãn trạng thái
-  models.js             cấu trúc Deck / Card / ReviewLog + kiểm tra dữ liệu
+  models.js             cấu trúc Deck / Card / ReviewLog + kiểm tra dữ liệu, DECK_COLORS, JLPT_LEVELS
+  furigana.js           cú pháp 漢字[かんじ]: parseFurigana, plainFurigana, renderFurigana
+  card-compat.js        TẠM tới L6b: đọc/ghi thẻ cũ front/back (chỉ repo.js dùng)
   storage.js            đọc/ghi localStorage
   date.js               ngày học (bắt đầu 4h sáng), định dạng thời gian
   dom.js                h() tạo element an toàn, $(), getParam(), startPage()
@@ -74,7 +76,7 @@ core/repo.js ──► core/storage.js ──► localStorage
         │
         └─► scheduler.js · queue.js · models.js · date.js   (hàm thuần, có test)
 
-dom.js, routes.js: tiện ích cho trang
+dom.js, routes.js, furigana.js: tiện ích cho trang
 ```
 
 - **Trang** chỉ lo giao diện: đọc dữ liệu qua `repo.js`, vẽ bằng `h()`, gắn sự kiện.
@@ -88,12 +90,23 @@ Trang được import những module nào: xem [conventions.md › Code](convent
 
 Ba "bảng" trong localStorage, key có tiền tố `nholau:`: `decks`, `cards`, `reviewLogs`. Mỗi bảng lưu thành một object JSON `{ [id]: bản ghi }`.
 
-Các trường của `Deck`, `Card`, `ReviewLog` và giới hạn độ dài: xem chú thích trong [`core/models.js`](../core/models.js), đó là nguồn chính xác nhất.
+Các trường của `Deck`, `Card`, `ReviewLog` và giới hạn độ dài: xem chú thích trong [`core/models.js`](../core/models.js), đó là nguồn chính xác nhất. Tóm tắt:
+
+| Bản ghi | Trường nội dung | Ghi chú |
+|---|---|---|
+| `Deck` | `name`, `description`, `newPerDay`, `color` | `color` là một trong `DECK_COLORS` (`pink`, `peach`, `yellow`, `green`, `sky`, `lavender`) |
+| `Card` | `term`, `meaning`, `reading`, `example`, `jlpt` | `term`, `meaning` bắt buộc; `jlpt` là `''` hoặc `N5`…`N1`; furigana `漢字[かんじ]` trong `term`, `example` |
+| `Card` (tiến độ) | `state`, `due`, `interval`, `ease`, `step`, `reps`, `lapses`, `lastReview` | do `scheduler.js` tính |
+
+- **Dữ liệu cũ (trước L6):**
+  - Thẻ chỉ có `front` / `back`: `repo.js` đọc ra thành `term` / `meaning` qua `core/card-compat.js`; khi thẻ được lưu lại thì chỉ ghi trường mới.
+  - Bộ chưa có `color`: đọc ra màu theo thứ tự danh sách (`DECK_COLORS[i % 6]`); khi bộ được lưu lại thì ghi màu.
+  - Lớp tương thích này là tạm, bỏ ở L6b. Mọi thẻ repo trả ra hiện kèm `front` = `term`, `back` = `meaning` cho các trang chưa đổi.
 
 - **Xóa bộ thẻ:** xóa luôn thẻ trong bộ, nhưng **giữ** lượt ôn, để heatmap và chuỗi ngày không bị mất.
 - **Dung lượng:** localStorage khoảng 5 MB. Mỗi lượt ôn chiếm khoảng 300 byte, và mỗi lần chấm điểm ghi lại cả bảng `reviewLogs`. Chứa được khoảng 16 nghìn lượt ôn (khoảng 5 tháng nếu ôn 100 lượt/ngày). Đầy thì `storage.js` báo lỗi "Bộ nhớ trình duyệt đã đầy".
 - **Dữ liệu hỏng:** JSON đọc ra không hợp lệ thì `storage.js` báo lỗi thay vì âm thầm trả về rỗng, vì lần ghi tiếp theo sẽ đè mất dữ liệu cũ.
-- **Chưa có số phiên bản dữ liệu:** đổi cấu trúc trong `models.js` (VD sang thẻ tiếng Nhật) thì dữ liệu cũ trên máy người dùng không tự chuyển đổi. Cần viết bước chuyển đổi hoặc yêu cầu `?reset`.
+- **Chưa có số phiên bản dữ liệu:** đổi cấu trúc trong `models.js` thì dữ liệu cũ trên máy người dùng không tự chuyển đổi. Lần đổi sang thẻ tiếng Nhật (L6) được xử lý bằng lớp tương thích ở trên; lần sau cần viết bước chuyển đổi hoặc yêu cầu `?reset`.
 
 ## API `core/repo.js`
 
@@ -101,27 +114,31 @@ Các trường của `Deck`, `Card`, `ReviewLog` và giới hạn độ dài: xe
 |---|---|---|
 | `getDecks()` | `Deck[]` | cũ trước mới sau |
 | `getDeck(id)` | `Deck \| null` | |
-| `createDeck({ name, description, newPerDay })` | `Deck` | `newPerDay` mặc định 20 |
-| `updateDeck(id, { name?, description?, newPerDay? })` | `Deck` | chỉ truyền trường cần đổi |
+| `createDeck({ name, description, newPerDay, color })` | `Deck` | `newPerDay` bỏ trống thì 20; `color` bỏ trống thì màu kế tiếp sau bộ tạo gần nhất |
+| `updateDeck(id, { name?, description?, newPerDay?, color? })` | `Deck` | chỉ truyền trường cần đổi; `newPerDay` rỗng → `ValidationError` |
 | `deleteDeck(id)` | — | xóa luôn thẻ, giữ lịch sử ôn |
 | `getCards(deckId?)` | `Card[]` | không truyền id → mọi thẻ |
 | `getCard(id)` | `Card \| null` | |
-| `createCard({ deckId, front, back })` | `Card` | |
-| `createCards(deckId, [{ front, back }])` | `Card[]` | một thẻ lỗi → cả lượt không lưu |
-| `updateCard(id, { front?, back? })` | `Card` | giữ nguyên tiến độ học |
+| `createCard({ deckId, term, meaning, reading?, example?, jlpt? })` | `Card` | trường không bắt buộc mặc định `''` |
+| `createCards(deckId, [{ term, meaning, … }])` | `Card[]` | một thẻ lỗi → cả lượt không lưu |
+| `updateCard(id, { term?, meaning?, reading?, example?, jlpt? })` | `Card` | giữ nguyên tiến độ học |
 | `deleteCard(id)`, `resetCard(id)` | — / `Card` | `resetCard` đưa thẻ về Mới |
 | `getStudyQueue(deckId, { lastCardId? })` | `{ deck, card, counts, nextLearningAt }` | `card === null` → học xong |
-| `reviewCard(cardId, rating, { timeMs? })` | `{ card, log, undo }` | rating 1 Lại · 2 Khó · 3 Tốt · 4 Dễ |
+| `reviewCard(cardId, rating, { timeMs? })` | `{ card, log, undo }` | rating 1 Lại · 2 Khó · 3 Tốt · 4 Dễ; `await undo()` trả về thẻ đã khôi phục |
 | `getReviewLogs({ deckId?, from?, to? })` | `ReviewLog[]` | cho heatmap, thống kê |
 | `getDeckOverview()` | `[{ deck, total, due: { new, learning, review } }]` | |
 
 Lỗi do người dùng nhập sai có `err.name === 'ValidationError'`; `id` không tồn tại thì `NotFoundError`.
+
+Tạm tới L6b: các hàm thẻ vẫn nhận `{ front, back }` như `{ term, meaning }`, và thẻ trả ra kèm `front` / `back`. Code mới chỉ dùng tên mới.
 
 Ngoài ra trang hay dùng:
 - `scheduler.js`: `previewRatings(card)` (thời gian ghi trên 4 nút), `RATING_LABELS`.
 - `queue.js`: `STATE_LABELS`, `describeDue(card)` ("Ngày mai", "Sau 5 ngày").
 - `date.js`: `dayKey()`, `daysBetween()`, `formatSpan()`.
 - `dom.js`: `h()`, `$()`, `$$()`, `getParam()`, `startPage()`.
+- `models.js`: `DECK_COLORS` (6 màu bìa theo thứ tự), `JLPT_LEVELS`, `ValidationError`, `NotFoundError`.
+- `furigana.js`: `renderFurigana(text)` dựng `<span lang="ja">` có `<ruby>`; `plainFurigana(text)` bỏ phần `[..]` để tìm kiếm, so trùng; `parseFurigana(text)` trả mảng đoạn.
 
 Đầu mỗi file `pages/<trang>/<trang>.js` có chú thích liệt kê các hàm trang đó hay dùng.
 
@@ -147,7 +164,7 @@ Thông số nằm ở `DEFAULT_CONFIG` trong `core/scheduler.js`. Test ở `test
 
 `npm test` chạy `node --test`, Node tự tìm mọi file `*.test.js`:
 
-- `tests/`: thuật toán SM-2, thứ tự chọn thẻ, ngày học, lớp dữ liệu (`repo.js` chạy trên một localStorage giả trong bộ nhớ, `tests/helpers/memory-storage.js`).
+- `tests/`: thuật toán SM-2, thứ tự chọn thẻ, ngày học, lớp dữ liệu (`repo.js` chạy trên một localStorage giả trong bộ nhớ, `tests/helpers/memory-storage.js`), thẻ tiếng Nhật, màu bìa, lớp tương thích, furigana, `h()` (trên DOM giả tối giản), và các lỗi B1–B5.
 - `pages/home/analytics.test.js`: phần tính số liệu của Trang chủ (lượt ôn, chuỗi ngày, tỉ lệ nhớ, ô heatmap, cột tháng).
 
 Giao diện các trang chưa có test tự động.

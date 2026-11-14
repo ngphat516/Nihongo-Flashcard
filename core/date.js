@@ -43,9 +43,10 @@ export function dayKey(ts = Date.now()) {
 export function formatSpan(ms) {
   const minutes = ms / MINUTE;
   if (minutes < 1) return '<1 phút';
-  if (minutes < 60) return `${Math.round(minutes)} phút`;
+  // Làm tròn trước rồi mới so ranh giới, để 59,6 phút thành "1 giờ" chứ không thành "60 phút"
+  if (Math.round(minutes) < 60) return `${Math.round(minutes)} phút`;
   const hours = minutes / 60;
-  if (hours < 24) return `${oneDecimal(hours)} giờ`;
+  if (Number(hours.toFixed(1)) < 24) return `${oneDecimal(hours)} giờ`;
   return formatDays(ms / DAY);
 }
 

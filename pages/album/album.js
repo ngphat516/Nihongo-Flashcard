@@ -9,8 +9,11 @@
  * Hàm core hay dùng:
  *   getDeckOverview()                    → [{ deck, total, due: { new, learning, review } }]
  *   getDeck(id), getCards(deckId)
- *   updateDeck(id, { name, description, newPerDay }), deleteDeck(id)
- *   updateCard(id, { front, back }), deleteCard(id), resetCard(id)
+ *   updateDeck(id, { name, description, newPerDay, color }), deleteDeck(id)
+ *   updateCard(id, { term, meaning, reading, example, jlpt }), deleteCard(id), resetCard(id)
+ *   deck.color, DECK_COLORS (models.js)  → màu bìa đã lưu trên bộ; bộ cũ cũng đã có màu khi đọc ra
+ *   renderFurigana(text), plainFurigana(text) (furigana.js) → hiện term/example; tìm kiếm không tính phần [..]
+ * Thẻ đang tạm có card.front / card.back (= term / meaning) cho tới L6b. Việc cần đổi: docs/tasks.md › L6b.
  *   STATE_LABELS[card.state]             → 'Mới' | 'Đang học' | 'Học lại' | 'Ôn tập'
  *   describeDue(card)                    → 'Chưa học' | 'Đến hạn' | 'Ngày mai' | 'Sau 5 ngày' ...
  *   routes.study(id), routes.create(id)

@@ -204,7 +204,7 @@ const FUZZ_RANGES = [
 
 /**
  * Khoảng [thấp, cao] mà interval có thể rơi vào sau khi fuzz (theo cách tính của Anki).
- * VD: 25 ngày → [23, 27]. Interval dưới 2.5 ngày không fuzz.
+ * VD: 25 ngày → [22, 28]. Interval dưới 2.5 ngày không fuzz.
  */
 export function fuzzRange(interval, min = 1, max = Infinity) {
   const ivl = clamp(interval, min, max);

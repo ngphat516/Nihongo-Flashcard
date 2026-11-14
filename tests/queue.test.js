@@ -91,4 +91,13 @@ describe('ngày học bắt đầu lúc 4h sáng', () => {
     assert.equal(formatDays(45), '1,5 tháng');
     assert.equal(formatDays(400), '1,1 năm');
   });
+
+  test('B5: ranh giới phút/giờ/ngày không hiện "60 phút" hay "24 giờ"', () => {
+    assert.equal(formatSpan(59.4 * MINUTE), '59 phút');
+    assert.equal(formatSpan(59.6 * MINUTE), '1 giờ');
+    assert.equal(formatSpan(60 * MINUTE), '1 giờ');
+    assert.equal(formatSpan(23.9 * 60 * MINUTE), '23,9 giờ');
+    assert.equal(formatSpan(23.97 * 60 * MINUTE), '1 ngày');
+    assert.equal(formatSpan(24 * 60 * MINUTE), '1 ngày');
+  });
 });

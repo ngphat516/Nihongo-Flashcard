@@ -16,6 +16,29 @@
 
 ---
 
+## 2026-11-14 — Thẻ tiếng Nhật, màu bìa, sửa lỗi core (L6, B1–B5)
+
+- **Người làm:** Leader, cùng Claude.
+- **Đã xong:**
+  - `Card` đổi sang `term`, `meaning`, `reading`, `example`, `jlpt` (`core/models.js`, `core/repo.js`). `term`, `meaning` bắt buộc; `jlpt` chỉ nhận `''`, `N5`…`N1`.
+  - Lớp tương thích tạm `core/card-compat.js`: đọc thẻ cũ `front`/`back` thành `term`/`meaning`, thẻ trả ra kèm `front`/`back`, repo nhận `{ front, back }`, storage chỉ lưu trường mới. Bỏ ở L6b.
+  - `core/furigana.js`: `parseFurigana`, `plainFurigana`, `renderFurigana` cho cú pháp `漢字[かんじ]`.
+  - Màu bìa: `DECK_COLORS`, `deck.color`; bộ mới lấy màu kế tiếp; bộ cũ đọc ra màu theo thứ tự như các trang tính trước đây.
+  - Sửa B1 (`h()` gán `value` sau khi có con), B2 (số thẻ mới mỗi ngày bỏ trống), B3 (`undo()` trả về thẻ), B4 (`Object.hasOwn` trong `storage.get`), B5 (chú thích `fuzzRange`, ranh giới `formatSpan`, ghi lượt ôn trước thẻ). Mỗi lỗi có test, đã chạy thử test đó trên code cũ để chắc nó bắt được lỗi.
+  - Dữ liệu mẫu dùng trường mới, mỗi bộ một màu (vẫn là nội dung cũ; bộ tiếng Nhật là L9).
+  - Test: 43 → 70.
+  - Chỉ sửa chú thích đầu file các trang; giao diện và logic trang giữ nguyên.
+  - Đã thử trên Chrome: dữ liệu cũ tạo bằng bản `main` rồi mở nhánh mới (không reset), và dữ liệu mới (`?reset`, `?seed`). Cả 2 trường hợp: 4 trang đủ thẻ và bìa, màu bìa từng bộ giống `main`, học được một lượt, Console không có lỗi. Thẻ vừa chấm được ghi lại chỉ với trường mới.
+  - Nhánh `core/the-tieng-nhat`.
+- **Quyết định:**
+  - Ngoặc furigana rỗng (`漢字[]`) giữ nguyên là chữ, như ngoặc không khớp.
+  - `jlpt` phân biệt hoa thường: `n5` là sai.
+  - Bộ cũ chưa có màu chỉ được ghi màu khi bộ đó được lưu lại; đọc thôi thì không ghi.
+- **Tiếp theo:** Album, Tạo thẻ, Học đổi sang trường mới và `deck.color` (việc cụ thể ở đầu mục từng trang trong [tasks.md](tasks.md)), rồi L6b. Sau đó L7 (bật/tắt furigana) và L9 (dữ liệu mẫu tiếng Nhật).
+- **Vướng mắc:**
+  - Thông báo lỗi giờ nói "Từ" / "Nghĩa" (VD "Từ không được để trống."), trong khi giao diện Album và Tạo thẻ vẫn ghi "Mặt trước" / "Mặt sau". Hai trang đó tự kiểm tra ô trống trước khi lưu nên hiếm gặp; hết lệch khi các trang đổi sang trường mới.
+  - `python -m http.server` không cấm trình duyệt lưu cache. Chuyển nhánh xong mà trang vẫn chạy code cũ thì tải lại bằng Ctrl+F5 (hoặc bật "Disable cache" trong DevTools).
+
 ## 2026-11-13 — Đồng bộ màu bìa trang Học (S1)
 
 - Bìa trên màn chọn bộ dùng cùng bảng màu và thứ tự với Album, kể cả bộ chưa có thẻ cần học.

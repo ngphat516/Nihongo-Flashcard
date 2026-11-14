@@ -1,3 +1,14 @@
+/**
+ * Học (pages/study/): chọn bộ, lật thẻ, chấm điểm, hoàn tác.
+ *
+ * Gợi ý vòng học: getStudyQueue(deckId, { lastCardId }) → hiện queue.card → reviewCard(card.id, rating, { timeMs })
+ * → lặp lại. Hoàn tác: `const restored = await undo()` trả về đúng thẻ vừa hoàn tác (B3 đã sửa trong core),
+ * nên hiện thẳng `restored` là đủ, không cần tự giữ thẻ (restoredCard) để tránh lỗi.
+ *
+ * Thẻ tiếng Nhật (L6): mặt trước dùng renderFurigana(card.term) (furigana.js, đã gắn lang="ja"),
+ * mặt sau card.meaning, kèm reading / example nếu có. card.front / card.back chỉ còn tạm tới L6b.
+ * Màu bìa: deck.color thay cho COVER_COLORS[i % 6].
+ */
 import { $, getParam, h, startPage } from '../../core/dom.js';
 import { NotFoundError } from '../../core/models.js';
 import { LEARN_AHEAD_MS, isLearning } from '../../core/queue.js';
