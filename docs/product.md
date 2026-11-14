@@ -29,8 +29,8 @@ Dùng đúng các từ này trong giao diện, code và tài liệu.
 | **Bộ thẻ** | `Deck` | Một nhóm thẻ, VD "JLPT N5 – Từ vựng" |
 | **Bìa** | class `cover` | Khối màu pastel đại diện cho một bộ thẻ trên Trang chủ và Album |
 | **Màu bìa** | `deck.color` | Một trong 6 màu pastel của bìa: `pink`, `peach`, `yellow`, `green`, `sky`, `lavender` |
-| **Thẻ** | `Card` | Một mục cần nhớ. Hiện có 2 mặt `front` / `back`; sẽ đổi sang thẻ tiếng Nhật (xem bên dưới) |
-| **Mặt trước / mặt sau** | `front` / `back` | Câu hỏi / đáp án |
+| **Thẻ** | `Card` | Một mục cần nhớ: từ tiếng Nhật và nghĩa, kèm cách đọc, câu ví dụ, cấp JLPT (xem [Thẻ tiếng Nhật](#thẻ-tiếng-nhật)) |
+| **Từ / nghĩa** | `term` / `meaning` | Mặt trước / mặt sau khi học chiều Nhật → Việt. `front` / `back` là tên cũ, chỉ còn tạm tới L6b |
 | **Trạng thái thẻ** | `card.state` | **Mới** `new` · **Đang học** `learning` · **Học lại** `relearning` (quên khi đang ôn) · **Ôn tập** `review` |
 | **Chấm điểm** | `rating` 1–4 | Sau khi lật thẻ, người học tự chấm **Lại** / **Khó** / **Tốt** / **Dễ** |
 | **Lượt ôn** | `ReviewLog` | Một lần chấm điểm. Dùng cho heatmap, thống kê, hoàn tác |
@@ -60,6 +60,8 @@ Các quyết định này đã chốt nhưng code chưa có. Ai làm thì cập 
 
 ### Thẻ tiếng Nhật
 
+**Trạng thái:** `core/` đã xong (L6, 14/11/2026). Các trang **chưa** đổi giao diện, vẫn chạy nhờ lớp tương thích tạm: thẻ đọc ra kèm `front` = `term`, `back` = `meaning`, và repo nhận `{ front, back }` như `{ term, meaning }`. Thẻ cũ trong localStorage được đọc như thẻ mới, và chỉ được ghi lại bằng trường mới khi lưu. Lớp này bỏ ở L6b, sau khi các trang đã đổi.
+
 Thay 2 mặt `front` / `back` bằng các trường riêng, để sau này làm được bài tập trắc nghiệm, gõ cách đọc:
 
 | Trường | Bắt buộc | Ví dụ |
@@ -70,8 +72,13 @@ Thay 2 mặt `front` / `back` bằng các trường riêng, để sau này làm 
 | `example` | Không | `毎朝[まいあさ]パンを食[た]べる。` |
 | `jlpt` | Không | N5 … N1 |
 
-- **Cú pháp furigana:** viết `漢字[かんじ]` trong `term` và `example`, app hiển thị thành `<ruby>`.
-- Đổi cấu trúc này phải sửa `core/`, dữ liệu mẫu, test và cả 3 trang đang dùng thẻ 2 mặt (Album, Tạo thẻ, Học). Danh sách chỗ cần sửa: [tasks.md › L6](tasks.md#leader-nền-chung).
+- **Cú pháp furigana:** viết `漢字[かんじ]` trong `term` và `example`, app hiển thị thành `<ruby>`. Cách đọc gắn vào cụm kanji liền ngay trước `[` (kể cả `々`); ngoặc thiếu, ngoặc rỗng, hoặc trước `[` không có kanji thì giữ nguyên là chữ thường. Hàm ở `core/furigana.js`: `renderFurigana()` để hiện, `plainFurigana()` để tìm kiếm và so trùng.
+- `jlpt` chỉ nhận `''`, `N5`, `N4`, `N3`, `N2`, `N1`. `term`, `meaning` bắt buộc; mỗi ô tối đa 2000 ký tự.
+- **Các trang còn phải làm** (chi tiết ở đầu mục từng trang trong [tasks.md](tasks.md)):
+  - Album: hiện thẻ bằng `renderFurigana(card.term)` và `card.meaning`, dialog sửa thẻ gửi trường mới, tìm kiếm qua `plainFurigana()`.
+  - Tạo thẻ: mỗi dòng thẻ có các ô `term`, `meaning`, `reading`, `example`, `jlpt`.
+  - Học: mặt trước `renderFurigana(card.term)`, mặt sau `meaning` kèm `reading` / `example`.
+  - Xong cả 3 thì làm L6b (bỏ lớp tương thích).
 
 ### Màu bìa bộ thẻ
 
@@ -79,6 +86,8 @@ Thay 2 mặt `front` / `back` bằng các trường riêng, để sau này làm 
 - Người học chọn màu khi tạo bộ và đổi được khi sửa bộ.
 - Bộ mới được chọn sẵn màu kế tiếp trong danh sách, để các bộ đứng cạnh nhau khác màu.
 - `deck.color` lưu tên màu (VD `'pink'`), không lưu mã màu, để chỉnh bảng màu sau này mà không phải chuyển đổi dữ liệu.
+- **Trạng thái:** `core/` đã xong (L6). `DECK_COLORS` trong `core/models.js`. `createDeck` không truyền màu thì lấy màu kế tiếp sau màu của bộ tạo gần nhất (chưa có bộ nào thì `pink`); `updateDeck` đổi được màu; màu lạ báo `ValidationError`. Bộ cũ chưa có màu: đọc ra theo thứ tự danh sách (giống cách các trang tính trước đây), chỉ ghi màu khi bộ được lưu lại.
+- **Các trang còn phải làm:** Album và Học đổi `COVER_COLORS[i % 6]` sang `deck.color`; Tạo thẻ thêm ô chọn màu (C8); Album thêm chọn màu vào dialog sửa bộ (A5).
 
 ### Furigana bật/tắt
 

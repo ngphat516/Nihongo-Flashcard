@@ -1,6 +1,7 @@
 /** Trang chủ H1–H8. Dữ liệu chỉ qua repo, không thay đổi lịch ôn của core.
  * getDeckOverview: số cần học có giới hạn thẻ mới và học trước 20 phút.
  * getReviewLogs: ngày học 4h; getCards: lịch đến hạn 14 ngày.
+ * Từ L6 mọi bộ đọc ra đều có deck.color (bộ cũ được gán theo thứ tự), nên không cần COVER_COLORS[i % 6] nữa.
  */
 import { getCards, getDeckOverview, getReviewLogs } from '../../core/repo.js';
 import { routes } from '../../core/routes.js';

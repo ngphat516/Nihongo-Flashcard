@@ -10,7 +10,7 @@ Luật chung cho cả nhóm và cho agent. Kiến trúc xem [architecture.md](ar
 
 ## Code
 
-1. **Đọc/ghi dữ liệu chỉ qua `core/repo.js`.** Trang được import mọi module trong `core/` trừ `storage.js` và `seed.js`. Nhờ vậy sau này đổi sang backend không phải sửa trang.
+1. **Đọc/ghi dữ liệu chỉ qua `core/repo.js`.** Trang được import mọi module trong `core/` trừ `storage.js`, `seed.js` và `card-compat.js` (lớp tạm của repo, bỏ ở L6b). Nhờ vậy sau này đổi sang backend không phải sửa trang.
 2. **Đưa dữ liệu người dùng vào trang bằng `h()` (trong `core/dom.js`) hoặc `textContent`.** Không dùng `innerHTML` với tên bộ, nội dung thẻ hay bất cứ thứ gì người dùng gõ, vì dễ bị lỗi bảo mật XSS.
 3. **Mọi hàm trong `repo.js` đều async**, nhớ `await`. Lỗi do người dùng nhập sai có `err.name === 'ValidationError'`: hiện `err.message` cho người dùng; lỗi khác thì `throw` tiếp.
 4. **Bọc code khởi động trang trong `startPage(async () => { ... })`**, để lỗi hiện lên trang thay vì chỉ nằm trong Console.

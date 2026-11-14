@@ -85,7 +85,7 @@ Có 6 màu. Tên màu (cột "Giá trị") vừa là giá trị lưu trong `deck
 | `lavender` | Tím | `cover-lavender` |
 
 - **Thứ tự trong bảng là thứ tự bộ mới lấy màu.** Người học chọn hoặc đổi màu ở form tạo bộ và form sửa bộ ([product.md › Màu bìa](product.md#màu-bìa-bộ-thẻ)).
-- **`deck.color` có từ task L6.** Trước L6, lấy màu theo vị trí của bộ trong `getDeckOverview()`: `['pink', 'peach', 'yellow', 'green', 'sky', 'lavender'][i % 6]`. L6 thêm danh sách `DECK_COLORS` vào `core/models.js`; khi đó đổi sang dùng `deck.color`.
+- **Trang dùng `deck.color`** (có từ L6, danh sách ở `DECK_COLORS` trong `core/models.js`). Bộ tạo trước L6 chưa lưu màu thì repo đọc ra màu theo vị trí trong danh sách, giống cách các trang tự tính trước đây (`DECK_COLORS[i % 6]`), nên màu không đổi.
 
 ## Chữ
 
