@@ -13,9 +13,18 @@ export const COLLECTIONS = Object.freeze({
 export const LIMITS = Object.freeze({
   deckName: 80,
   deckDescription: 300,
-  cardText: 2000,
+  cardText: 2000, // mỗi trường chữ của thẻ
   newPerDayMax: 999,
 });
+
+/** 6 màu bìa, theo thứ tự bộ mới lấy màu (docs/design.md › Màu bìa bộ thẻ). Lưu tên màu, không lưu mã màu. */
+export const DECK_COLORS = Object.freeze(['pink', 'peach', 'yellow', 'green', 'sky', 'lavender']);
+
+/** Cấp JLPT của thẻ. '' = không ghi cấp. */
+export const JLPT_LEVELS = Object.freeze(['', 'N5', 'N4', 'N3', 'N2', 'N1']);
+
+/** Số thẻ mới mỗi ngày khi tạo bộ mà không ghi số. */
+export const DEFAULT_NEW_PER_DAY = 20;
 
 /**
  * Bộ thẻ (album).
@@ -24,6 +33,7 @@ export const LIMITS = Object.freeze({
  * @property {string} name
  * @property {string} description
  * @property {number} newPerDay   số thẻ mới tối đa được học mỗi ngày
+ * @property {string} color       màu bìa, một trong DECK_COLORS
  * @property {number} createdAt   timestamp (ms)
  * @property {number} updatedAt   timestamp (ms)
  */
@@ -34,12 +44,16 @@ export const LIMITS = Object.freeze({
  */
 
 /**
- * Một flashcard.
+ * Một flashcard tiếng Nhật.
+ * Cú pháp furigana trong `term` và `example`: 漢字[かんじ] (xem core/furigana.js).
  * @typedef {Object} Card
  * @property {string} id
  * @property {string} deckId
- * @property {string} front       mặt trước (câu hỏi)
- * @property {string} back        mặt sau (đáp án)
+ * @property {string} term        từ, bắt buộc. VD '約束[やくそく]'
+ * @property {string} meaning     nghĩa tiếng Việt, bắt buộc
+ * @property {string} reading     cách đọc bằng kana, '' nếu không ghi
+ * @property {string} example     câu ví dụ, '' nếu không ghi
+ * @property {''|'N5'|'N4'|'N3'|'N2'|'N1'} jlpt  cấp JLPT, '' nếu không ghi
  * @property {CardState} state
  * @property {number} due         thời điểm đến hạn ôn (ms). Thẻ mới: 0
  * @property {number} interval    số ngày giữa 2 lần ôn
@@ -88,6 +102,9 @@ export function cleanText(value) {
   return String(value ?? '').normalize('NFC').trim();
 }
 
+/** '', chỉ có khoảng trắng, null, undefined. */
+export const isBlank = (value) => cleanText(value) === '';
+
 export function newId() {
   if (globalThis.crypto?.randomUUID) return crypto.randomUUID();
   // randomUUID chỉ có trên https/localhost; mở qua IP mạng LAN (test trên điện thoại) thì dùng cách này.
@@ -98,13 +115,18 @@ export function newId() {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
-/** @returns {Deck} */
-export function makeDeck({ name, description = '', newPerDay = 20 } = {}, now = Date.now()) {
+/**
+ * Bộ thẻ mới. `newPerDay` bỏ trống ('', null, undefined) thì lấy DEFAULT_NEW_PER_DAY.
+ * `color` bỏ trống thì lấy màu đầu tiên; repo.createDeck tự chọn màu kế tiếp trước khi gọi hàm này.
+ * @returns {Deck}
+ */
+export function makeDeck({ name, description = '', newPerDay, color } = {}, now = Date.now()) {
   const deck = {
     id: newId(),
     name: cleanText(name),
     description: cleanText(description),
-    newPerDay: Number(newPerDay),
+    newPerDay: isBlank(newPerDay) ? DEFAULT_NEW_PER_DAY : Number(newPerDay),
+    color: color ?? DECK_COLORS[0],
     createdAt: now,
     updatedAt: now,
   };
@@ -124,15 +146,24 @@ export function validateDeck(deck) {
   if (!Number.isInteger(n) || n < 0 || n > LIMITS.newPerDayMax) {
     throw new ValidationError(`Số thẻ mới mỗi ngày phải là số nguyên từ 0 đến ${LIMITS.newPerDayMax}.`);
   }
+  if (!DECK_COLORS.includes(deck.color)) {
+    throw new ValidationError(`Màu bìa phải là một trong: ${DECK_COLORS.join(', ')}.`);
+  }
 }
 
+/** Các trường nội dung của thẻ (không gồm id, deckId, tiến độ học). */
+export const CARD_FIELDS = Object.freeze(['term', 'meaning', 'reading', 'example', 'jlpt']);
+
 /** @returns {Card} */
-export function makeCard({ deckId, front, back } = {}, now = Date.now()) {
+export function makeCard({ deckId, term, meaning, reading = '', example = '', jlpt = '' } = {}, now = Date.now()) {
   const card = {
     id: newId(),
     deckId,
-    front: cleanText(front),
-    back: cleanText(back),
+    term: cleanText(term),
+    meaning: cleanText(meaning),
+    reading: cleanText(reading),
+    example: cleanText(example),
+    jlpt: cleanText(jlpt),
     ...NEW_CARD_PROGRESS,
     createdAt: now,
     updatedAt: now,
@@ -143,10 +174,13 @@ export function makeCard({ deckId, front, back } = {}, now = Date.now()) {
 
 export function validateCard(card) {
   if (!card.deckId) throw new ValidationError('Thẻ phải thuộc một bộ thẻ.');
-  if (!card.front) throw new ValidationError('Mặt trước không được để trống.');
-  if (!card.back) throw new ValidationError('Mặt sau không được để trống.');
-  if (card.front.length > LIMITS.cardText || card.back.length > LIMITS.cardText) {
-    throw new ValidationError(`Mỗi mặt thẻ tối đa ${LIMITS.cardText} ký tự.`);
+  if (!card.term) throw new ValidationError('Từ không được để trống.');
+  if (!card.meaning) throw new ValidationError('Nghĩa không được để trống.');
+  if (!JLPT_LEVELS.includes(card.jlpt)) {
+    throw new ValidationError('Cấp JLPT phải là N5, N4, N3, N2, N1 hoặc để trống.');
+  }
+  if (CARD_FIELDS.some((field) => card[field].length > LIMITS.cardText)) {
+    throw new ValidationError(`Mỗi ô của thẻ tối đa ${LIMITS.cardText} ký tự.`);
   }
 }
 

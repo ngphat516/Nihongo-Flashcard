@@ -8,9 +8,13 @@
  */
 import * as storage from './storage.js';
 import {
+  CARD_FIELDS,
   COLLECTIONS,
+  DECK_COLORS,
   NotFoundError,
+  ValidationError,
   cleanText,
+  isBlank,
   makeCard,
   makeDeck,
   makeReviewLog,
@@ -18,6 +22,7 @@ import {
   validateCard,
   validateDeck,
 } from './models.js';
+import { readCard, writeCard } from './card-compat.js'; // TẠM, bỏ ở L6b
 import { schedule } from './scheduler.js';
 import { dayStart } from './date.js';
 import { countDue, newCardsLeft, nextLearningDue, pickNextCard } from './queue.js';
@@ -29,26 +34,36 @@ const byCreated = (a, b) => a.createdAt - b.createdAt;
 
 /** Mọi bộ thẻ, cũ trước mới sau. */
 export async function getDecks() {
-  return (await storage.list(DECKS)).sort(byCreated);
+  return withColors((await storage.list(DECKS)).sort(byCreated));
 }
 
 /** Một bộ thẻ theo id, hoặc null. */
 export async function getDeck(id) {
-  return storage.get(DECKS, id);
+  return (await getDecks()).find((deck) => deck.id === id) ?? null;
 }
 
-/** Tạo bộ mới. `newPerDay` mặc định 20. */
-export async function createDeck({ name, description, newPerDay } = {}) {
-  return storage.put(DECKS, makeDeck({ name, description, newPerDay }));
+/**
+ * Tạo bộ mới. `newPerDay` bỏ trống thì 20.
+ * `color` bỏ trống thì lấy màu kế tiếp sau màu của bộ tạo gần nhất (chưa có bộ nào thì 'pink').
+ */
+export async function createDeck({ name, description, newPerDay, color } = {}) {
+  const last = (await getDecks()).at(-1);
+  const nextColor = last ? DECK_COLORS[(DECK_COLORS.indexOf(last.color) + 1) % DECK_COLORS.length] : DECK_COLORS[0];
+  return storage.put(DECKS, makeDeck({ name, description, newPerDay, color: isBlank(color) ? nextColor : color }));
 }
 
-/** Sửa tên / mô tả / số thẻ mới mỗi ngày. Chỉ truyền trường cần đổi. */
-export async function updateDeck(id, { name, description, newPerDay } = {}) {
+/** Sửa tên / mô tả / số thẻ mới mỗi ngày / màu bìa. Chỉ truyền trường cần đổi. */
+export async function updateDeck(id, { name, description, newPerDay, color } = {}) {
   const deck = await requireDeck(id);
   const next = { ...deck, updatedAt: Date.now() };
   if (name !== undefined) next.name = cleanText(name);
   if (description !== undefined) next.description = cleanText(description);
-  if (newPerDay !== undefined) next.newPerDay = Number(newPerDay);
+  if (newPerDay !== undefined) {
+    // Number('') === 0 sẽ âm thầm tắt thẻ mới của bộ (lỗi B2), nên ô trống là lỗi
+    if (isBlank(newPerDay)) throw new ValidationError('Số thẻ mới mỗi ngày không được để trống.');
+    next.newPerDay = Number(newPerDay);
+  }
+  if (color !== undefined) next.color = color;
   validateDeck(next);
   return storage.put(DECKS, next);
 }
@@ -67,41 +82,44 @@ export async function deleteDeck(id) {
 
 /** Thẻ của một bộ (hoặc mọi thẻ nếu không truyền deckId), cũ trước mới sau. */
 export async function getCards(deckId) {
-  const cards = await storage.list(CARDS);
+  const cards = (await storage.list(CARDS)).map(readCard);
   return (deckId ? cards.filter((c) => c.deckId === deckId) : cards).sort(byCreated);
 }
 
 export async function getCard(id) {
-  return storage.get(CARDS, id);
+  return readCard(await storage.get(CARDS, id));
 }
 
-/** Thêm một thẻ vào bộ. */
-export async function createCard({ deckId, front, back } = {}) {
+/** Thêm một thẻ vào bộ: { deckId, term, meaning, reading?, example?, jlpt? }. */
+export async function createCard(input = {}) {
+  const { deckId, ...fields } = writeCard(input);
   await requireDeck(deckId);
-  return storage.put(CARDS, makeCard({ deckId, front, back }));
+  return readCard(await storage.put(CARDS, makeCard({ ...fields, deckId })));
 }
 
 /**
  * Thêm nhiều thẻ một lần (nhập hàng loạt). Thẻ nào sai thì cả lượt không lưu (ném ValidationError).
  * @param {string} deckId
- * @param {{front: string, back: string}[]} items
+ * @param {{ term: string, meaning: string, reading?: string, example?: string, jlpt?: string }[]} items
  */
 export async function createCards(deckId, items) {
   await requireDeck(deckId);
   const now = Date.now();
-  const cards = items.map((item, i) => makeCard({ deckId, front: item.front, back: item.back }, now + i));
+  const cards = items.map((item, i) => makeCard({ ...writeCard(item), deckId }, now + i));
   await storage.putMany(CARDS, cards);
-  return cards;
+  return cards.map(readCard);
 }
 
-/** Sửa nội dung thẻ. Tiến độ học giữ nguyên. */
-export async function updateCard(id, { front, back } = {}) {
+/** Sửa nội dung thẻ: chỉ truyền trường cần đổi (term, meaning, reading, example, jlpt). Tiến độ học giữ nguyên. */
+export async function updateCard(id, input = {}) {
   const card = await requireCard(id);
-  const next = { ...card, updatedAt: Date.now() };
-  if (front !== undefined) next.front = cleanText(front);
-  if (back !== undefined) next.back = cleanText(back);
+  const fields = writeCard(input);
+  const next = { ...writeCard(card), updatedAt: Date.now() };
+  for (const field of CARD_FIELDS) {
+    if (fields[field] !== undefined) next[field] = cleanText(fields[field]);
+  }
   validateCard(next);
-  return storage.put(CARDS, next);
+  return readCard(await storage.put(CARDS, next));
 }
 
 export async function deleteCard(id) {
@@ -111,7 +129,7 @@ export async function deleteCard(id) {
 /** Cho thẻ học lại từ đầu (về trạng thái Mới). */
 export async function resetCard(id) {
   const card = await requireCard(id);
-  return storage.put(CARDS, resetProgress(card));
+  return readCard(await storage.put(CARDS, writeCard(resetProgress(card))));
 }
 
 // ============================== Học & ôn =============================
@@ -151,21 +169,24 @@ export async function getStudyQueue(deckId, { now = Date.now(), lastCardId = nul
  * @param {string} cardId
  * @param {1|2|3|4} rating   Lại / Khó / Tốt / Dễ (xem Rating trong scheduler.js)
  * @param {{ now?: number, timeMs?: number }} [options] timeMs: thời gian từ lúc hiện thẻ đến lúc chấm
- * @returns {Promise<{ card: object, log: object, undo: () => Promise<void> }>}
- *          gọi `await undo()` để hoàn tác lần chấm này.
+ * @returns {Promise<{ card: object, log: object, undo: () => Promise<object> }>}
+ *          gọi `await undo()` để hoàn tác lần chấm này; undo trả về thẻ đã khôi phục,
+ *          để trang Học hiện lại đúng thẻ đó (không hỏi lại getStudyQueue).
  */
 export async function reviewCard(cardId, rating, { now = Date.now(), timeMs = 0 } = {}) {
   const before = await requireCard(cardId);
   const after = { ...schedule(before, rating, { now }), updatedAt: now };
   const log = makeReviewLog({ before, after, rating, now, timeMs });
-  await storage.put(CARDS, after);
+  // Ghi lượt ôn trước: ghi thẻ có lỗi (VD bộ nhớ đầy) thì thẻ giữ lịch cũ, không mất dấu lượt ôn
   await storage.put(LOGS, log);
+  await storage.put(CARDS, writeCard(after));
   return {
     card: after,
     log,
     undo: async () => {
-      await storage.put(CARDS, before);
+      await storage.put(CARDS, writeCard(before));
       await storage.remove(LOGS, log.id);
+      return before;
     },
   };
 }
@@ -199,6 +220,15 @@ export async function getDeckOverview({ now = Date.now() } = {}) {
 }
 
 // ============================== Nội bộ ==============================
+
+/**
+ * Bộ cũ (tạo trước L6) chưa có màu: đọc ra màu theo thứ tự trong danh sách, giống cách các trang
+ * tính trước đây (COVER_COLORS[i % 6]), để giao diện không đổi màu. Màu chỉ ghi xuống khi bộ được lưu lại.
+ */
+function withColors(decks) {
+  return decks.map((deck, i) =>
+    DECK_COLORS.includes(deck.color) ? deck : { ...deck, color: DECK_COLORS[i % DECK_COLORS.length] });
+}
 
 async function requireDeck(id) {
   const deck = id ? await getDeck(id) : null;

@@ -44,7 +44,9 @@ export async function list(collection) {
 
 /** Một bản ghi theo id, hoặc null. */
 export async function get(collection, id) {
-  return readMap(collection)[id] ?? null;
+  // Object.hasOwn: id như 'constructor' không được trả về hàm của Object.prototype (lỗi B4)
+  const map = readMap(collection);
+  return Object.hasOwn(map, id) ? map[id] : null;
 }
 
 /** Thêm mới hoặc ghi đè một bản ghi (theo id). */

@@ -1,10 +1,10 @@
 /**
- * Dữ liệu mẫu cho lúc phát triển: 3 bộ thẻ + giả lập khoảng 4 tháng ôn tập bằng chính thuật toán SM-2,
+ * Dữ liệu mẫu cho lúc phát triển: 3 bộ thẻ (mỗi bộ một màu bìa) + giả lập khoảng 4 tháng ôn tập bằng chính thuật toán SM-2,
  * để trang chủ có heatmap, album có thẻ ở đủ trạng thái, trang học có thẻ đến hạn.
  * Gọi qua dev.js (?seed trên URL hoặc dev.seed() trong Console).
  */
 import * as storage from './storage.js';
-import { COLLECTIONS, makeCard, makeDeck, makeReviewLog } from './models.js';
+import { COLLECTIONS, DECK_COLORS, makeCard, makeDeck, makeReviewLog } from './models.js';
 import { schedule } from './scheduler.js';
 import { HOUR, addDays, dayStart } from './date.js';
 import { isLearning } from './queue.js';
@@ -87,10 +87,11 @@ export async function seedDemoData({ days = 120, now = Date.now(), random = Math
   const decks = [];
   const cards = [];
   SAMPLE_DECKS.forEach((sample, i) => {
-    const deck = makeDeck(sample, firstDay + i);
+    const deck = makeDeck({ ...sample, color: DECK_COLORS[i % DECK_COLORS.length] }, firstDay + i);
     decks.push(deck);
-    sample.cards.forEach(([front, back], j) => {
-      cards.push(makeCard({ deckId: deck.id, front, back }, firstDay + i * 1000 + j));
+    // Nội dung mẫu vẫn là 2 mặt (câu hỏi, đáp án) → term, meaning. Đổi sang bộ tiếng Nhật thật là L9.
+    sample.cards.forEach(([term, meaning], j) => {
+      cards.push(makeCard({ deckId: deck.id, term, meaning }, firstDay + i * 1000 + j));
     });
   });
 
