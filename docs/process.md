@@ -16,6 +16,18 @@
 
 ---
 
+## 2026-11-16 — Chuẩn bị đợt 2 (L14, H9)
+
+- **Người làm:** Leader, cùng Claude.
+- **Đã xong:**
+  - L14: class `color-picker` (6 chấm màu bìa, radio dùng được bằng bàn phím, ô đang chọn có viền và dấu ✓) và kiểu chữ furigana (`rt` 0.5em màu `--text-2`, khối chứa `<ruby>` giãn dòng gấp đôi) trong `styles/components.css`. Thêm mẫu vào styleguide, ghi vào bảng class (conventions.md) và design.md › Thành phần.
+  - H9: Trang chủ bỏ `COVER_COLORS`, bìa dùng thẳng `deck.color`; đã so với `?seed`, màu từng bộ trùng Album.
+  - Ghi việc đợt 2 vào tasks.md: A9, C9, S10 mới; sửa A5, C2, C3, C8, L6b; ghi chú đầu mục Album, Tạo thẻ, Học rút còn 1 câu.
+  - Test: 70/70 (không sửa `core/`). Đã thử trên trình duyệt: ô chọn màu bấm được bằng chuột và mũi tên, có vòng focus; furigana không đè dòng trên, kể cả trên mặt thẻ chữ to; rộng 375px không cuộn ngang; Console không có lỗi.
+  - Nhánh `core/chuan-bi-dot-2`.
+- **Quyết định:** ghi việc đợt 2 thành A9, C9, S10; L6b làm sau cả 3.
+- **Tiếp theo:** Thành viên 2, 3, 4 làm A9 + A5, C9 + C8, S10; rồi L6b, L7, L9.
+
 ## 2026-11-14 — Thẻ tiếng Nhật, màu bìa, sửa lỗi core (L6, B1–B5)
 
 - **Người làm:** Leader, cùng Claude.
