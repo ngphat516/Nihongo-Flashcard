@@ -47,6 +47,7 @@ Chỉ có CSS tự viết: không thư viện, không build, không dark mode. M
 | `badge badge-<card.state>` | trạng thái thẻ (chấm màu + chữ) |
 | `chips` > `chip` (`<button aria-pressed>`) | nút lọc bật/tắt; đang chọn: `aria-pressed="true"` |
 | `cover cover-<deck.color>` > `cover-mark`, `cover-title`, `cover-text`, `cover-meta` > `cover-badge` | bìa bộ thẻ màu pastel; cả bìa là một link |
+| `<fieldset class="color-picker">` > `legend.field-label`, `label.color-picker-option` > `input[type=radio]` + `color-picker-swatch cover-<màu>` + `visually-hidden` (tên màu) | chọn màu bìa trong form tạo / sửa bộ; không cần JS |
 | `flashcard` > `flashcard-inner` > `flashcard-face flashcard-front` / `-back` | thẻ lật; JS bật `is-flipped` |
 | `<dialog class="dialog">` > `dialog-title`, `dialog-actions` | hộp xác nhận, mở bằng `showModal()`; xóa `returnValue` trước mỗi lần mở |
 | `toast`, `toast-error` | thông báo nhỏ tự ẩn sau 3 giây |

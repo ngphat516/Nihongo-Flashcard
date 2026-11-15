@@ -150,6 +150,8 @@ Mẫu HTML của từng thành phần có trong styleguide. Phần dưới đây
     - Dòng "N thẻ".
   - Cả bìa là **một** link: ở Trang chủ tới `routes.study(id)`, ở Album tới `routes.album(id)`. Không đặt nút hay link nào khác bên trong bìa.
   - Ở Trang chủ, 3 con số Mới / Đang học / Đến hạn ghi bằng màu đậm của bìa, không tô màu trạng thái.
+- **Chọn màu bìa (`color-picker`)** dùng trong form tạo bộ (C8) và form sửa bộ (A5). 6 chấm tròn 32px theo thứ tự [bảng màu bìa](#màu-bìa-bộ-thẻ), vùng bấm 44px. Màu đang chọn có viền và dấu ✓ bằng màu đậm của bìa, nên không chỉ dựa vào màu. Bên trong là radio thật: Tab vào nhóm, mũi tên đổi màu; tên màu tiếng Việt chỉ dành cho trình đọc màn hình.
+- **Furigana** (`<ruby>` do `renderFurigana()` tạo): chữ nhỏ 0.5em, màu `--text-2`. Khối có `<ruby>` là con trực tiếp được giãn dòng gấp đôi để furigana không đè dòng trên. Trong `flashcard-face` (là flex) thì bọc chữ trong một `<span>`; `renderFurigana()` đã trả về `<span>` sẵn.
 - **Chip (`chips` > `chip`)** là nút lọc bật/tắt. Mỗi chip là một `<button aria-pressed>`; cả nhóm là `role="group"` có `aria-label`. Dùng cho A6 (lọc thẻ theo trạng thái).
 - **Biểu đồ lượt ôn (H8):**
   - Dựng bằng HTML/CSS hoặc SVG, không dùng thư viện.

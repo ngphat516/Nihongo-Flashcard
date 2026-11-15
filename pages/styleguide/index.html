@@ -64,6 +64,7 @@
         <p style="font-size: var(--text-xs)"><code>--text-xs</code> Thời gian trên nút chấm điểm</p>
         <p class="styleguide-weights"><span style="font-weight: 400">400 Ôn tập ひらがな</span> <span style="font-weight: 500">500 Ôn tập カタカナ</span> <span style="font-weight: 600">600 Ôn tập</span> <span style="font-weight: 700">700 Ôn tập 漢字</span></p>
         <p><code>lang="ja"</code> <span lang="ja">毎朝パンを食べる。「JLPT N5」</span> <span class="muted">← cả câu dùng Noto Sans JP</span></p>
+        <p><code>furigana</code> <span lang="ja"><ruby>約束<rt>やくそく</rt></ruby>を<ruby>守<rt>まも</rt></ruby>る。</span> <span class="muted">← &lt;ruby&gt; &lt;rt&gt;, renderFurigana() tạo sẵn; chữ nhỏ 0.5em, màu --text-2</span></p>
       </div>
     </section>
 
@@ -160,6 +161,44 @@
         <a class="cover cover-sky" href="#"><span class="cover-mark" aria-hidden="true">カ</span><span class="cover-title">Katakana</span><span class="cover-text">46 chữ cái và âm ghép.</span><span class="cover-meta">46 thẻ</span></a>
         <a class="cover cover-lavender" href="#"><span class="cover-mark" aria-hidden="true">文</span><span class="cover-title">文法 – Ngữ pháp N5</span><span class="cover-meta"><span class="cover-badge">5 cần học</span> 30 thẻ</span></a>
       </div>
+    </section>
+
+    <!-- ===== Chọn màu bìa ===== -->
+    <section class="section">
+      <h2 class="section-title">Chọn màu bìa <span class="muted">· .color-picker — radio, Tab vào nhóm rồi dùng mũi tên</span></h2>
+      <fieldset class="color-picker">
+        <legend class="field-label">Màu bìa</legend>
+        <label class="color-picker-option">
+          <input type="radio" name="demo-color" value="pink">
+          <span class="color-picker-swatch cover-pink"></span>
+          <span class="visually-hidden">Hồng</span>
+        </label>
+        <label class="color-picker-option">
+          <input type="radio" name="demo-color" value="peach">
+          <span class="color-picker-swatch cover-peach"></span>
+          <span class="visually-hidden">Đào</span>
+        </label>
+        <label class="color-picker-option">
+          <input type="radio" name="demo-color" value="yellow">
+          <span class="color-picker-swatch cover-yellow"></span>
+          <span class="visually-hidden">Vàng</span>
+        </label>
+        <label class="color-picker-option">
+          <input type="radio" name="demo-color" value="green" checked>
+          <span class="color-picker-swatch cover-green"></span>
+          <span class="visually-hidden">Lá</span>
+        </label>
+        <label class="color-picker-option">
+          <input type="radio" name="demo-color" value="sky">
+          <span class="color-picker-swatch cover-sky"></span>
+          <span class="visually-hidden">Trời</span>
+        </label>
+        <label class="color-picker-option">
+          <input type="radio" name="demo-color" value="lavender">
+          <span class="color-picker-swatch cover-lavender"></span>
+          <span class="visually-hidden">Tím</span>
+        </label>
+      </fieldset>
     </section>
 
     <!-- ===== Thẻ lật ===== -->
