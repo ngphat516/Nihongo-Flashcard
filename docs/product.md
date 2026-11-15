@@ -72,11 +72,13 @@ Thay 2 mặt `front` / `back` bằng các trường riêng, để sau này làm 
 | `example` | Không | `毎朝[まいあさ]パンを食[た]べる。` |
 | `jlpt` | Không | N5 … N1 |
 
+Giao diện chưa dùng trường `jlpt`: không có ô nhập, không hiện trên thẻ. Trường vẫn giữ trong dữ liệu (mặc định `''`) để sau này lọc theo cấp.
+
 - **Cú pháp furigana:** viết `漢字[かんじ]` trong `term` và `example`, app hiển thị thành `<ruby>`. Cách đọc gắn vào cụm kanji liền ngay trước `[` (kể cả `々`); ngoặc thiếu, ngoặc rỗng, hoặc trước `[` không có kanji thì giữ nguyên là chữ thường. Hàm ở `core/furigana.js`: `renderFurigana()` để hiện, `plainFurigana()` để tìm kiếm và so trùng.
 - `jlpt` chỉ nhận `''`, `N5`, `N4`, `N3`, `N2`, `N1`. `term`, `meaning` bắt buộc; mỗi ô tối đa 2000 ký tự.
-- **Các trang còn phải làm** (chi tiết ở đầu mục từng trang trong [tasks.md](tasks.md)):
+- **Các trang còn phải làm** (chi tiết ở A9, C9, S10 trong [tasks.md](tasks.md)):
   - Album: hiện thẻ bằng `renderFurigana(card.term)` và `card.meaning`, dialog sửa thẻ gửi trường mới, tìm kiếm qua `plainFurigana()`.
-  - Tạo thẻ: mỗi dòng thẻ có các ô `term`, `meaning`, `reading`, `example`, `jlpt`.
+  - Tạo thẻ: mỗi dòng thẻ có các ô `term`, `meaning`, `reading`, `example`.
   - Học: mặt trước `renderFurigana(card.term)`, mặt sau `meaning` kèm `reading` / `example`.
   - Xong cả 3 thì làm L6b (bỏ lớp tương thích).
 

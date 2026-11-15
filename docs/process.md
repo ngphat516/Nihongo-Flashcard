@@ -16,6 +16,16 @@
 
 ---
 
+## 2026-11-16 — Bỏ JLPT khỏi giao diện, chỉnh việc đợt 2
+
+- **Người làm:** Leader, cùng Claude.
+- **Đã xong:**
+  - `product.md` › Thẻ tiếng Nhật: thêm câu "giao diện chưa dùng trường `jlpt`" dưới bảng trường; danh sách trang còn phải làm trỏ tới A9, C9, S10, bỏ `jlpt` khỏi dòng Tạo thẻ.
+  - `tasks.md`: A9, S10 bỏ badge JLPT, mặt sau gọn lại (nghĩa, kèm cách đọc và ví dụ nếu có); S10 bỏ đường kẻ mảnh; A9 hộp thoại sửa thẻ còn 4 ô; C9 mỗi dòng 4 ô, bỏ nút "Thêm chi tiết" và `CARD_FIELDS`, `JLPT_LEVELS`; L6b chỉ cần A9, C9, S10; viết lại dòng "Đợt 2".
+  - Không sửa code. Nhánh `docs/bo-jlpt-giao-dien`.
+- **Quyết định:** giao diện không dùng JLPT (ghi ở [product.md](product.md#thẻ-tiếng-nhật)); A9, C9, S10 bỏ badge và ô JLPT, bỏ nút "Thêm chi tiết"; L6b chỉ cần A9, C9, S10.
+- **Tiếp theo:** Thành viên 2, 3, 4 làm A9 + A5, C9 + C8, S10; rồi L6b, L7, L9.
+
 ## 2026-11-16 — Chuẩn bị đợt 2 (L14, H9)
 
 - **Người làm:** Leader, cùng Claude.
