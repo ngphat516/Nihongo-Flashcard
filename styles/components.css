@@ -356,6 +356,91 @@ button.cover:hover {
   font-weight: 600;
 }
 
+/* ---------- Chọn màu bìa: 6 chấm tròn, chọn một (radio) ---------- */
+/* <fieldset class="color-picker">
+     <legend class="field-label">Màu bìa</legend>
+     <label class="color-picker-option">
+       <input type="radio" name="color" value="pink">
+       <span class="color-picker-swatch cover-pink"></span>
+       <span class="visually-hidden">Hồng</span>
+     </label>
+     … đủ 6 màu theo thứ tự DECK_COLORS: pink Hồng, peach Đào, yellow Vàng, green Lá, sky Trời, lavender Tím
+   </fieldset>
+   Màu chấm lấy từ class .cover-<màu> (--cover-bg, --cover-ink). Radio chỉ ẩn khỏi mắt, vẫn dùng được
+   bằng bàn phím (Tab vào nhóm, mũi tên đổi màu) và trình đọc màn hình. Không cần JS. */
+.color-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.color-picker legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+}
+.color-picker-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px; /* vùng bấm tối thiểu */
+  height: 44px;
+  cursor: pointer;
+}
+.color-picker-option input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.color-picker-swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 2px solid color-mix(in srgb, var(--cover-ink) 20%, transparent);
+  border-radius: 50%;
+  background: var(--cover-bg);
+  color: var(--cover-ink);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+  transition: border-color var(--duration-fast), transform var(--duration-fast);
+}
+.color-picker-option:hover .color-picker-swatch {
+  transform: scale(1.08);
+}
+.color-picker-option input:checked + .color-picker-swatch {
+  border-color: var(--cover-ink);
+}
+.color-picker-option input:checked + .color-picker-swatch::after {
+  content: '✓';
+}
+.color-picker-option input:focus-visible + .color-picker-swatch {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------- Furigana: <ruby lang="ja">約束<rt>やくそく</rt></ruby> (renderFurigana() tạo sẵn) ---------- */
+ruby {
+  ruby-position: over;
+}
+rt {
+  font-size: 0.5em;
+  font-weight: 400;
+  color: var(--text-2);
+}
+/* Chừa chỗ phía trên cho furigana để không đè lên dòng trước */
+:where(*):has(> ruby) {
+  line-height: 2;
+}
+
 /* ---------- Thông báo trên trang ---------- */
 .alert {
   margin-bottom: var(--space-4);
