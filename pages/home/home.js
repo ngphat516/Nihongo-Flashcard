@@ -1,7 +1,7 @@
 /** Trang chủ H1–H8. Dữ liệu chỉ qua repo, không thay đổi lịch ôn của core.
  * getDeckOverview: số cần học có giới hạn thẻ mới và học trước 20 phút.
  * getReviewLogs: ngày học 4h; getCards: lịch đến hạn 14 ngày.
- * Từ L6 mọi bộ đọc ra đều có deck.color (bộ cũ được gán theo thứ tự), nên không cần COVER_COLORS[i % 6] nữa.
+ * Màu bìa: deck.color (H9). Từ L6 mọi bộ đọc ra đều có màu, bộ cũ chưa lưu màu được repo gán theo thứ tự.
  */
 import { getCards, getDeckOverview, getReviewLogs } from '../../core/repo.js';
 import { routes } from '../../core/routes.js';
@@ -10,7 +10,6 @@ import { dayKey } from '../../core/date.js';
 import { dueTotal, hasJapanese, number, summarize } from './analytics.js';
 import { renderActivity, renderMonthly, renderForecast, installTooltips } from './charts.js';
 
-const COVER_COLORS = ['pink', 'peach', 'yellow', 'green', 'sky', 'lavender'];
 const countLabels = { new: 'Mới', learning: 'Đang học', review: 'Đến hạn' };
 let loading = false;
 let loaded = false;
@@ -115,7 +114,7 @@ function renderDecks(overview, stats) {
       h('a', { class: 'btn btn-primary', href: routes.create() }, 'Tạo bộ thẻ đầu tiên')));
     return;
   }
-  const sorted = overview.map((item, index) => ({ ...item, color: COVER_COLORS.includes(item.deck.color) ? item.deck.color : COVER_COLORS[index % 6] }))
+  const sorted = overview.map((item) => ({ ...item, color: item.deck.color }))
     .sort((a, b) => Number(dueTotal(b) > 0) - Number(dueTotal(a) > 0));
   $('#today').replaceChildren(head,
     ...(!next ? [h('div', { class: 'alert alert-success home-complete', role: 'status' },
