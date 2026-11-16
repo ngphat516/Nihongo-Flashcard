@@ -16,6 +16,14 @@
 
 ---
 
+## 2026-11-16 — Chọn màu bìa trong Album (A5)
+
+- **Người làm:** Banana (`tanphat-trinh`, `trinhphat2931@gmail.com`), cùng Codex.
+- **Đã xong:** `#deck-dialog` dùng `color-picker` chung với đủ 6 màu, chọn sẵn `deck.color`; form lưu màu qua `updateDeck()`. Giữ nguyên chức năng A9, không sửa phần chung hoặc trang khác.
+- **Kiểm tra:** 74 test Node; kiểm tra chọn sẵn, mũi tên đổi radio, lưu/mở lại, Esc hủy ở 1440/375px. Album và Trang chủ đọc đúng màu mới. Ảnh tại `pages/album/screenshots/album-a5-*.png`.
+- **Vướng mắc:** Study vẫn dùng `COVER_COLORS[index % ...]` trên main hiện tại, nên chưa hiện màu mới. Đây là phần S10 của thành viên 4; không sửa vượt phạm vi. A5 chưa đánh dấu Xong toàn bộ vì còn phụ thuộc này.
+- **Tiếp theo:** review nhánh `feature/album-a9`, chờ S10 để kiểm tra lại đồng bộ màu cả 3 trang. Chưa tạo PR hoặc merge.
+
 ## 2026-11-16 — Thẻ tiếng Nhật trong Album (A9)
 
 - **Người làm:** Banana (`tanphat-trinh`, `trinhphat2931@gmail.com`), cùng Codex.

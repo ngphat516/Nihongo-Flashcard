@@ -123,7 +123,7 @@
     </form>
   </dialog>
 
-  <!-- A5: sửa bộ thẻ (màu bìa thêm sau L6) -->
+  <!-- A5: sửa bộ thẻ và màu bìa -->
   <dialog class="dialog" id="deck-dialog" aria-labelledby="deck-dialog-title">
     <form>
       <h2 class="dialog-title" id="deck-dialog-title">Sửa bộ thẻ</h2>
@@ -141,6 +141,39 @@
         <input class="input" name="newPerDay" type="number" min="0" max="999" step="1" inputmode="numeric">
         <span class="field-hint">Số thẻ mới tối đa được học mỗi ngày trong bộ này.</span>
       </label>
+      <fieldset class="color-picker">
+        <legend class="field-label">Màu bìa</legend>
+        <label class="color-picker-option">
+          <input type="radio" name="color" value="pink">
+          <span class="color-picker-swatch cover-pink" aria-hidden="true"></span>
+          <span class="visually-hidden">Hồng</span>
+        </label>
+        <label class="color-picker-option">
+          <input type="radio" name="color" value="peach">
+          <span class="color-picker-swatch cover-peach" aria-hidden="true"></span>
+          <span class="visually-hidden">Đào</span>
+        </label>
+        <label class="color-picker-option">
+          <input type="radio" name="color" value="yellow">
+          <span class="color-picker-swatch cover-yellow" aria-hidden="true"></span>
+          <span class="visually-hidden">Vàng</span>
+        </label>
+        <label class="color-picker-option">
+          <input type="radio" name="color" value="green">
+          <span class="color-picker-swatch cover-green" aria-hidden="true"></span>
+          <span class="visually-hidden">Lá</span>
+        </label>
+        <label class="color-picker-option">
+          <input type="radio" name="color" value="sky">
+          <span class="color-picker-swatch cover-sky" aria-hidden="true"></span>
+          <span class="visually-hidden">Trời</span>
+        </label>
+        <label class="color-picker-option">
+          <input type="radio" name="color" value="lavender">
+          <span class="color-picker-swatch cover-lavender" aria-hidden="true"></span>
+          <span class="visually-hidden">Tím</span>
+        </label>
+      </fieldset>
       <div class="dialog-actions">
         <button class="btn" type="button" value="cancel">Hủy</button>
         <button class="btn btn-primary" type="submit">Lưu</button>

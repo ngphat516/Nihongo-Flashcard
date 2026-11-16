@@ -101,7 +101,7 @@ function countItem(state, n, label) {
 async function editDeck() {
   const { deck } = view;
   const saved = await openForm($('#deck-dialog'), {
-    values: { name: deck.name, description: deck.description, newPerDay: deck.newPerDay },
+    values: { name: deck.name, description: deck.description, newPerDay: deck.newPerDay, color: deck.color },
     save: (data) => {
       // Ô số để trống: Number('') === 0 sẽ âm thầm tắt thẻ mới (lỗi B2), nên chặn ở đây
       if (data.newPerDay.trim() === '') throw new ValidationError('Hãy nhập số thẻ mới mỗi ngày (0 nếu không muốn học thẻ mới).');

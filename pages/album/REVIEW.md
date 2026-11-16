@@ -1,6 +1,6 @@
 # Kiểm tra Album — A9
 
-Nhánh `feature/album-a9`, bắt đầu từ `main` `df8aaeb` ngày 16/11/2026. Đối chiếu A9 trong `docs/tasks.md` sau quyết định bỏ JLPT khỏi giao diện. Phần chọn màu trong hộp sửa bộ thuộc A5, chưa thay đổi trong nhánh này.
+Nhánh `feature/album-a9`, bắt đầu từ `main` `df8aaeb` ngày 16/11/2026. Đối chiếu A9 trong `docs/tasks.md` sau quyết định bỏ JLPT khỏi giao diện. Phần chọn màu A5 được bổ sung sau A9; xem mục bên dưới.
 
 ## Yêu cầu và kết quả
 
@@ -39,3 +39,12 @@ Dữ liệu tiếng Nhật được tạo qua `core/repo.js` trong browser conte
 - [Thảo luận Things 3 trên Reddit](https://www.reddit.com/r/thingsapp/comments/1sx6hxi/things_3_is_beautiful_but_what_do_you_wish_it_did/): người dùng khen sự đơn giản, đồng thời phàn nàn việc cắt nội dung dài. Áp dụng cho A9: phân cấp từ/nghĩa rõ và cho văn bản xuống dòng, không cắt ví dụ.
 - [Các ứng dụng được yêu thích trên r/UXDesign](https://www.reddit.com/r/UXDesign/comments/1n20mwr/which_apps_do_you_actually_enjoy_using_and_which/): tham khảo ý kiến về trải nghiệm gọn, tìm/lọc dễ dùng, tránh giao diện nhiều nội dung thừa.
 - [Things — trang sản phẩm chính thức](https://culturedcode.com/things/): tham khảo sự tiết chế trong trình bày. Màu, font, bo góc, component và điều hướng của Album vẫn theo tài liệu Nhớ Lâu; không sao chép giao diện sản phẩm này.
+
+
+## Bổ sung A5 — chọn màu bìa
+
+Hộp sửa bộ dùng `color-picker` chung, 6 màu theo đúng thứ tự design system. `openForm()` gán `RadioNodeList.value` bằng màu hiện tại; `FormData` gửi màu đã chọn qua `updateDeck()`. Không sửa CSS/core hoặc chức năng A9.
+
+Đã kiểm tra ở 1440px và 375px: chọn sẵn, mũi tên đổi màu, lưu và mở lại, hủy không lưu. Album và Trang chủ hiện màu Trời sau khi đổi từ Tím. **Study chưa đạt:** vẫn dùng màu theo vị trí; cần S10 chuyển sang `deck.color`. Không đánh dấu A5 hoàn tất xuyên cả ba trang.
+
+Ảnh kiểm thử: [hộp chọn desktop](screenshots/album-a5-picker-1440.png), [hộp chọn mobile](screenshots/album-a5-picker-375.png), [Album](screenshots/album-a5-album-1440.png), [Trang chủ](screenshots/album-a5-home-1440.png), [Study còn màu cũ](screenshots/album-a5-study-1440.png).
