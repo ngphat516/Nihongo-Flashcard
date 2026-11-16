@@ -41,7 +41,7 @@
     </button>
   </header>
 
-  <!-- ALBUM — phụ trách: Thành viên 2 · việc cần làm: docs/tasks.md mục A1–A8 -->
+  <!-- ALBUM — phụ trách: Thành viên 2 · việc cần làm: docs/tasks.md mục A1–A9 -->
   <main class="container">
 
     <!-- Chế độ 1 — pages/album/: lưới các bộ thẻ -->
@@ -60,7 +60,7 @@
       <div id="card-toolbar" class="section album-toolbar" hidden>
         <label class="album-search">
           <span class="visually-hidden">Tìm thẻ</span>
-          <input id="card-search" class="input" type="search" placeholder="Tìm theo nội dung thẻ">
+          <input id="card-search" class="input" type="search" placeholder="Tìm từ, nghĩa, cách đọc, ví dụ">
         </label>
         <div id="state-filter" class="chips" role="group" aria-label="Lọc theo trạng thái">
           <button class="chip" type="button" aria-pressed="true" data-filter="all">Tất cả</button>
@@ -93,19 +93,28 @@
     </form>
   </dialog>
 
-  <!-- A4: sửa thẻ -->
-  <dialog class="dialog" id="card-dialog" aria-labelledby="card-dialog-title">
+  <!-- A4 · A9: sửa nội dung tiếng Nhật, giữ nguyên tiến độ học -->
+  <dialog class="dialog album-card-dialog" id="card-dialog" aria-labelledby="card-dialog-title" aria-describedby="card-edit-hint">
     <form>
       <h2 class="dialog-title" id="card-dialog-title">Sửa thẻ</h2>
+      <p class="field-hint" id="card-edit-hint">Tiến độ học của thẻ giữ nguyên. Ctrl+Enter để lưu.</p>
       <p class="alert alert-error" role="alert" hidden></p>
       <label class="field">
-        <span class="field-label">Mặt trước</span>
-        <textarea class="input" name="front"></textarea>
+        <span class="field-label">Từ</span>
+        <textarea class="input" name="term" lang="ja" rows="2" maxlength="2000" aria-required="true" aria-describedby="card-term-hint"></textarea>
+        <span class="field-hint" id="card-term-hint">Ghi cách đọc trong ngoặc vuông sau kanji, VD <span lang="ja">約束[やくそく]</span></span>
       </label>
       <label class="field">
-        <span class="field-label">Mặt sau</span>
-        <textarea class="input" name="back"></textarea>
-        <span class="field-hint">Tiến độ học của thẻ giữ nguyên. Ctrl+Enter để lưu.</span>
+        <span class="field-label">Nghĩa</span>
+        <textarea class="input" name="meaning" rows="2" maxlength="2000" aria-required="true"></textarea>
+      </label>
+      <label class="field">
+        <span class="field-label">Cách đọc <span class="album-optional">(không bắt buộc)</span></span>
+        <input class="input" name="reading" lang="ja" maxlength="2000">
+      </label>
+      <label class="field">
+        <span class="field-label">Ví dụ <span class="album-optional">(không bắt buộc)</span></span>
+        <textarea class="input" name="example" lang="ja" rows="2" maxlength="2000"></textarea>
       </label>
       <div class="dialog-actions">
         <button class="btn" type="button" value="cancel">Hủy</button>

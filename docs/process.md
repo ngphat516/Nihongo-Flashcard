@@ -16,6 +16,15 @@
 
 ---
 
+## 2026-11-16 — Thẻ tiếng Nhật trong Album (A9)
+
+- **Người làm:** Banana (`tanphat-trinh`, `trinhphat2931@gmail.com`), cùng Codex.
+- **Đã xong:** A9 trên nhánh `feature/album-a9`, từ `main` `df8aaeb`: mặt trước và ví dụ có furigana, nghĩa/cách đọc ở mặt sau, ẩn trường trống; tìm cả 4 trường, bỏ furigana khi tìm và xác nhận xóa; hộp sửa đủ 4 ô; bìa dùng `deck.color`. Giữ lịch ôn và trường JLPT trong dữ liệu, không hiện JLPT trên giao diện. Cập nhật trạng thái A9.
+- **Kiểm tra:** 74/74 test Node; 75 kiểm tra Chromium về A9, chức năng Album cũ, XSS, bàn phím, giảm chuyển động, nội dung dài, kích thước 1440/1280/768/375/320px. Luồng tạo bộ → thêm thẻ → Album sửa → học/chấm/hoàn tác → Trang chủ → Album qua ở 1440 và 375px. Báo cáo và ảnh chụp trình duyệt tại [pages/album/REVIEW.md](../pages/album/REVIEW.md).
+- **Quyết định:** chỉ sửa Album và cập nhật tiến độ; giữ bố cục/điều hướng chung, không làm thêm A5, không thêm dependency. Không tạo PR hoặc merge theo yêu cầu người dùng.
+- **Tiếp theo:** người dùng duyệt branch và ảnh trước khi cho phép tạo PR; phần chọn màu trong hộp sửa bộ vẫn thuộc A5.
+- **Vướng mắc:** không có lỗi JavaScript trong các luồng kiểm tra; Cloud chặn Google Fonts nên ảnh dùng font dự phòng. Server cục bộ trả 404 cho `/favicon.ico` vốn chưa có ở `main`; không sửa phần chung để xử lý hai lỗi tài nguyên này.
+
 ## 2026-11-16 — Bỏ JLPT khỏi giao diện, chỉnh việc đợt 2
 
 - **Người làm:** Leader, cùng Claude.

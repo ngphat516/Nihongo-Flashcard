@@ -61,7 +61,7 @@
 /* A2 · A3 · A4: lưới thẻ. Thẻ lật nhỏ hơn thẻ ở trang Học. */
 .album-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: var(--space-4);
   margin: 0;
   padding: 0;
@@ -74,10 +74,75 @@
   min-width: 0;
 }
 .album-card .flashcard-face {
-  min-height: 140px;
-  padding: var(--space-4);
-  font-size: var(--text-lg);
+  min-width: 0; /* Nội dung ruby dài không ép rộng cột grid. */
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: calc(var(--space-6) * 5);
+  padding: var(--space-5);
+  font-size: var(--text-base);
   box-shadow: none;
+}
+.album-card .flashcard {
+  flex: 1;
+}
+.album-card .flashcard-inner {
+  height: 100%;
+}
+.album-face-label,
+.album-flip-hint {
+  font-size: var(--text-xs);
+  color: var(--muted);
+  font-weight: 400;
+}
+.album-face-label {
+  display: block;
+}
+.album-term {
+  min-width: 0;
+  max-width: 100%;
+  margin: auto 0;
+  font-size: var(--text-card);
+  font-weight: 600;
+}
+.album-answer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+  width: 100%;
+  margin: auto 0;
+}
+.album-meaning {
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+.album-reading,
+.album-example {
+  color: var(--text-2);
+}
+.album-reading {
+  font-size: var(--text-sm);
+}
+.album-example {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+}
+.album-card .flashcard:hover .flashcard-face {
+  border-color: var(--primary);
+}
+.album-card-dialog {
+  width: min(560px, calc(100% - 2 * var(--space-4)));
+  max-height: calc(100dvh - 2 * var(--space-4));
+  overflow-y: auto;
+}
+.album-card-dialog textarea {
+  min-height: 0;
+}
+.album-optional {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  font-weight: 400;
 }
 .album-card-meta {
   display: flex;
