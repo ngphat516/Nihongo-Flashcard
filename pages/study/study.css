@@ -190,12 +190,16 @@
 .study-card-reading,
 .study-card-example {
   color: var(--text-2);
-  font-size: var(--text-sm);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
+.study-card-reading {
+  font-size: var(--text-lg);
+}
+
 .study-card-example {
+  font-size: var(--text-base);
   max-block-size: 6em;
   overflow-y: auto;
   overscroll-behavior: contain;
