@@ -16,14 +16,13 @@ Bảng này là **trạng thái hiện tại**: còn việc gì, ai làm. Lịch
 | **Thành viên 3 (kakushi)** | **Tạo thẻ** | `pages/create/` |
 | **Thành viên 4** | **Học** | `pages/study/` |
 
-**Lộ trình còn lại sau khi xong `L6`, `L14`, `H9`, `L9`, `C9 + C8`:**
-1. **Bước 1 — Hoàn thiện & merge PR giao diện tiếng Nhật (đang mở):**
-   - `A9 + A5` (Album — PR #12) và `S10` (Học — PR #13). Người làm/review mở kèm `?seed` để test thẳng 3 bộ tiếng Nhật đủ 4 trường ([bảng mẫu](architecture.md#dữ-liệu-mẫu-seed)), hoặc tạo/sửa thêm qua `pages/create/`.
-2. **Bước 2 — Dọn lớp tương thích & tính năng chung (`core/`, `styles/`):**
-   - Khi `A9`, `C9`, `S10` đã vào `main` → Leader làm **`L6b`** (xóa `core/card-compat.js`).
-   - Làm **`L7`** (nút bật/tắt furigana toàn web).
-3. **Bước 3 — Mở rộng & Kiểm thử cuối:**
-   - Tạo thẻ nâng cao (`C4`, `C5`, `C7`), tinh chỉnh giao diện (`L13`), bật bảo vệ `main` (`L2`), rồi kiểm thử cuối & dọn code (`L5`).
+**Đợt 2 (xong):** đợt 2 chỉ sửa giao diện. Trường thẻ, kiểm tra dữ liệu, furigana, màu bìa đều có trong `core/` từ `L6`. Vì vậy `A9 + A5`, `C9 + C8`, `S10` làm song song, không việc nào chờ việc nào. Các trang không import code của nhau, chỉ nối qua dữ liệu thẻ: Tạo thẻ ghi, Album và Học đọc, đều qua `core/repo.js`. Lúc làm từng trang thì dùng `?seed` ([bảng mẫu](architecture.md#dữ-liệu-mẫu-seed)) thay cho Tạo thẻ. Chỗ nối thật chỉ kiểm tra được khi chạy thử cả luồng sau merge. Đã merge PR #14 (C9 + C8 + L9), #12 (A9 + A5), #13 (S10).
+
+**Tiếp theo:**
+1. Chạy thử luồng Tạo thẻ → Album → Học (`L15`).
+2. Bỏ lớp tương thích `front`/`back` (`L6b`).
+3. Nút bật/tắt furigana (`L7`).
+4. `C4`, `C5`, `C7`, `L13`, `L2`, rồi kiểm thử cuối `L5`.
 
 Không tự sửa `styles/` hay `core/` trong PR của trang; cần biến CSS hoặc hàm core mới thì báo Leader.
 
@@ -41,7 +40,8 @@ Không tự sửa `styles/` hay `core/` trong PR của trang; cần biến CSS h
 | L4 | Hệ thống giao diện | `styles/tokens.css` + `styles/components.css` (nút, ô nhập, thống kê, bộ đếm, badge, thẻ lật, dialog, toast, trạng thái rỗng), font Noto Sans JP, trang `pages/styleguide/`. Chỉ CSS, không có JS cho component | Nên có | Xong |
 | L5 | Kiểm thử cuối | `npm test` qua hết, thử luồng tạo bộ → thêm thẻ → học → xem heatmap, thử trên điện thoại, làm hết mục [Trước khi nộp](conventions.md#trước-khi-nộp--deploy) | Bắt buộc | Chưa làm |
 | L6 | Thẻ tiếng Nhật + màu bìa | Đổi `Card` từ `front`/`back` sang `term`, `meaning`, `reading`, `example`, `jlpt` + cú pháp furigana `漢字[かんじ]` (chi tiết: [product.md](product.md#thẻ-tiếng-nhật)). Thêm `Deck.color` ([product.md](product.md#màu-bìa-bộ-thẻ)): `DECK_COLORS` trong `models.js` theo thứ tự ở [design.md](design.md#màu-bìa-bộ-thẻ), `createDeck` không truyền màu thì lấy màu kế tiếp, `updateDeck` đổi được màu, màu lạ báo `ValidationError`, bộ cũ chưa có màu thì đọc ra theo thứ tự. Sửa `models.js`, `repo.js`, `seed.js`, test, chú thích đầu file các trang. Album, Tạo thẻ, Học đều đang dùng thẻ 2 mặt: phần đổi ở mỗi trang là A9, C9, S10 bên dưới | Bắt buộc | Xong (còn L6b) |
-| L6b | Bỏ lớp tương thích `front`/`back` | Cần A9, C9, S10 đã merge vào `main` (H9, C9 đã xong). Không cần chờ A5, C8. Xóa `core/card-compat.js` và 2 chỗ gọi `readCard` / `writeCard` trong `core/repo.js`, bỏ nhóm test "lớp tương thích" trong `tests/repo.test.js`. Xong khi `grep -rn "\.front\|\.back\|front:\|back:" pages core` không còn dòng nào khớp và `npm test` xanh | Bắt buộc | Chưa làm |
+| L6b | Bỏ lớp tương thích `front`/`back` | Cần A9, C9, S10 đã merge vào `main`, làm sau L15. Không cần chờ A5, C8. Xóa `core/card-compat.js` và các chỗ gọi `readCard` / `writeCard` trong `core/repo.js`, bỏ nhóm test "lớp tương thích" trong `tests/repo.test.js`. Thẻ cũ còn `front`/`back` trong localStorage phải được xử lý: chuyển đổi một lần khi mở app, hoặc chấp nhận bỏ; chọn cách nào thì ghi vào [process.md](process.md). Xong khi `grep -rnE '\.(front\|back)([^-[:alnum:]_]\|$)\|\b(front\|back):' pages core` không còn dòng nào khớp (lệnh này bỏ qua class `.back-link`) và `npm test` xanh | Bắt buộc | Chưa làm |
+| L15 | Chạy thử luồng sau đợt 2 | Trên `main` sau khi merge A9, C9, S10, bắt đầu từ `?reset`: tạo bộ ở Tạo thẻ với thẻ có furigana, `reading`, `example` và chọn màu bìa → Album hiển thị đúng, tìm và sửa được → Học hiển thị đúng furigana, chấm, hoàn tác → màu bìa khớp ở Trang chủ, Album, Học. Thử ở 1440px và 375px; Console không lỗi. Làm trước L6b | Bắt buộc | Chưa làm |
 | L7 | Furigana bật/tắt | Nút bật/tắt furigana chung cho cả web ([product.md](product.md#furigana-bậttắt)): nút đã có sẵn ở cuối cột điều hướng (`.rail-furigana`, L12). Gợi ý: thêm hàm đọc/ghi trạng thái vào `core/` (lưu `localStorage`, mặc định bật), ở cả 4 trang khởi tạo `aria-pressed` và gắn `data-furigana="off"` lên `document.documentElement` kèm rule ẩn `rt` trong `styles/components.css` để không phải render lại thẻ. Cần L6 trước | Nên có | Chưa làm |
 | L8 | Đổi chiều học | Nhật → Việt / Việt → Nhật ([product.md](product.md#đổi-chiều-học)). Cách lưu lịch ôn chưa chốt | Nên có | Chưa làm |
 | L9 | Dữ liệu mẫu tiếng Nhật | Thay 3 bộ mẫu trong `core/seed.js` bằng bộ tiếng Nhật. Làm sau L6 | Nên có | Xong |
@@ -95,7 +95,7 @@ Mục đích: xem, tìm, sửa các bộ thẻ và thẻ. Trang có 2 chế đ�
 | A2 | Chi tiết bộ | Đầu trang: tên, mô tả, nút "Học ngay" (`routes.study`) và "Thêm thẻ" (`routes.create`). Bên dưới: lưới thẻ, bấm một thẻ thì lật xem mặt sau | `getDeck()`, `getCards(deckId)` | Bắt buộc | Xong |
 | A3 | Trạng thái thẻ | Mỗi thẻ có badge Mới / Đang học / Ôn tập và hạn ôn ("Ngày mai", "Sau 5 ngày") | `STATE_LABELS`, `describeDue()`, class `.badge-<state>` | Bắt buộc | Xong |
 | A4 | Sửa / xóa thẻ | Sửa nội dung thẻ (tiến độ học giữ nguyên). Xóa có hỏi xác nhận. Lỗi nhập liệu hiện `err.message` | `updateCard()`, `deleteCard()` | Bắt buộc | Xong |
-| A5 | Sửa / xóa bộ | Sửa tên, mô tả, số thẻ mới/ngày, màu bìa. Màu bìa: dùng `color-picker` trong `#deck-dialog`, chọn sẵn màu hiện tại, lưu bằng `updateDeck(id, { color })`; đổi màu xong thì Trang chủ và Học cũng hiện màu mới. Cần L14. Xóa bộ (xóa luôn thẻ, giữ lịch sử ôn) có hỏi xác nhận, xóa xong về lưới | `updateDeck()`, `deleteDeck()` | Bắt buộc | Album xong; chờ S10 để Học đọc màu mới |
+| A5 | Sửa / xóa bộ | Sửa tên, mô tả, số thẻ mới/ngày, màu bìa. Màu bìa: dùng `color-picker` trong `#deck-dialog`, chọn sẵn màu hiện tại, lưu bằng `updateDeck(id, { color })`; đổi màu xong thì Trang chủ và Học cũng hiện màu mới. Cần L14. Xóa bộ (xóa luôn thẻ, giữ lịch sử ôn) có hỏi xác nhận, xóa xong về lưới | `updateDeck()`, `deleteDeck()` | Bắt buộc | Xong |
 | A6 | Tìm & lọc | Ô tìm theo nội dung thẻ (gõ "thuat toan" vẫn ra "thuật toán": bỏ dấu bằng `normalize('NFD')`), lọc theo trạng thái bằng `chip`, sắp xếp (mới tạo / sắp đến hạn) | — | Nên có | Xong |
 | A7 | Học lại từ đầu | Nút đưa một thẻ về trạng thái Mới | `resetCard()` | Nếu kịp | Xong |
 | A8 | Trường hợp đặc biệt | Chưa có bộ nào: lời nhắc + nút tạo bộ. `?deck=` sai id: thông báo + link về lưới. Bộ chưa có thẻ: nút "Thêm thẻ đầu tiên" | `getDeck()` trả `null` | Bắt buộc | Xong |
