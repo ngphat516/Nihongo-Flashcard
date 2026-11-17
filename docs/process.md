@@ -16,6 +16,7 @@
 
 ---
 
+
 ### 2026-11-17 — Đồng bộ main vào Album (A9, A5)
 
 - **Người làm:** Banana (`tanphat-trinh`), cùng Codex.
@@ -33,6 +34,13 @@
   - L9: thay 3 bộ mẫu trong `core/seed.js` bằng 3 bộ tiếng Nhật (22, 12, 8 thẻ) kèm furigana, `reading`, `example`; cập nhật test trong `tests/repo.test.js`.
   - Tài liệu: cập nhật trạng thái trong `product.md`, `tasks.md`; bổ sung bảng dữ liệu mẫu `?seed` và ghi chú `card-rows.js` vào `architecture.md`; sắp xếp lại lộ trình 3 bước và thêm gợi ý triển khai cho `L6b`, `L7`, `C4`, `C5`, `C7` trong `tasks.md`.
 - **Tiếp theo:** Review & merge A9 + A5 (PR #12), S10 (PR #13) và C9 + C8; rồi làm L6b, L7, C4/C5/C7.
+
+## 2026-11-16 — Thẻ tiếng Nhật trên trang Học (S10)
+
+- **Người làm:** AT, cùng Codex.
+- **Đã xong:** hiện từ và ví dụ có furigana, kèm nghĩa và cách đọc nếu có. Bìa lấy màu từ bộ thẻ. Hoàn tác hiện thẻ do core trả về.
+- **Kiểm tra:** 70 bài test qua. Edge chạy hết một lượt với dữ liệu mẫu, kiểm tra phím tắt và ví dụ dài ở 375 px.
+- **Tiếp theo:** gửi S10 để review cùng các thay đổi đợt 2.
 
 ## 2026-11-16 — Chọn màu bìa trong Album (A5)
 
