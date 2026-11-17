@@ -16,6 +16,13 @@
 
 ---
 
+## 2026-11-16 — Thẻ tiếng Nhật trên trang Học (S10)
+
+- **Người làm:** AT, cùng Codex.
+- **Đã xong:** hiện từ và ví dụ có furigana, kèm nghĩa và cách đọc nếu có. Bìa lấy màu từ bộ thẻ. Hoàn tác hiện thẻ do core trả về.
+- **Kiểm tra:** 70 bài test qua. Edge chạy hết một lượt với dữ liệu mẫu, kiểm tra phím tắt và ví dụ dài ở 375 px.
+- **Tiếp theo:** gửi S10 để review cùng các thay đổi đợt 2.
+
 ## 2026-11-16 — Bỏ JLPT khỏi giao diện, chỉnh việc đợt 2
 
 - **Người làm:** Leader, cùng Claude.

@@ -1,15 +1,11 @@
 /**
  * Học (pages/study/): chọn bộ, lật thẻ, chấm điểm, hoàn tác.
  *
- * Gợi ý vòng học: getStudyQueue(deckId, { lastCardId }) → hiện queue.card → reviewCard(card.id, rating, { timeMs })
- * → lặp lại. Hoàn tác: `const restored = await undo()` trả về đúng thẻ vừa hoàn tác (B3 đã sửa trong core),
- * nên hiện thẳng `restored` là đủ, không cần tự giữ thẻ (restoredCard) để tránh lỗi.
- *
- * Thẻ tiếng Nhật (L6): mặt trước dùng renderFurigana(card.term) (furigana.js, đã gắn lang="ja"),
- * mặt sau card.meaning, kèm reading / example nếu có. card.front / card.back chỉ còn tạm tới L6b.
- * Màu bìa: deck.color thay cho COVER_COLORS[i % 6].
+ * getStudyQueue() chọn thẻ đến lượt học; reviewCard() lưu lượt ôn và cung cấp undo().
+ * renderFurigana() hiển thị từ và ví dụ có chú âm, getDeckOverview() cung cấp màu bìa.
  */
 import { $, getParam, h, startPage } from '../../core/dom.js';
+import { renderFurigana } from '../../core/furigana.js';
 import { NotFoundError } from '../../core/models.js';
 import { LEARN_AHEAD_MS, isLearning } from '../../core/queue.js';
 import { getCards, getDeckOverview, getStudyQueue, reviewCard } from '../../core/repo.js';
@@ -17,8 +13,6 @@ import { routes } from '../../core/routes.js';
 import { Rating, RATINGS, RATING_LABELS, previewRatings } from '../../core/scheduler.js';
 
 const countLabels = { new: 'Mới', learning: 'Đang học', review: 'Đến hạn' };
-// Cùng thứ tự với Album cho tới khi L6 lưu màu trên từng bộ thẻ.
-const COVER_COLORS = ['pink', 'peach', 'yellow', 'green', 'sky', 'lavender'];
 const ratingClasses = {
   [Rating.AGAIN]: 'btn-again',
   [Rating.HARD]: 'btn-hard',
@@ -26,7 +20,6 @@ const ratingClasses = {
   [Rating.EASY]: 'btn-easy',
 };
 const clock = new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit' });
-const japaneseText = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
 
 startPage(async () => {
   const deckId = getParam('deck');
@@ -40,13 +33,6 @@ function countItems(counts) {
     return h('span', { class: `count count-${state}${count === 0 ? ' is-zero' : ''}` },
       h('b', {}, count), h('span', {}, label));
   });
-}
-
-function setCardText(face, text) {
-  const content = $('.study-card-text', face);
-  content.textContent = text;
-  if (japaneseText.test(text)) content.lang = 'ja';
-  else content.removeAttribute('lang');
 }
 
 function browsableCards(cards, newLimit, now, lastCardId) {
@@ -73,11 +59,10 @@ async function showDeckPicker() {
       h('a', { class: 'btn btn-primary', href: routes.create() }, 'Tạo bộ thẻ'),
     ));
   } else {
-    list.replaceChildren(h('ul', { class: 'study-decks' }, overview.map(({ deck, due }, index) => {
-      const color = COVER_COLORS[index % COVER_COLORS.length];
+    list.replaceChildren(h('ul', { class: 'study-decks' }, overview.map(({ deck, due }) => {
       const total = Object.values(due).reduce((sum, count) => sum + count, 0);
       return h('li', {}, h('a', {
-        class: `cover cover-${color} study-deck${total === 0 ? ' is-zero' : ''}`,
+        class: `cover cover-${deck.color} study-deck${total === 0 ? ' is-zero' : ''}`,
         href: routes.study(deck.id),
       },
       h('span', { class: 'study-deck-heading' },
@@ -98,6 +83,8 @@ async function startSession(deckId) {
   const stage = $('#card-stage');
   const front = $('#card-front');
   const back = $('#card-back');
+  const term = $('.study-card-text', front);
+  const answerText = $('.study-card-answer', back);
   const ratings = $('#rating-buttons');
   const previousCard = $('#previous-card');
   const nextCard = $('#next-card');
@@ -117,7 +104,6 @@ async function startSession(deckId) {
   let revealed = false;
   let lastReview = null;
   let lastCardId = null;
-  let restoredCard = null;
   let busy = false;
   let wakeTimer;
 
@@ -136,8 +122,12 @@ async function startSession(deckId) {
     revealed = false;
     stage.classList.remove('is-flipped');
     stage.classList.add('is-resetting');
-    setCardText(front, card.front);
-    setCardText(back, card.back);
+    term.replaceChildren(renderFurigana(card.term));
+    answerText.replaceChildren(
+      h('span', { class: 'study-card-text study-card-meaning' }, card.meaning),
+      card.reading && h('span', { class: 'study-card-reading', lang: 'ja' }, card.reading),
+      card.example && h('span', { class: 'study-card-example' }, renderFurigana(card.example)),
+    );
     front.removeAttribute('aria-hidden');
     back.setAttribute('aria-hidden', 'true');
     cardPosition.textContent = `Thẻ ${cardIndex + 1} / ${cardsToBrowse.length}`;
@@ -197,13 +187,13 @@ async function startSession(deckId) {
     $('#done-title').focus();
   }
 
-  async function loadQueue() {
+  async function loadQueue(preferredCard) {
     clearTimeout(wakeTimer);
     current = null;
     try {
       const now = Date.now();
       const queue = await getStudyQueue(deckId, { now, lastCardId });
-      const card = restoredCard ?? queue.card;
+      const card = preferredCard ?? queue.card;
       if (card) {
         const cards = await getCards(deckId);
         cardsToBrowse = browsableCards(cards, queue.counts.new, now, lastCardId);
@@ -215,7 +205,6 @@ async function startSession(deckId) {
       }
       $('#deck-name').textContent = queue.deck.name;
       $('#study-counts').replaceChildren(...countItems(queue.counts));
-      restoredCard = null;
       if (card) showFront(card);
       else showDone(queue.nextLearningAt);
     } catch (error) {
@@ -223,6 +212,7 @@ async function startSession(deckId) {
       done.hidden = true;
       if (!(error instanceof NotFoundError)) {
         showError(error);
+        retryButton.onclick = () => run(() => loadQueue(preferredCard));
         retryButton.hidden = false;
         retryButton.focus();
         return;
@@ -258,7 +248,7 @@ async function startSession(deckId) {
       const timeMs = Math.round(performance.now() - shownAt);
       const wasReviewed = reviewedCards.has(card.id);
       const { undo } = await reviewCard(card.id, rating, { timeMs });
-      lastReview = { card, timeMs, wasReviewed, undo };
+      lastReview = { timeMs, wasReviewed, undo };
       lastCardId = card.id;
       reviewedCards.add(card.id);
       studyMs += timeMs;
@@ -269,22 +259,19 @@ async function startSession(deckId) {
   function undoLast() {
     if (!lastReview) return;
     return run(async () => {
-      const { card, timeMs, wasReviewed, undo } = lastReview;
-      await undo();
+      const { timeMs, wasReviewed, undo } = lastReview;
+      const card = await undo();
       if (!wasReviewed) reviewedCards.delete(card.id);
       studyMs -= timeMs;
       lastReview = null;
       lastCardId = null;
-      // Hiện lại đúng thẻ vừa hoàn tác kể cả khi thẻ khác vừa đến hạn (B3).
-      restoredCard = card;
-      await loadQueue();
+      await loadQueue(card);
     });
   }
 
   stage.addEventListener('click', flipCard);
   previousCard.addEventListener('click', () => moveCard(-1));
   nextCard.addEventListener('click', () => moveCard(1));
-  retryButton.addEventListener('click', reloadQueue);
   for (const button of undoButtons) button.addEventListener('click', undoLast);
 
   document.addEventListener('keydown', (event) => {
