@@ -30,7 +30,7 @@ Dùng đúng các từ này trong giao diện, code và tài liệu.
 | **Bìa** | class `cover` | Khối màu pastel đại diện cho một bộ thẻ trên Trang chủ và Album |
 | **Màu bìa** | `deck.color` | Một trong 6 màu pastel của bìa: `pink`, `peach`, `yellow`, `green`, `sky`, `lavender` |
 | **Thẻ** | `Card` | Một mục cần nhớ: từ tiếng Nhật và nghĩa, kèm cách đọc, câu ví dụ, cấp JLPT (xem [Thẻ tiếng Nhật](#thẻ-tiếng-nhật)) |
-| **Từ / nghĩa** | `term` / `meaning` | Mặt trước / mặt sau khi học chiều Nhật → Việt. `front` / `back` là tên cũ, chỉ còn tạm tới L6b |
+| **Từ / nghĩa** | `term` / `meaning` | Mặt trước / mặt sau khi học chiều Nhật → Việt. `front` / `back` là tên cũ, đã bỏ ở L6b |
 | **Trạng thái thẻ** | `card.state` | **Mới** `new` · **Đang học** `learning` · **Học lại** `relearning` (quên khi đang ôn) · **Ôn tập** `review` |
 | **Chấm điểm** | `rating` 1–4 | Sau khi lật thẻ, người học tự chấm **Lại** / **Khó** / **Tốt** / **Dễ** |
 | **Lượt ôn** | `ReviewLog` | Một lần chấm điểm. Dùng cho heatmap, thống kê, hoàn tác |
@@ -54,13 +54,9 @@ App có 4 trang. Danh sách việc chi tiết và tiêu chí xong nằm trong [t
 | **Tạo thẻ** | Tạo bộ mới hoặc mở một bộ có sẵn; thêm, sửa, xóa thẻ rồi lưu một lần |
 | **Học** | Học một bộ: xem mặt trước → lật → chấm Lại/Khó/Tốt/Dễ; bộ đếm Mới/Đang học/Đến hạn; hoàn tác |
 
-## Đã chốt, chưa làm
-
-Các quyết định này đã chốt nhưng code chưa có. Ai làm thì cập nhật [tasks.md](tasks.md) và chuyển mục ra khỏi đây khi xong.
-
 ### Thẻ tiếng Nhật
 
-**Trạng thái:** `core/` (`L6`), dữ liệu mẫu tiếng Nhật (`L9`) và trang Tạo thẻ (`C9`) đã xong. Album (`A9`) và Học (`S10`) đang mở PR hoàn thiện giao diện; mọi thẻ đọc ra vẫn tạm kèm `front` = `term`, `back` = `meaning` qua `core/card-compat.js` và repo tạm nhận `{ front, back }` cho tới `L6b`.
+**Trạng thái:** xong cả `core/` (`L6`, `L6b`), dữ liệu mẫu (`L9`), Tạo thẻ (`C9`), Album (`A9`), Học (`S10`). Thẻ cũ `front` / `back` được đổi sang trường mới một lần khi mở app.
 
 Thay 2 mặt `front` / `back` bằng các trường riêng, để sau này làm được bài tập trắc nghiệm, gõ cách đọc:
 
@@ -76,10 +72,10 @@ Giao diện chưa dùng trường `jlpt`: không có ô nhập, không hiện tr
 
 - **Cú pháp furigana:** viết `漢字[かんじ]` trong `term` và `example`, app hiển thị thành `<ruby>`. Cách đọc gắn vào cụm kanji liền ngay trước `[` (kể cả `々`); ngoặc thiếu, ngoặc rỗng, hoặc trước `[` không có kanji thì giữ nguyên là chữ thường. Hàm ở `core/furigana.js`: `renderFurigana()` để hiện, `plainFurigana()` để tìm kiếm và so trùng.
 - `jlpt` chỉ nhận `''`, `N5`, `N4`, `N3`, `N2`, `N1`. `term`, `meaning` bắt buộc; mỗi ô tối đa 2000 ký tự.
-- **Các trang còn phải làm** (chi tiết ở A9, S10, L6b trong [tasks.md](tasks.md)):
-  - Album (`A9`): hiện thẻ bằng `renderFurigana(card.term)` và `card.meaning`, dialog sửa thẻ gửi trường mới, tìm kiếm qua `plainFurigana()`.
-  - Học (`S10`): mặt trước `renderFurigana(card.term)`, mặt sau `meaning` kèm `reading` / `example`.
-  - Xong cả Album và Học thì làm `L6b` (bỏ lớp tương thích `core/card-compat.js`).
+
+## Đã chốt, chưa làm
+
+Các quyết định này đã chốt nhưng code chưa có. Ai làm thì cập nhật [tasks.md](tasks.md) và chuyển mục ra khỏi đây khi xong.
 
 ### Màu bìa bộ thẻ
 

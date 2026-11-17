@@ -31,7 +31,7 @@ core/                   phần lõi dùng chung
   queue.js              chọn thẻ tiếp theo, đếm thẻ cần học, nhãn trạng thái
   models.js             cấu trúc Deck / Card / ReviewLog + kiểm tra dữ liệu, DECK_COLORS, JLPT_LEVELS
   furigana.js           cú pháp 漢字[かんじ]: parseFurigana, plainFurigana, renderFurigana
-  card-compat.js        TẠM tới L6b: đọc/ghi thẻ cũ front/back (chỉ repo.js dùng)
+  migrate.js            đổi thẻ cũ front/back sang trường mới một lần (chỉ repo.js dùng)
   storage.js            đọc/ghi localStorage
   date.js               ngày học (bắt đầu 4h sáng), định dạng thời gian
   dom.js                h() tạo element an toàn, $(), getParam(), startPage()
@@ -106,9 +106,8 @@ Các trường của `Deck`, `Card`, `ReviewLog` và giới hạn độ dài: xe
 | `Card` (tiến độ) | `state`, `due`, `interval`, `ease`, `step`, `reps`, `lapses`, `lastReview` | do `scheduler.js` tính |
 
 - **Dữ liệu cũ (trước L6):**
-  - Thẻ chỉ có `front` / `back`: `repo.js` đọc ra thành `term` / `meaning` qua `core/card-compat.js`; khi thẻ được lưu lại thì chỉ ghi trường mới.
+  - Thẻ chỉ có `front` / `back`: ở lần đọc thẻ đầu tiên sau khi mở trang, `repo.js` gọi `migrateCards()` (`core/migrate.js`) đổi sang `term` / `meaning`, điền `''` cho trường thiếu, bỏ `front` / `back` rồi ghi lại. Chạy lại nhiều lần không đổi gì thêm.
   - Bộ chưa có `color`: đọc ra màu theo thứ tự danh sách (`DECK_COLORS[i % 6]`); khi bộ được lưu lại thì ghi màu.
-  - Lớp tương thích này là tạm, bỏ ở L6b. Mọi thẻ repo trả ra hiện kèm `front` = `term`, `back` = `meaning` cho các trang chưa đổi.
 
 - **Xóa bộ thẻ:** xóa luôn thẻ trong bộ, nhưng **giữ** lượt ôn, để heatmap và chuỗi ngày không bị mất.
 - **Dung lượng:** localStorage khoảng 5 MB. Mỗi lượt ôn chiếm khoảng 300 byte, và mỗi lần chấm điểm ghi lại cả bảng `reviewLogs`. Chứa được khoảng 16 nghìn lượt ôn (khoảng 5 tháng nếu ôn 100 lượt/ngày). Đầy thì `storage.js` báo lỗi "Bộ nhớ trình duyệt đã đầy".
@@ -147,7 +146,7 @@ Mở bất kỳ trang nào kèm `?seed` (hoặc gọi `dev.seed()` trong Console
 
 Lỗi do người dùng nhập sai có `err.name === 'ValidationError'`; `id` không tồn tại thì `NotFoundError`.
 
-Tạm tới L6b: các hàm thẻ vẫn nhận `{ front, back }` như `{ term, meaning }`, và thẻ trả ra kèm `front` / `back`. Code mới chỉ dùng tên mới.
+Các hàm thẻ chỉ nhận và trả tên trường mới; gửi `{ front, back }` thì báo `ValidationError` vì thiếu `term` / `meaning`.
 
 Ngoài ra trang hay dùng:
 - `scheduler.js`: `previewRatings(card)` (thời gian ghi trên 4 nút), `RATING_LABELS`.
