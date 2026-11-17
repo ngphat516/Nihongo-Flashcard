@@ -16,12 +16,48 @@
 
 ---
 
+
+### 2026-11-17 — Đồng bộ main vào Album (A9, A5)
+
+- **Người làm:** Banana (`tanphat-trinh`), cùng Codex.
+- **Đã xong:** merge `main` `02894d9` vào `feature/album-a9`, giữ lịch sử A9/A5. Conflict duy nhất ở nhật ký: giữ đầy đủ 21 mục của hai nhánh, xếp ngày mới trước. Các thay đổi C9/C8/L9 và tài liệu được tích hợp nguyên bản; không sửa code hoặc giao diện Album.
+- **Kiểm tra:** API/model không đổi. 74/74 test Node và 75 kiểm tra hồi quy Album qua. Luồng tạo bộ/thẻ mới → Album → Học/hoàn tác → Trang chủ qua ở 1440/375px; thêm luồng với `?seed` tiếng Nhật mới: xem cả 3 bộ, sửa bằng C9 → tìm/sửa trong Album giữ tiến độ → đổi màu → học/chấm/hoàn tác → Album, qua ở cả hai kích thước. Không có lỗi JavaScript; giới hạn tải Google Fonts và favicon cục bộ như đã ghi trước đó.
+- **Vướng mắc:** Study chưa có S10 trên main, vẫn dùng màu theo vị trí; không sửa phần của thành viên khác.
+- **Tiếp theo:** cập nhật PR #12 để nhóm review; không merge PR.
+
+# 2026-11-17 — Thẻ tiếng Nhật và chọn màu bìa trang Tạo thẻ (C9, C8), dữ liệu mẫu tiếng Nhật (L9)
+
+- **Người làm:** kakushi.
+- **Đã xong:**
+  - C9: mỗi dòng thẻ ở `pages/create/` có 4 ô Từ, Nghĩa, Cách đọc, Ví dụ; gợi ý cú pháp furigana; kiểm tra thiếu Từ/Nghĩa; so trùng bằng `plainFurigana()`; Tab ở ô Ví dụ dòng cuối thêm dòng mới; lưu qua `createCards()` / `updateCard()` với 4 trường mới; tách các hàm dòng thẻ (`ROW_FIELDS`, `fieldsOf`, `snapshot`, `autosizeRow`) trong `pages/create/card-rows.js`.
+  - C8: thêm `.color-picker` 6 màu bìa vào form bộ thẻ; tạo bộ mới tự chọn màu kế tiếp theo `DECK_COLORS`; mở bộ cũ chọn sẵn `deck.color` và lưu khi đổi màu.
+  - L9: thay 3 bộ mẫu trong `core/seed.js` bằng 3 bộ tiếng Nhật (22, 12, 8 thẻ) kèm furigana, `reading`, `example`; cập nhật test trong `tests/repo.test.js`.
+  - Tài liệu: cập nhật trạng thái trong `product.md`, `tasks.md`; bổ sung bảng dữ liệu mẫu `?seed` và ghi chú `card-rows.js` vào `architecture.md`; sắp xếp lại lộ trình 3 bước và thêm gợi ý triển khai cho `L6b`, `L7`, `C4`, `C5`, `C7` trong `tasks.md`.
+- **Tiếp theo:** Review & merge A9 + A5 (PR #12), S10 (PR #13) và C9 + C8; rồi làm L6b, L7, C4/C5/C7.
+
 ## 2026-11-16 — Thẻ tiếng Nhật trên trang Học (S10)
 
 - **Người làm:** AT, cùng Codex.
 - **Đã xong:** hiện từ và ví dụ có furigana, kèm nghĩa và cách đọc nếu có. Bìa lấy màu từ bộ thẻ. Hoàn tác hiện thẻ do core trả về.
 - **Kiểm tra:** 70 bài test qua. Edge chạy hết một lượt với dữ liệu mẫu, kiểm tra phím tắt và ví dụ dài ở 375 px.
 - **Tiếp theo:** gửi S10 để review cùng các thay đổi đợt 2.
+
+## 2026-11-16 — Chọn màu bìa trong Album (A5)
+
+- **Người làm:** Banana (`tanphat-trinh`, `trinhphat2931@gmail.com`), cùng Codex.
+- **Đã xong:** `#deck-dialog` dùng `color-picker` chung với đủ 6 màu, chọn sẵn `deck.color`; form lưu màu qua `updateDeck()`. Giữ nguyên chức năng A9, không sửa phần chung hoặc trang khác.
+- **Kiểm tra:** 74 test Node; kiểm tra chọn sẵn, mũi tên đổi radio, lưu/mở lại, Esc hủy ở 1440/375px. Album và Trang chủ đọc đúng màu mới. Ảnh tại `pages/album/screenshots/album-a5-*.png`.
+- **Vướng mắc:** Study vẫn dùng `COVER_COLORS[index % ...]` trên main hiện tại, nên chưa hiện màu mới. Đây là phần S10 của thành viên 4; không sửa vượt phạm vi. A5 chưa đánh dấu Xong toàn bộ vì còn phụ thuộc này.
+- **Tiếp theo:** review nhánh `feature/album-a9`, chờ S10 để kiểm tra lại đồng bộ màu cả 3 trang. Chưa tạo PR hoặc merge.
+
+## 2026-11-16 — Thẻ tiếng Nhật trong Album (A9)
+
+- **Người làm:** Banana (`tanphat-trinh`, `trinhphat2931@gmail.com`), cùng Codex.
+- **Đã xong:** A9 trên nhánh `feature/album-a9`, từ `main` `df8aaeb`: mặt trước và ví dụ có furigana, nghĩa/cách đọc ở mặt sau, ẩn trường trống; tìm cả 4 trường, bỏ furigana khi tìm và xác nhận xóa; hộp sửa đủ 4 ô; bìa dùng `deck.color`. Giữ lịch ôn và trường JLPT trong dữ liệu, không hiện JLPT trên giao diện. Cập nhật trạng thái A9.
+- **Kiểm tra:** 74/74 test Node; 75 kiểm tra Chromium về A9, chức năng Album cũ, XSS, bàn phím, giảm chuyển động, nội dung dài, kích thước 1440/1280/768/375/320px. Luồng tạo bộ → thêm thẻ → Album sửa → học/chấm/hoàn tác → Trang chủ → Album qua ở 1440 và 375px. Báo cáo và ảnh chụp trình duyệt tại [pages/album/REVIEW.md](../pages/album/REVIEW.md).
+- **Quyết định:** chỉ sửa Album và cập nhật tiến độ; giữ bố cục/điều hướng chung, không làm thêm A5, không thêm dependency. Không tạo PR hoặc merge theo yêu cầu người dùng.
+- **Tiếp theo:** người dùng duyệt branch và ảnh trước khi cho phép tạo PR; phần chọn màu trong hộp sửa bộ vẫn thuộc A5.
+- **Vướng mắc:** không có lỗi JavaScript trong các luồng kiểm tra; Cloud chặn Google Fonts nên ảnh dùng font dự phòng. Server cục bộ trả 404 cho `/favicon.ico` vốn chưa có ở `main`; không sửa phần chung để xử lý hai lỗi tài nguyên này.
 
 ## 2026-11-16 — Bỏ JLPT khỏi giao diện, chỉnh việc đợt 2
 
@@ -83,6 +119,7 @@
 - **Người làm:** AT, cùng Codex.
 - **Đã xong:** lật qua lại bằng Space hoặc bấm thẻ, đặt gợi ý phím ở đáy thẻ, hiện bốn nút chấm ngay và hỗ trợ phím mũi tên để xem thẻ trước hoặc sau trong hàng đợi.
 - **Kiểm tra:** 37 test qua. Edge xác nhận Space không chấm điểm kể cả khi nút chấm đang được focus, mũi tên dừng ở hai đầu và bốn nút vẫn nằm trên một hàng ở 375 px.
+
 ## 2026-11-11 — Deploy lên Vercel
 
 - **Người làm:** Leader, cùng Claude.

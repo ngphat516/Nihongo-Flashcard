@@ -2,18 +2,17 @@
  * Tạo thẻ: soạn một bộ thẻ.
  *
  *   pages/create/             → tạo bộ mới
- *   pages/create/?deck=<id>   → sửa bộ đó: tên, mô tả, thêm / sửa / xóa thẻ
+ *   pages/create/?deck=<id>   → sửa bộ đó: tên, mô tả, màu bìa, thêm / sửa / xóa thẻ
  *
  * Mọi thay đổi chỉ nằm trên trang cho tới khi bấm Lưu (hoặc Ctrl+Enter). Lúc lưu, trang kiểm tra
  * hết các ô trước rồi mới ghi qua repo.js, nên một lượt lưu không dừng giữa chừng vì nhập sai.
- * Thẻ đã lưu bị xóa (bấm thùng rác hoặc xóa trắng cả 2 mặt) thì hỏi xác nhận một lần trước khi lưu.
+ * Thẻ đã lưu bị xóa (bấm thùng rác hoặc xóa trắng cả 4 ô) thì hỏi xác nhận một lần trước khi lưu.
  *
  * Module trong folder: card-rows.js (các dòng thẻ), feedback.js (báo lỗi, toast, hộp xác nhận).
  *
- * Thẻ tiếng Nhật (L6): createCards / updateCard nhận { term, meaning, reading, example, jlpt };
- * { front, back } vẫn được nhận tạm như term / meaning cho tới L6b. Bộ mới tự lấy màu kế tiếp,
- * muốn cho chọn màu thì truyền createDeck({ color }) với một giá trị trong DECK_COLORS (C8).
- * So trùng thẻ nên dùng plainFurigana(term) (furigana.js) để 約束[やくそく] trùng với 約束.
+ * Thẻ tiếng Nhật (C9): createCards / updateCard nhận { term, meaning, reading, example }.
+ * Màu bìa (C8): chọn màu từ DECK_COLORS qua .color-picker; tạo bộ mới chọn sẵn màu kế tiếp.
+ * So trùng thẻ dùng plainFurigana(term) (furigana.js) để 約束[やくそく] trùng với 約束.
  */
 import {
   createCards,
@@ -24,10 +23,18 @@ import {
   updateCard,
   updateDeck,
 } from '../../core/repo.js';
-import { cleanText, LIMITS } from '../../core/models.js';
+import { DECK_COLORS, cleanText, LIMITS } from '../../core/models.js';
 import { routes } from '../../core/routes.js';
 import { $, getParam, h, startPage } from '../../core/dom.js';
-import { autosize, createCardRows, facesOf, hasContent, isRowChanged } from './card-rows.js';
+import {
+  autosize,
+  autosizeRow,
+  createCardRows,
+  fieldsOf,
+  hasContent,
+  isRowChanged,
+  snapshot,
+} from './card-rows.js';
 import { confirmDialog, setError, showFailure, toast } from './feedback.js';
 
 const DEFAULT_NEW_PER_DAY = 20;
@@ -67,6 +74,22 @@ startPage(async () => {
   bindEvents();
 });
 
+// ------------------------------ Màu bìa ------------------------------
+
+function nextDeckColor() {
+  const last = decks.at(-1);
+  return last ? DECK_COLORS[(DECK_COLORS.indexOf(last.color) + 1) % DECK_COLORS.length] : DECK_COLORS[0];
+}
+
+function getSelectedColor() {
+  return form.elements.color?.value || DECK_COLORS[0];
+}
+
+function setSelectedColor(color) {
+  const valid = DECK_COLORS.includes(color) ? color : DECK_COLORS[0];
+  if (form.elements.color) form.elements.color.value = valid;
+}
+
 // ------------------------------ Mở bộ ------------------------------
 
 async function openDeck(target) {
@@ -75,6 +98,7 @@ async function openDeck(target) {
   nameInput.value = deck.name;
   limitInput.value = deck.newPerDay;
   descInput.value = deck.description;
+  setSelectedColor(deck.color);
   cards.clear();
   deckCards.forEach((card) => cards.add(card));
   cards.add();
@@ -86,6 +110,7 @@ function openNewDeck() {
   nameInput.value = '';
   limitInput.value = DEFAULT_NEW_PER_DAY;
   descInput.value = '';
+  setSelectedColor(nextDeckColor());
   cards.clear();
   for (let i = 0; i < BLANK_ROWS_FOR_NEW_DECK; i++) cards.add();
   afterOpen();
@@ -140,13 +165,19 @@ function deckFields() {
     name: cleanText(nameInput.value),
     description: cleanText(descInput.value),
     newPerDay: limitInput.value.trim(),
+    color: getSelectedColor(),
   };
 }
 
 function isDeckChanged() {
-  const { name, description, newPerDay } = deckFields();
+  const { name, description, newPerDay, color } = deckFields();
   if (!deck) return Boolean(name || description) || newPerDay !== String(DEFAULT_NEW_PER_DAY);
-  return name !== deck.name || description !== deck.description || newPerDay !== String(deck.newPerDay);
+  return (
+    name !== deck.name ||
+    description !== deck.description ||
+    newPerDay !== String(deck.newPerDay) ||
+    color !== deck.color
+  );
 }
 
 function isDirty() {
@@ -171,7 +202,7 @@ function bindEvents() {
     if (button) deleteRow(cards.find(button));
   });
   addButton.addEventListener('click', () => {
-    cards.add().front.focus();
+    cards.add().term.focus();
     refresh();
   });
   select.addEventListener('change', onSelectDeck);
@@ -183,7 +214,7 @@ function bindEvents() {
   let resizeFrame = 0;
   window.addEventListener('resize', () => {
     cancelAnimationFrame(resizeFrame);
-    resizeFrame = requestAnimationFrame(() => rows.forEach((row) => [row.front, row.back].forEach(autosize)));
+    resizeFrame = requestAnimationFrame(() => rows.forEach(autosizeRow));
   });
 }
 
@@ -192,7 +223,7 @@ function deleteRow(row) {
   cards.remove(row);
   if (row.id) removedIds.push(row.id);
   const next = rows[i] ?? rows[i - 1];
-  (next ? next.front : addButton).focus();
+  (next ? next.term : addButton).focus();
   refresh();
 }
 
@@ -212,12 +243,12 @@ function onKeydown(event) {
     form.requestSubmit();
   } else if (event.key === 'Enter' && input.tagName === 'INPUT') {
     event.preventDefault(); // Enter trong ô một dòng không lưu ngay
-  } else if (event.key === 'Tab' && !event.shiftKey && input.dataset.face === 'back') {
-    // Tab ở mặt sau của thẻ cuối: thêm dòng mới để gõ tiếp
+  } else if (event.key === 'Tab' && !event.shiftKey && input.dataset.field === 'example') {
+    // Tab ở ô Ví dụ của thẻ cuối: thêm dòng mới để gõ tiếp
     const row = cards.find(input);
     if (row === rows.at(-1) && hasContent(row)) {
       event.preventDefault();
-      cards.add().front.focus();
+      cards.add().term.focus();
       refresh();
     }
   }
@@ -279,15 +310,15 @@ async function save() {
     else if (isDeckChanged()) deck = await updateDeck(deck.id, fields);
 
     for (const row of filled.filter((r) => r.id && isRowChanged(r))) {
-      const card = await updateCard(row.id, facesOf(row));
-      row.saved = { front: card.front, back: card.back };
+      const card = await updateCard(row.id, fieldsOf(row));
+      row.saved = snapshot(card);
     }
     const fresh = filled.filter((row) => !row.id);
     if (fresh.length) {
-      const created = await createCards(deck.id, fresh.map(facesOf));
+      const created = await createCards(deck.id, fresh.map(fieldsOf));
       created.forEach((card, i) => {
         fresh[i].id = card.id;
-        fresh[i].saved = { front: card.front, back: card.back };
+        fresh[i].saved = snapshot(card);
       });
     }
     for (const id of toDelete) await deleteCard(id);
@@ -323,9 +354,10 @@ function validate() {
     fail(limitInput, `Nhập số nguyên từ 0 đến ${LIMITS.newPerDayMax}.`);
   }
   for (const row of rows) {
-    const { front, back } = facesOf(row);
-    if (back && !front) fail(row.front, 'Nhập mặt trước.');
-    if (front && !back) fail(row.back, 'Nhập mặt sau.');
+    if (!hasContent(row)) continue;
+    const { term, meaning } = fieldsOf(row);
+    if (!term) fail(row.term, 'Nhập từ.');
+    if (!meaning) fail(row.meaning, 'Nhập nghĩa.');
   }
   return invalid;
 }
@@ -340,7 +372,7 @@ function tidyRowsAfterSave() {
   if (rows.length && !hasContent(rows.at(-1))) return;
   const blank = cards.add();
   // Vừa lưu từ thẻ cuối (VD bấm Ctrl+Enter) thì đưa con trỏ xuống dòng mới để gõ thẻ tiếp theo
-  if (lastBefore?.el.contains(active)) blank.front.focus();
+  if (lastBefore?.el.contains(active)) blank.term.focus();
 }
 
 function showNotice(message) {
