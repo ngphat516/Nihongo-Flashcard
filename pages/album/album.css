@@ -174,8 +174,8 @@
 .album-leaf {
   top: var(--space-3);
   right: var(--space-3);
-  width: var(--space-4);
-  height: var(--space-4);
+  width: var(--space-5);
+  height: var(--space-5);
   color: var(--muted);
 }
 .flashcard-back .album-leaf {
