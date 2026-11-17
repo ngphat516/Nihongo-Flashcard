@@ -300,10 +300,13 @@ test('dữ liệu mẫu tạo được và hợp lệ', async () => {
   assert.ok(logs.every((l) => l.reviewedAt <= now));
   const overview = await repo.getDeckOverview({ now });
   assert.equal(overview.length, 3);
-  assert.equal(overview[2].due.new, 8); // bộ Lịch sử để nguyên chưa học
+  assert.equal(overview[2].due.new, 8); // bộ Chào hỏi để nguyên chưa học
   assert.deepEqual(overview.map((o) => o.deck.color), ['pink', 'peach', 'yellow']); // giống màu trước L6
 
   const stored = Object.values(raw('cards'));
   assert.ok(stored.every((c) => c.term && c.meaning && !('front' in c)), 'thẻ mẫu dùng trường mới');
-  assert.equal((await repo.getCards(overview[0].deck.id))[0].term, 'algorithm');
+  const firstCard = (await repo.getCards(overview[0].deck.id))[0];
+  assert.equal(firstCard.term, '約束[やくそく]');
+  assert.equal(firstCard.reading, 'やくそく');
+  assert.equal(firstCard.example, '約束[やくそく]を守[まも]る。');
 });
