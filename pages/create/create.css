@@ -14,7 +14,8 @@
     grid-template-columns: minmax(0, 1fr) 180px;
   }
   .create-deck-picker,
-  .create-deck-desc {
+  .create-deck-desc,
+  .create-deck-color {
     grid-column: 1 / -1;
   }
 }
@@ -24,13 +25,17 @@
 .create-deck-desc .input {
   min-height: 64px;
 }
-.create-deck-desc .muted {
+.create-deck-desc .muted,
+.create-card .field-label .muted {
   font-weight: 400;
 }
 
 /* ---------- Danh sách thẻ ----------
-   Điện thoại: số thứ tự + nút xóa trên cùng, mặt trước và mặt sau xếp dọc.
-   Màn hình rộng: một hàng gồm số | mặt trước | mặt sau | nút xóa. */
+   Điện thoại: số thứ tự + nút xóa trên cùng, 4 ô xếp dọc.
+   Màn hình rộng: số | (Từ, Nghĩa / Cách đọc, Ví dụ) | nút xóa. */
+.create-cards-hint {
+  margin: calc(-1 * var(--space-2)) 0 var(--space-3);
+}
 .create-cards {
   display: grid;
   gap: var(--space-3);
@@ -43,8 +48,10 @@
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
     'num delete'
-    'front front'
-    'back back';
+    'term term'
+    'meaning meaning'
+    'reading reading'
+    'example example';
   gap: var(--space-2) var(--space-3);
   align-items: center;
   padding: var(--space-3) var(--space-4) var(--space-4);
@@ -61,12 +68,20 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-.create-card-front {
-  grid-area: front;
+.create-card-term {
+  grid-area: term;
 }
-.create-card-back {
-  grid-area: back;
-  margin-top: var(--space-2);
+.create-card-meaning {
+  grid-area: meaning;
+  margin-top: var(--space-1);
+}
+.create-card-reading {
+  grid-area: reading;
+  margin-top: var(--space-1);
+}
+.create-card-example {
+  grid-area: example;
+  margin-top: var(--space-1);
 }
 .create-card-delete {
   grid-area: delete;
@@ -79,14 +94,19 @@
 @media (min-width: 720px) {
   .create-card {
     grid-template-columns: 2rem minmax(0, 1fr) minmax(0, 1fr) 40px;
-    grid-template-areas: 'num front back delete';
+    grid-template-areas:
+      'num term meaning delete'
+      '. reading example .';
     align-items: start;
-    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-3) var(--space-4) var(--space-4);
   }
-  .create-card-back {
+  .create-card-meaning,
+  .create-card-reading,
+  .create-card-example {
     margin-top: 0;
   }
-  /* Số thứ tự và nút xóa thẳng hàng với ô nhập (ô nhập nằm dưới nhãn của nó) */
+  /* Số thứ tự và nút xóa thẳng hàng với ô nhập hàng đầu (ô nhập nằm dưới nhãn của nó) */
   .create-card-num,
   .create-card-delete {
     margin-top: calc(var(--text-sm) * 1.6 + 6px);
@@ -96,7 +116,7 @@
   }
 }
 
-/* Ô nhập mặt thẻ: một dòng, tự cao lên theo nội dung (create.js đặt chiều cao) */
+/* Ô nhập thẻ: một dòng, tự cao lên theo nội dung (card-rows.js đặt chiều cao) */
 textarea.create-card-input {
   min-height: 40px;
   overflow: hidden;

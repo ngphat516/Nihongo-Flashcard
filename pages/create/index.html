@@ -74,10 +74,46 @@
           <label class="field-label" for="deck-desc">Mô tả <span class="muted">(không bắt buộc)</span></label>
           <textarea class="input" id="deck-desc" maxlength="300" rows="2"></textarea>
         </div>
+        <fieldset class="color-picker create-deck-color">
+          <legend class="field-label">Màu bìa</legend>
+          <label class="color-picker-option">
+            <input type="radio" name="color" value="pink" checked>
+            <span class="color-picker-swatch cover-pink" aria-hidden="true"></span>
+            <span class="visually-hidden">Hồng</span>
+          </label>
+          <label class="color-picker-option">
+            <input type="radio" name="color" value="peach">
+            <span class="color-picker-swatch cover-peach" aria-hidden="true"></span>
+            <span class="visually-hidden">Đào</span>
+          </label>
+          <label class="color-picker-option">
+            <input type="radio" name="color" value="yellow">
+            <span class="color-picker-swatch cover-yellow" aria-hidden="true"></span>
+            <span class="visually-hidden">Vàng</span>
+          </label>
+          <label class="color-picker-option">
+            <input type="radio" name="color" value="green">
+            <span class="color-picker-swatch cover-green" aria-hidden="true"></span>
+            <span class="visually-hidden">Lá</span>
+          </label>
+          <label class="color-picker-option">
+            <input type="radio" name="color" value="sky">
+            <span class="color-picker-swatch cover-sky" aria-hidden="true"></span>
+            <span class="visually-hidden">Trời</span>
+          </label>
+          <label class="color-picker-option">
+            <input type="radio" name="color" value="lavender">
+            <span class="color-picker-swatch cover-lavender" aria-hidden="true"></span>
+            <span class="visually-hidden">Tím</span>
+          </label>
+        </fieldset>
       </section>
 
       <section class="section" aria-labelledby="cards-title">
         <h2 class="section-title" id="cards-title">Thẻ</h2>
+        <p class="field-hint create-cards-hint" id="cards-hint">
+          Ghi cách đọc trong ngoặc vuông ngay sau kanji, VD <span lang="ja">約束[やくそく]</span>, <span lang="ja">日本語[にほんご]勉強[べんきょう]</span> (mỗi từ kanji một cặp ngoặc).
+        </p>
         <ol class="create-cards" id="cards"></ol>
         <button class="btn create-add" id="add-card" type="button">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
@@ -95,18 +131,28 @@
     <template id="card-template">
       <li class="create-card">
         <span class="create-card-num" aria-hidden="true"></span>
-        <div class="field create-card-front">
-          <label class="field-label">Mặt trước</label>
-          <textarea class="input create-card-input" data-face="front" rows="1" maxlength="2000"></textarea>
+        <div class="field create-card-term">
+          <label class="field-label">Từ</label>
+          <textarea class="input create-card-input" data-field="term" lang="ja" rows="1" maxlength="2000" placeholder="VD: 約束[やくそく]"></textarea>
           <span class="field-error" hidden></span>
           <span class="create-warning" hidden>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
             <span class="create-warning-text"></span>
           </span>
         </div>
-        <div class="field create-card-back">
-          <label class="field-label">Mặt sau</label>
-          <textarea class="input create-card-input" data-face="back" rows="1" maxlength="2000"></textarea>
+        <div class="field create-card-meaning">
+          <label class="field-label">Nghĩa</label>
+          <textarea class="input create-card-input" data-field="meaning" rows="1" maxlength="2000"></textarea>
+          <span class="field-error" hidden></span>
+        </div>
+        <div class="field create-card-reading">
+          <label class="field-label">Cách đọc <span class="muted">(không bắt buộc)</span></label>
+          <textarea class="input create-card-input" data-field="reading" lang="ja" rows="1" maxlength="2000" placeholder="VD: やくそく"></textarea>
+          <span class="field-error" hidden></span>
+        </div>
+        <div class="field create-card-example">
+          <label class="field-label">Ví dụ <span class="muted">(không bắt buộc)</span></label>
+          <textarea class="input create-card-input" data-field="example" lang="ja" rows="1" maxlength="2000" placeholder="VD: 約束[やくそく]を守[まも]る。"></textarea>
           <span class="field-error" hidden></span>
         </div>
         <button class="btn btn-ghost create-card-delete" type="button">

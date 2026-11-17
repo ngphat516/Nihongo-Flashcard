@@ -1,27 +1,47 @@
 /**
  * Danh sách dòng thẻ của trang Tạo thẻ.
  *
- * Mỗi dòng: { el, front, back, id, saved }
- *   front, back   hai ô <textarea>
- *   id            id thẻ đã lưu; null nếu thẻ chưa lưu
- *   saved         { front, back } đã lưu, để biết dòng nào bị sửa; null nếu thẻ chưa lưu
+ * Mỗi dòng: { el, term, meaning, reading, example, id, saved }
+ *   term, meaning, reading, example   4 ô <textarea>
+ *   id                                id thẻ đã lưu; null nếu thẻ chưa lưu
+ *   saved                             { term, meaning, reading, example } đã lưu; null nếu chưa lưu
  */
 import { cleanText } from '../../core/models.js';
+import { plainFurigana } from '../../core/furigana.js';
 import { $, $$ } from '../../core/dom.js';
 
-export const facesOf = (row) => ({ front: cleanText(row.front.value), back: cleanText(row.back.value) });
+export const ROW_FIELDS = Object.freeze(['term', 'meaning', 'reading', 'example']);
+const FURIGANA_FIELDS = new Set(['term', 'example']);
 
-export const hasContent = (row) => Boolean(cleanText(row.front.value) || cleanText(row.back.value));
+export const snapshot = (card) => ({
+  term: card.term ?? '',
+  meaning: card.meaning ?? '',
+  reading: card.reading ?? '',
+  example: card.example ?? '',
+});
+
+export const fieldsOf = (row) => ({
+  term: cleanText(row.term.value),
+  meaning: cleanText(row.meaning.value),
+  reading: cleanText(row.reading.value),
+  example: cleanText(row.example.value),
+});
+
+export const hasContent = (row) => ROW_FIELDS.some((field) => Boolean(cleanText(row[field].value)));
 
 export function isRowChanged(row) {
-  const { front, back } = facesOf(row);
-  return front !== row.saved.front || back !== row.saved.back;
+  const current = fieldsOf(row);
+  return ROW_FIELDS.some((field) => current[field] !== row.saved[field]);
 }
 
-/** Ô mặt thẻ cao lên theo nội dung, không hiện thanh cuộn. */
+/** Ô thẻ cao lên theo nội dung, không hiện thanh cuộn. */
 export function autosize(input) {
   input.style.height = 'auto';
   input.style.height = `${input.scrollHeight + input.offsetHeight - input.clientHeight}px`;
+}
+
+export function autosizeRow(row) {
+  ROW_FIELDS.forEach((field) => autosize(row[field]));
 }
 
 /**
@@ -36,9 +56,11 @@ export function createCardRows(list, template) {
   function add(card = null) {
     const el = template.content.firstElementChild.cloneNode(true);
     const n = ++seq;
+    const hasGlobalHint = Boolean($('#cards-hint'));
     for (const input of $$('textarea', el)) {
       const field = input.closest('.field');
-      const id = `card-${n}-${input.dataset.face}`;
+      const name = input.dataset.field;
+      const id = `card-${n}-${name}`;
       input.id = id;
       $('label', field).htmlFor = id;
       const describedBy = [];
@@ -46,20 +68,22 @@ export function createCardRows(list, template) {
         message.id = `${id}-${message.classList.contains('field-error') ? 'error' : 'warning'}`;
         describedBy.push(message.id);
       }
+      if (hasGlobalHint && FURIGANA_FIELDS.has(name)) describedBy.push('cards-hint');
       input.setAttribute('aria-describedby', describedBy.join(' '));
-      input.value = card?.[input.dataset.face] ?? '';
+      input.value = card?.[name] ?? '';
     }
     const row = {
       el,
-      front: $('[data-face="front"]', el),
-      back: $('[data-face="back"]', el),
+      term: $('[data-field="term"]', el),
+      meaning: $('[data-field="meaning"]', el),
+      reading: $('[data-field="reading"]', el),
+      example: $('[data-field="example"]', el),
       id: card?.id ?? null,
-      saved: card ? { front: card.front, back: card.back } : null,
+      saved: card?.id ? snapshot(card) : null,
     };
     rows.push(row);
     list.append(el);
-    autosize(row.front);
-    autosize(row.back);
+    autosizeRow(row);
     return row;
   }
 
@@ -85,15 +109,15 @@ export function createCardRows(list, template) {
     markDuplicates();
   }
 
-  /** Mặt trước trùng một thẻ phía trên (không phân biệt hoa thường, khoảng trắng thừa) thì nhắc, vẫn cho lưu. */
+  /** Từ trùng một thẻ phía trên (bỏ [..] furigana, không phân biệt hoa thường, khoảng trắng thừa) thì nhắc, vẫn cho lưu. */
   function markDuplicates() {
     const firstIndex = new Map();
     rows.forEach((row, i) => {
-      const key = cleanText(row.front.value).toLowerCase().replace(/\s+/g, ' ');
+      const key = plainFurigana(cleanText(row.term.value)).toLowerCase().replace(/\s+/g, ' ');
       const isDuplicate = Boolean(key) && firstIndex.has(key);
       const warning = $('.create-warning', row.el);
       $('.create-warning-text', warning).textContent = isDuplicate
-        ? `Trùng mặt trước với thẻ ${firstIndex.get(key) + 1}`
+        ? `Trùng từ với thẻ ${firstIndex.get(key) + 1}`
         : '';
       warning.hidden = !isDuplicate;
       if (key && !isDuplicate) firstIndex.set(key, i);

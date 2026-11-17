@@ -86,6 +86,13 @@ dom.js, routes.js, furigana.js: tiện ích cho trang
 
 Trang được import những module nào: xem [conventions.md › Code](conventions.md#code).
 
+### Module nội bộ đáng chú ý ở `pages/create/`
+
+`pages/create/card-rows.js` quản lý danh sách dòng thẻ 4 trường (`ROW_FIELDS = ['term', 'meaning', 'reading', 'example']`) và export sẵn các hàm để tái sử dụng cho `C4`, `C5`, `C7`:
+- `createCardRows(list, template)` → `{ rows, add, remove, clear, find, refresh }`, trong đó `add(card)` nhận sẵn object `{ term, meaning, reading, example }` (kể cả thẻ chưa lưu).
+- `fieldsOf(row)` → `{ term, meaning, reading, example }` đã `cleanText()`.
+- `snapshot(card)`, `hasContent(row)`, `isRowChanged(row)`, `autosizeRow(row)`.
+
 ## Dữ liệu
 
 Ba "bảng" trong localStorage, key có tiền tố `nholau:`: `decks`, `cards`, `reviewLogs`. Mỗi bảng lưu thành một object JSON `{ [id]: bản ghi }`.
@@ -107,6 +114,16 @@ Các trường của `Deck`, `Card`, `ReviewLog` và giới hạn độ dài: xe
 - **Dung lượng:** localStorage khoảng 5 MB. Mỗi lượt ôn chiếm khoảng 300 byte, và mỗi lần chấm điểm ghi lại cả bảng `reviewLogs`. Chứa được khoảng 16 nghìn lượt ôn (khoảng 5 tháng nếu ôn 100 lượt/ngày). Đầy thì `storage.js` báo lỗi "Bộ nhớ trình duyệt đã đầy".
 - **Dữ liệu hỏng:** JSON đọc ra không hợp lệ thì `storage.js` báo lỗi thay vì âm thầm trả về rỗng, vì lần ghi tiếp theo sẽ đè mất dữ liệu cũ.
 - **Chưa có số phiên bản dữ liệu:** đổi cấu trúc trong `models.js` thì dữ liệu cũ trên máy người dùng không tự chuyển đổi. Lần đổi sang thẻ tiếng Nhật (L6) được xử lý bằng lớp tương thích ở trên; lần sau cần viết bước chuyển đổi hoặc yêu cầu `?reset`.
+
+### Dữ liệu mẫu (`?seed`)
+
+Mở bất kỳ trang nào kèm `?seed` (hoặc gọi `dev.seed()` trong Console) sẽ xóa dữ liệu hiện tại và nạp 3 bộ tiếng Nhật từ [`core/seed.js`](../core/seed.js) kèm ~4 tháng lịch sử ôn giả lập bằng SM-2; mở `?reset` (hoặc `dev.reset()`) để xóa sạch.
+
+| Bộ mẫu (`?seed`) | Màu | Số thẻ & Tiến độ | Dùng để kiểm tra |
+|---|---|---|---|
+| `JLPT N5 – Từ vựng` | `pink` | 22 thẻ, học từ 120 ngày trước (đủ Mới / Đang học / Ôn tập; có kanji + furigana, okurigana, `々`, và từ thuần kana `reading: ''`) | Heatmap 12 tháng & biểu đồ 6 tháng (Trang chủ); tìm kiếm & lọc 4 trường, sửa thẻ giữ tiến độ SM-2 (Album `A9`, Tạo thẻ `C9`) |
+| `食べ物 – Đồ ăn & Quán ăn` | `peach` | 12 thẻ, học 21 ngày trước, nghỉ 4 ngày gần đây (nhiều thẻ đến hạn hôm nay) | Vòng học SM-2, mặt trước/sau furigana, 4 nút chấm điểm và hoàn tác (Học `S10`) |
+| `挨拶 – Chào hỏi cơ bản` | `yellow` | 8 thẻ, chưa học lần nào (`due.new === 8`) | Bộ thẻ mới nguyên, giới hạn thẻ mới mỗi ngày; tạo thêm bộ mới sẽ tự chọn màu kế tiếp (`green`) |
 
 ## API `core/repo.js`
 

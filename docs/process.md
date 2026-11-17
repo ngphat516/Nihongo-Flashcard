@@ -16,6 +16,24 @@
 
 ---
 
+### 2026-11-17 — Đồng bộ main vào Album (A9, A5)
+
+- **Người làm:** Banana (`tanphat-trinh`), cùng Codex.
+- **Đã xong:** merge `main` `02894d9` vào `feature/album-a9`, giữ lịch sử A9/A5. Conflict duy nhất ở nhật ký: giữ đầy đủ 21 mục của hai nhánh, xếp ngày mới trước. Các thay đổi C9/C8/L9 và tài liệu được tích hợp nguyên bản; không sửa code hoặc giao diện Album.
+- **Kiểm tra:** API/model không đổi. 74/74 test Node và 75 kiểm tra hồi quy Album qua. Luồng tạo bộ/thẻ mới → Album → Học/hoàn tác → Trang chủ qua ở 1440/375px; thêm luồng với `?seed` tiếng Nhật mới: xem cả 3 bộ, sửa bằng C9 → tìm/sửa trong Album giữ tiến độ → đổi màu → học/chấm/hoàn tác → Album, qua ở cả hai kích thước. Không có lỗi JavaScript; giới hạn tải Google Fonts và favicon cục bộ như đã ghi trước đó.
+- **Vướng mắc:** Study chưa có S10 trên main, vẫn dùng màu theo vị trí; không sửa phần của thành viên khác.
+- **Tiếp theo:** cập nhật PR #12 để nhóm review; không merge PR.
+
+# 2026-11-17 — Thẻ tiếng Nhật và chọn màu bìa trang Tạo thẻ (C9, C8), dữ liệu mẫu tiếng Nhật (L9)
+
+- **Người làm:** kakushi.
+- **Đã xong:**
+  - C9: mỗi dòng thẻ ở `pages/create/` có 4 ô Từ, Nghĩa, Cách đọc, Ví dụ; gợi ý cú pháp furigana; kiểm tra thiếu Từ/Nghĩa; so trùng bằng `plainFurigana()`; Tab ở ô Ví dụ dòng cuối thêm dòng mới; lưu qua `createCards()` / `updateCard()` với 4 trường mới; tách các hàm dòng thẻ (`ROW_FIELDS`, `fieldsOf`, `snapshot`, `autosizeRow`) trong `pages/create/card-rows.js`.
+  - C8: thêm `.color-picker` 6 màu bìa vào form bộ thẻ; tạo bộ mới tự chọn màu kế tiếp theo `DECK_COLORS`; mở bộ cũ chọn sẵn `deck.color` và lưu khi đổi màu.
+  - L9: thay 3 bộ mẫu trong `core/seed.js` bằng 3 bộ tiếng Nhật (22, 12, 8 thẻ) kèm furigana, `reading`, `example`; cập nhật test trong `tests/repo.test.js`.
+  - Tài liệu: cập nhật trạng thái trong `product.md`, `tasks.md`; bổ sung bảng dữ liệu mẫu `?seed` và ghi chú `card-rows.js` vào `architecture.md`; sắp xếp lại lộ trình 3 bước và thêm gợi ý triển khai cho `L6b`, `L7`, `C4`, `C5`, `C7` trong `tasks.md`.
+- **Tiếp theo:** Review & merge A9 + A5 (PR #12), S10 (PR #13) và C9 + C8; rồi làm L6b, L7, C4/C5/C7.
+
 ## 2026-11-16 — Chọn màu bìa trong Album (A5)
 
 - **Người làm:** Banana (`tanphat-trinh`, `trinhphat2931@gmail.com`), cùng Codex.
@@ -93,6 +111,7 @@
 - **Người làm:** AT, cùng Codex.
 - **Đã xong:** lật qua lại bằng Space hoặc bấm thẻ, đặt gợi ý phím ở đáy thẻ, hiện bốn nút chấm ngay và hỗ trợ phím mũi tên để xem thẻ trước hoặc sau trong hàng đợi.
 - **Kiểm tra:** 37 test qua. Edge xác nhận Space không chấm điểm kể cả khi nút chấm đang được focus, mũi tên dừng ở hai đầu và bốn nút vẫn nằm trên một hàng ở 375 px.
+
 ## 2026-11-11 — Deploy lên Vercel
 
 - **Người làm:** Leader, cùng Claude.

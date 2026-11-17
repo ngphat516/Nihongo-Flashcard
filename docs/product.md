@@ -60,7 +60,7 @@ Các quyết định này đã chốt nhưng code chưa có. Ai làm thì cập 
 
 ### Thẻ tiếng Nhật
 
-**Trạng thái:** `core/` đã xong (L6, 14/11/2026). Các trang **chưa** đổi giao diện, vẫn chạy nhờ lớp tương thích tạm: thẻ đọc ra kèm `front` = `term`, `back` = `meaning`, và repo nhận `{ front, back }` như `{ term, meaning }`. Thẻ cũ trong localStorage được đọc như thẻ mới, và chỉ được ghi lại bằng trường mới khi lưu. Lớp này bỏ ở L6b, sau khi các trang đã đổi.
+**Trạng thái:** `core/` (`L6`), dữ liệu mẫu tiếng Nhật (`L9`) và trang Tạo thẻ (`C9`) đã xong. Album (`A9`) và Học (`S10`) đang mở PR hoàn thiện giao diện; mọi thẻ đọc ra vẫn tạm kèm `front` = `term`, `back` = `meaning` qua `core/card-compat.js` và repo tạm nhận `{ front, back }` cho tới `L6b`.
 
 Thay 2 mặt `front` / `back` bằng các trường riêng, để sau này làm được bài tập trắc nghiệm, gõ cách đọc:
 
@@ -76,11 +76,10 @@ Giao diện chưa dùng trường `jlpt`: không có ô nhập, không hiện tr
 
 - **Cú pháp furigana:** viết `漢字[かんじ]` trong `term` và `example`, app hiển thị thành `<ruby>`. Cách đọc gắn vào cụm kanji liền ngay trước `[` (kể cả `々`); ngoặc thiếu, ngoặc rỗng, hoặc trước `[` không có kanji thì giữ nguyên là chữ thường. Hàm ở `core/furigana.js`: `renderFurigana()` để hiện, `plainFurigana()` để tìm kiếm và so trùng.
 - `jlpt` chỉ nhận `''`, `N5`, `N4`, `N3`, `N2`, `N1`. `term`, `meaning` bắt buộc; mỗi ô tối đa 2000 ký tự.
-- **Các trang còn phải làm** (chi tiết ở A9, C9, S10 trong [tasks.md](tasks.md)):
-  - Album: hiện thẻ bằng `renderFurigana(card.term)` và `card.meaning`, dialog sửa thẻ gửi trường mới, tìm kiếm qua `plainFurigana()`.
-  - Tạo thẻ: mỗi dòng thẻ có các ô `term`, `meaning`, `reading`, `example`.
-  - Học: mặt trước `renderFurigana(card.term)`, mặt sau `meaning` kèm `reading` / `example`.
-  - Xong cả 3 thì làm L6b (bỏ lớp tương thích).
+- **Các trang còn phải làm** (chi tiết ở A9, S10, L6b trong [tasks.md](tasks.md)):
+  - Album (`A9`): hiện thẻ bằng `renderFurigana(card.term)` và `card.meaning`, dialog sửa thẻ gửi trường mới, tìm kiếm qua `plainFurigana()`.
+  - Học (`S10`): mặt trước `renderFurigana(card.term)`, mặt sau `meaning` kèm `reading` / `example`.
+  - Xong cả Album và Học thì làm `L6b` (bỏ lớp tương thích `core/card-compat.js`).
 
 ### Màu bìa bộ thẻ
 
@@ -88,8 +87,8 @@ Giao diện chưa dùng trường `jlpt`: không có ô nhập, không hiện tr
 - Người học chọn màu khi tạo bộ và đổi được khi sửa bộ.
 - Bộ mới được chọn sẵn màu kế tiếp trong danh sách, để các bộ đứng cạnh nhau khác màu.
 - `deck.color` lưu tên màu (VD `'pink'`), không lưu mã màu, để chỉnh bảng màu sau này mà không phải chuyển đổi dữ liệu.
-- **Trạng thái:** `core/` đã xong (L6). `DECK_COLORS` trong `core/models.js`. `createDeck` không truyền màu thì lấy màu kế tiếp sau màu của bộ tạo gần nhất (chưa có bộ nào thì `pink`); `updateDeck` đổi được màu; màu lạ báo `ValidationError`. Bộ cũ chưa có màu: đọc ra theo thứ tự danh sách (giống cách các trang tính trước đây), chỉ ghi màu khi bộ được lưu lại.
-- **Các trang còn phải làm:** Album và Học đổi `COVER_COLORS[i % 6]` sang `deck.color`; Tạo thẻ thêm ô chọn màu (C8); Album thêm chọn màu vào dialog sửa bộ (A5).
+- **Trạng thái:** `core/` (`L6`), Trang chủ (`H9`) và Tạo thẻ (`C8` — chọn màu khi tạo và sửa bộ) đã xong. `DECK_COLORS` trong `core/models.js`. `createDeck` không truyền màu thì lấy màu kế tiếp sau màu của bộ tạo gần nhất (chưa có bộ nào thì `pink`); `updateDeck` đổi được màu; màu lạ báo `ValidationError`. Bộ cũ chưa có màu: đọc ra theo thứ tự danh sách (giống cách các trang tính trước đây), chỉ ghi màu khi bộ được lưu lại.
+- **Các trang còn phải làm:** Album bỏ `COVER_COLORS[i % 6]` sang `deck.color` (`A9`) và thêm chọn màu vào dialog sửa bộ (`A5`); Học bỏ `COVER_COLORS[i % 6]` sang `deck.color` (`S10`).
 
 ### Furigana bật/tắt
 
@@ -100,10 +99,6 @@ Giao diện chưa dùng trường `jlpt`: không có ô nhập, không hiện tr
 ### Đổi chiều học
 
 Người học đổi được giữa Nhật → Việt và Việt → Nhật.
-
-### Dữ liệu mẫu tiếng Nhật
-
-Dữ liệu mẫu (`?seed`) hiện là từ vựng IT, Cơ sở dữ liệu, Lịch sử Việt Nam. Sẽ thay bằng bộ tiếng Nhật, chưa làm.
 
 ## Chưa chốt
 
