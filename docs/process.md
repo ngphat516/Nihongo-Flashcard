@@ -16,8 +16,20 @@
 
 ---
 
+## 2026-11-18 — Làm rõ đợt 2 song song, lộ trình sau đợt 2
 
-### 2026-11-17 — Đồng bộ main vào Album (A9, A5)
+- **Người làm:** kakushi, cùng Claude.
+- **Đã xong:**
+  - `tasks.md`: thay "Lộ trình còn lại…" (3 bước) bằng đoạn **Đợt 2 (xong)** và danh sách **Tiếp theo**. Đoạn mới ghi rõ A9 + A5, C9 + C8, S10 làm song song, chỉ cần L6; đã merge PR #14, #12, #13.
+  - Thêm task L15: chạy thử luồng Tạo thẻ → Album → Học trên `main`, làm trước L6b.
+  - L6b: bỏ cụm "(H9, C9 đã xong)", thêm điều kiện làm sau L15; sửa lệnh grep để không khớp nhầm class `.back-link` (chạy trên `main` chỉ còn ra `core/card-compat.js`); thêm ý xử lý thẻ cũ `front`/`back` trong localStorage.
+  - A5: đổi trạng thái thành Xong, vì Học đã dùng `deck.color` (S10).
+  - Sửa tiêu đề 2 mục ngày 17/11 về `##` cho đúng mẫu.
+  - Không sửa code. Nhánh `docs/lam-ro-dot-2`.
+- **Quyết định:** đợt 2 chỉ phụ thuộc L6; các trang chỉ nối qua dữ liệu thẻ trong localStorage, qua `core/repo.js`. Bằng chứng: A9 (`810b692`) và S10 (`d5bb115`) commit trước C9 (`0cdf93f`), merge không conflict code, `npm test` 74/74. Thêm task chạy thử luồng (L15) trước L6b.
+- **Tiếp theo:** L15, rồi L6b.
+
+## 2026-11-17 — Đồng bộ main vào Album (A9, A5)
 
 - **Người làm:** Banana (`tanphat-trinh`), cùng Codex.
 - **Đã xong:** merge `main` `02894d9` vào `feature/album-a9`, giữ lịch sử A9/A5. Conflict duy nhất ở nhật ký: giữ đầy đủ 21 mục của hai nhánh, xếp ngày mới trước. Các thay đổi C9/C8/L9 và tài liệu được tích hợp nguyên bản; không sửa code hoặc giao diện Album.
@@ -25,7 +37,7 @@
 - **Vướng mắc:** Study chưa có S10 trên main, vẫn dùng màu theo vị trí; không sửa phần của thành viên khác.
 - **Tiếp theo:** cập nhật PR #12 để nhóm review; không merge PR.
 
-# 2026-11-17 — Thẻ tiếng Nhật và chọn màu bìa trang Tạo thẻ (C9, C8), dữ liệu mẫu tiếng Nhật (L9)
+## 2026-11-17 — Thẻ tiếng Nhật và chọn màu bìa trang Tạo thẻ (C9, C8), dữ liệu mẫu tiếng Nhật (L9)
 
 - **Người làm:** kakushi.
 - **Đã xong:**
