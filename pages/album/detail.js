@@ -17,11 +17,9 @@ import { ValidationError } from '../../core/models.js';
 import { STATE_LABELS, describeDue } from '../../core/queue.js';
 import { routes } from '../../core/routes.js';
 import { $, h } from '../../core/dom.js';
+import { plainFurigana } from '../../core/furigana.js';
+import { cardMatches, fold, makeFlashcard } from './cards.js';
 import { confirmAction, openForm, toast } from './ui.js';
-
-// Nội dung hai mặt thẻ. L6 đổi Card sang term / meaning / reading...: chỉ cần sửa 2 hàm này.
-const cardFront = (card) => card.front;
-const cardBack = (card) => card.back;
 
 // Chip "Đang học" gồm cả thẻ Học lại (quên khi đang ôn).
 const FILTERS = {
@@ -103,7 +101,7 @@ function countItem(state, n, label) {
 async function editDeck() {
   const { deck } = view;
   const saved = await openForm($('#deck-dialog'), {
-    values: { name: deck.name, description: deck.description, newPerDay: deck.newPerDay },
+    values: { name: deck.name, description: deck.description, newPerDay: deck.newPerDay, color: deck.color },
     save: (data) => {
       // Ô số để trống: Number('') === 0 sẽ âm thầm tắt thẻ mới (lỗi B2), nên chặn ở đây
       if (data.newPerDay.trim() === '') throw new ValidationError('Hãy nhập số thẻ mới mỗi ngày (0 nếu không muốn học thẻ mới).');
@@ -151,16 +149,11 @@ function setupToolbar() {
   });
 }
 
-/** Chữ thường, bỏ dấu tiếng Việt: "Thuật Toán" → "thuat toan". Chỉ bỏ dấu Latin, giữ nguyên dakuten của kana. */
-function fold(text) {
-  return text.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
-}
-
 function visibleCards() {
   const { cards, filter, sort, query } = view;
   return cards
     .filter(FILTERS[filter])
-    .filter((card) => !query || fold(`${cardFront(card)}\n${cardBack(card)}`).includes(query))
+    .filter((card) => cardMatches(card, query))
     .sort(SORTS[sort]);
 }
 
@@ -196,31 +189,14 @@ function renderCards() {
 }
 
 function cardItem(card) {
-  const flashcard = h('button', {
-    class: 'flashcard',
-    type: 'button',
-    'aria-pressed': 'false',
-    onClick: () => {
-      const flipped = flashcard.classList.toggle('is-flipped');
-      flashcard.setAttribute('aria-pressed', String(flipped));
-    },
-  },
-    h('span', { class: 'flashcard-inner' },
-      h('span', { class: 'flashcard-face flashcard-front' },
-        h('span', { class: 'visually-hidden' }, 'Mặt trước: '), cardFront(card)),
-      h('span', { class: 'flashcard-face flashcard-back' },
-        h('span', { class: 'visually-hidden' }, 'Mặt sau: '), cardBack(card)),
-    ),
-  );
-
-  return h('li', { class: 'album-card' },
-    flashcard,
+  return h('li', { class: 'album-card', dataset: { cardId: card.id } },
+    makeFlashcard(card),
     h('div', { class: 'album-card-meta' },
       h('span', { class: `badge badge-${card.state}` }, STATE_LABELS[card.state]),
       h('span', { class: 'muted' }, describeDue(card)),
     ),
     h('div', { class: 'album-card-actions' },
-      h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onClick: () => editCard(card) }, 'Sửa'),
+      h('button', { class: 'btn btn-ghost btn-sm', type: 'button', dataset: { action: 'edit' }, onClick: () => editCard(card) }, 'Sửa'),
       card.state !== 'new' &&
         h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onClick: () => restartCard(card) }, 'Học lại từ đầu'),
       h('button', { class: 'btn btn-ghost btn-sm album-danger', type: 'button', onClick: () => removeCard(card) }, 'Xóa'),
@@ -232,18 +208,20 @@ function cardItem(card) {
 
 async function editCard(card) {
   const saved = await openForm($('#card-dialog'), {
-    values: { front: cardFront(card), back: cardBack(card) },
+    values: { term: card.term, meaning: card.meaning, reading: card.reading, example: card.example },
     save: (data) => updateCard(card.id, data),
   });
   if (!saved) return;
   replaceCard(saved);
+  // Lưới được dựng lại sau khi lưu; trả focus về thẻ, hoặc ô tìm nếu thẻ không còn khớp.
+  ($(`[data-card-id="${CSS.escape(saved.id)}"] [data-action="edit"]`) ?? $('#card-search')).focus();
   toast('Đã lưu thẻ');
 }
 
 async function removeCard(card) {
   const ok = await confirmAction({
     title: 'Xóa thẻ này?',
-    text: `“${preview(cardFront(card))}” sẽ bị xóa khỏi bộ. Lịch sử ôn vẫn được giữ.`,
+    text: `“${preview(plainFurigana(card.term))}” sẽ bị xóa khỏi bộ. Lịch sử ôn vẫn được giữ.`,
     okLabel: 'Xóa thẻ',
   });
   if (!ok) return;
@@ -257,7 +235,7 @@ async function removeCard(card) {
 async function restartCard(card) {
   const ok = await confirmAction({
     title: 'Học lại thẻ này từ đầu?',
-    text: `“${preview(cardFront(card))}” sẽ về trạng thái Mới, mất tiến độ ôn hiện tại.`,
+    text: `“${preview(plainFurigana(card.term))}” sẽ về trạng thái Mới, mất tiến độ ôn hiện tại.`,
     okLabel: 'Học lại từ đầu',
   });
   if (!ok) return;

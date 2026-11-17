@@ -24,6 +24,9 @@ export function confirmAction({ title, text, okLabel }) {
 export function openForm(dialog, { values, save }) {
   const form = dialog.querySelector('form');
   const error = form.querySelector('.alert-error');
+  const requiredFields = [...form.querySelectorAll('[aria-required="true"]')];
+  const clearInvalid = () => requiredFields.forEach((field) => field.removeAttribute('aria-invalid'));
+  clearInvalid();
   for (const [name, value] of Object.entries(values)) form.elements[name].value = value;
   error.hidden = true;
   dialog.showModal();
@@ -32,6 +35,7 @@ export function openForm(dialog, { values, save }) {
     let result = null;
     const submit = async (event) => {
       event.preventDefault();
+      clearInvalid();
       const data = Object.fromEntries(new FormData(form));
       try {
         result = await save(data);
@@ -44,6 +48,9 @@ export function openForm(dialog, { values, save }) {
         }
         error.textContent = err.message;
         error.hidden = false;
+        const empty = requiredFields.filter((field) => !field.value.trim());
+        empty.forEach((field) => field.setAttribute('aria-invalid', 'true'));
+        empty[0]?.focus();
       }
     };
     const cancel = (event) => {
