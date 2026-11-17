@@ -22,7 +22,7 @@ import {
   validateCard,
   validateDeck,
 } from './models.js';
-import { readCard, writeCard } from './card-compat.js'; // TẠM, bỏ ở L6b
+import { migrateCards } from './migrate.js';
 import { schedule } from './scheduler.js';
 import { dayStart } from './date.js';
 import { countDue, newCardsLeft, nextLearningDue, pickNextCard } from './queue.js';
@@ -82,19 +82,21 @@ export async function deleteDeck(id) {
 
 /** Thẻ của một bộ (hoặc mọi thẻ nếu không truyền deckId), cũ trước mới sau. */
 export async function getCards(deckId) {
-  const cards = (await storage.list(CARDS)).map(readCard);
+  await cardsReady();
+  const cards = await storage.list(CARDS);
   return (deckId ? cards.filter((c) => c.deckId === deckId) : cards).sort(byCreated);
 }
 
 export async function getCard(id) {
-  return readCard(await storage.get(CARDS, id));
+  await cardsReady();
+  return storage.get(CARDS, id);
 }
 
 /** Thêm một thẻ vào bộ: { deckId, term, meaning, reading?, example?, jlpt? }. */
 export async function createCard(input = {}) {
-  const { deckId, ...fields } = writeCard(input);
+  const { deckId, ...fields } = input;
   await requireDeck(deckId);
-  return readCard(await storage.put(CARDS, makeCard({ ...fields, deckId })));
+  return storage.put(CARDS, makeCard({ ...fields, deckId }));
 }
 
 /**
@@ -105,21 +107,20 @@ export async function createCard(input = {}) {
 export async function createCards(deckId, items) {
   await requireDeck(deckId);
   const now = Date.now();
-  const cards = items.map((item, i) => makeCard({ ...writeCard(item), deckId }, now + i));
+  const cards = items.map((item, i) => makeCard({ ...item, deckId }, now + i));
   await storage.putMany(CARDS, cards);
-  return cards.map(readCard);
+  return cards;
 }
 
 /** Sửa nội dung thẻ: chỉ truyền trường cần đổi (term, meaning, reading, example, jlpt). Tiến độ học giữ nguyên. */
 export async function updateCard(id, input = {}) {
   const card = await requireCard(id);
-  const fields = writeCard(input);
-  const next = { ...writeCard(card), updatedAt: Date.now() };
+  const next = { ...card, updatedAt: Date.now() };
   for (const field of CARD_FIELDS) {
-    if (fields[field] !== undefined) next[field] = cleanText(fields[field]);
+    if (input[field] !== undefined) next[field] = cleanText(input[field]);
   }
   validateCard(next);
-  return readCard(await storage.put(CARDS, next));
+  return storage.put(CARDS, next);
 }
 
 export async function deleteCard(id) {
@@ -129,7 +130,7 @@ export async function deleteCard(id) {
 /** Cho thẻ học lại từ đầu (về trạng thái Mới). */
 export async function resetCard(id) {
   const card = await requireCard(id);
-  return readCard(await storage.put(CARDS, writeCard(resetProgress(card))));
+  return storage.put(CARDS, resetProgress(card));
 }
 
 // ============================== Học & ôn =============================
@@ -179,12 +180,12 @@ export async function reviewCard(cardId, rating, { now = Date.now(), timeMs = 0 
   const log = makeReviewLog({ before, after, rating, now, timeMs });
   // Ghi lượt ôn trước: ghi thẻ có lỗi (VD bộ nhớ đầy) thì thẻ giữ lịch cũ, không mất dấu lượt ôn
   await storage.put(LOGS, log);
-  await storage.put(CARDS, writeCard(after));
+  await storage.put(CARDS, after);
   return {
     card: after,
     log,
     undo: async () => {
-      await storage.put(CARDS, writeCard(before));
+      await storage.put(CARDS, before);
       await storage.remove(LOGS, log.id);
       return before;
     },
@@ -209,7 +210,7 @@ export async function getReviewLogs({ deckId, from = 0, to = Infinity } = {}) {
 export async function getDeckOverview({ now = Date.now() } = {}) {
   const [decks, cards, todayLogs] = await Promise.all([
     getDecks(),
-    storage.list(CARDS),
+    cardsReady().then(() => storage.list(CARDS)),
     getReviewLogs({ from: dayStart(now) }),
   ]);
   return decks.map((deck) => {
@@ -220,6 +221,20 @@ export async function getDeckOverview({ now = Date.now() } = {}) {
 }
 
 // ============================== Nội bộ ==============================
+
+/**
+ * Thẻ tạo trước L6 (front/back) được đổi sang trường mới một lần, ở lần đọc thẻ đầu tiên
+ * sau khi mở trang (xem migrate.js). Mọi đường đọc thẻ đều đi qua đây, nên trang không phải tự gọi.
+ * Lỗi thì lần sau thử lại, không giữ promise đã hỏng.
+ */
+let migration = null;
+function cardsReady() {
+  migration ??= migrateCards().catch((err) => {
+    migration = null;
+    throw err;
+  });
+  return migration;
+}
 
 /**
  * Bộ cũ (tạo trước L6) chưa có màu: đọc ra màu theo thứ tự trong danh sách, giống cách các trang
