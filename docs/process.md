@@ -16,6 +16,16 @@
 
 ---
 
+## 2026-11-17 — Thẻ tiếng Nhật và chọn màu bìa trang Tạo thẻ (C9, C8), dữ liệu mẫu tiếng Nhật (L9)
+
+- **Người làm:** kakushi.
+- **Đã xong:**
+  - C9: mỗi dòng thẻ ở `pages/create/` có 4 ô Từ, Nghĩa, Cách đọc, Ví dụ; gợi ý cú pháp furigana; kiểm tra thiếu Từ/Nghĩa; so trùng bằng `plainFurigana()`; Tab ở ô Ví dụ dòng cuối thêm dòng mới; lưu qua `createCards()` / `updateCard()` với 4 trường mới; tách các hàm dòng thẻ (`ROW_FIELDS`, `fieldsOf`, `snapshot`, `autosizeRow`) trong `pages/create/card-rows.js`.
+  - C8: thêm `.color-picker` 6 màu bìa vào form bộ thẻ; tạo bộ mới tự chọn màu kế tiếp theo `DECK_COLORS`; mở bộ cũ chọn sẵn `deck.color` và lưu khi đổi màu.
+  - L9: thay 3 bộ mẫu trong `core/seed.js` bằng 3 bộ tiếng Nhật (22, 12, 8 thẻ) kèm furigana, `reading`, `example`; cập nhật test trong `tests/repo.test.js`.
+  - Tài liệu: cập nhật trạng thái trong `product.md`, `tasks.md`; bổ sung bảng dữ liệu mẫu `?seed` và ghi chú `card-rows.js` vào `architecture.md`; sắp xếp lại lộ trình 3 bước và thêm gợi ý triển khai cho `L6b`, `L7`, `C4`, `C5`, `C7` trong `tasks.md`.
+- **Tiếp theo:** Review & merge A9 + A5 (PR #12), S10 (PR #13) và C9 + C8; rồi làm L6b, L7, C4/C5/C7.
+
 ## 2026-11-16 — Bỏ JLPT khỏi giao diện, chỉnh việc đợt 2
 
 - **Người làm:** Leader, cùng Claude.
