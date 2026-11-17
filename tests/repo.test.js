@@ -5,6 +5,7 @@ import * as repo from '../core/repo.js';
 import { DECK_COLORS } from '../core/models.js';
 import { Rating } from '../core/scheduler.js';
 import { seedDemoData } from '../core/seed.js';
+import { migrateCards } from '../core/migrate.js';
 
 let storage;
 beforeEach(() => {
@@ -149,61 +150,46 @@ describe('thẻ', () => {
   });
 });
 
-describe('lớp tương thích front/back (tạm, bỏ ở L6b)', () => {
+describe('thẻ cũ front/back (chuyển đổi một lần)', () => {
   const oldCard = {
     id: 'old-card', deckId: 'deck-1', front: 'dependency', back: 'thư viện phụ thuộc',
-    state: 'new', due: 0, interval: 0, ease: 0, step: 0, reps: 0, lapses: 0, lastReview: null,
+    state: 'review', due: 5, interval: 3, ease: 2.5, step: 0, reps: 2, lapses: 0, lastReview: 2,
     createdAt: 1, updatedAt: 1,
   };
-  const oldDeck = { id: 'deck-1', name: 'Cũ', description: '', newPerDay: 20, createdAt: 1, updatedAt: 1 };
+  const newCard = {
+    id: 'new-card', deckId: 'deck-1', term: '約束[やくそく]', meaning: 'lời hứa', reading: 'やくそく',
+    example: '', jlpt: 'N3', state: 'new', due: 0, interval: 0, ease: 0, step: 0, reps: 0, lapses: 0,
+    lastReview: null, createdAt: 2, updatedAt: 2,
+  };
 
-  test('đọc thẻ cũ: front → term, back → meaning; thẻ trả ra kèm front/back', async () => {
-    putRaw('decks', [oldDeck]);
+  test('thẻ cũ được đổi sang trường mới, giữ tiến độ học', async () => {
     putRaw('cards', [oldCard]);
-    const [card] = await repo.getCards('deck-1');
-    assert.equal(card.term, 'dependency');
-    assert.equal(card.meaning, 'thư viện phụ thuộc');
-    assert.deepEqual([card.reading, card.example, card.jlpt], ['', '', '']);
-    assert.equal(card.front, 'dependency');
-    assert.equal(card.back, 'thư viện phụ thuộc');
-    assert.equal((await repo.getCard('old-card')).term, 'dependency');
-    assert.equal((await repo.getStudyQueue('deck-1')).card.front, 'dependency');
-  });
-
-  test('ghi: nhận { front, back } như { term, meaning }, storage chỉ lưu trường mới', async () => {
-    const deck = await repo.createDeck({ name: 'A' });
-    const card = await repo.createCard({ deckId: deck.id, front: 'x', back: 'y' });
-    assert.equal(card.term, 'x');
-    assert.equal(card.front, 'x'); // trang cũ đọc tạm
-    const [batch] = await repo.createCards(deck.id, [{ front: 'p', back: 'q' }]);
-    await repo.updateCard(card.id, { back: 'y mới' });
-
-    for (const stored of Object.values(raw('cards'))) {
-      assert.ok(!('front' in stored) && !('back' in stored), `còn front/back: ${JSON.stringify(stored)}`);
-    }
-    assert.equal(raw('cards')[card.id].meaning, 'y mới');
-    assert.equal(raw('cards')[batch.id].term, 'p');
+    assert.equal(await migrateCards(), 1);
+    const { front, back, ...progress } = oldCard;
+    assert.deepEqual(raw('cards')['old-card'], {
+      ...progress, term: 'dependency', meaning: 'thư viện phụ thuộc', reading: '', example: '', jlpt: '',
+    });
   });
 
   test('có cả term lẫn front thì term thắng', async () => {
-    const deck = await repo.createDeck({ name: 'A' });
-    const card = await repo.createCard({ deckId: deck.id, term: 'term', front: 'front', meaning: 'm' });
-    assert.equal(card.term, 'term');
+    putRaw('cards', [{ ...oldCard, term: 'term', front: 'front' }]);
+    await migrateCards();
+    assert.equal(raw('cards')['old-card'].term, 'term');
+    assert.equal(raw('cards')['old-card'].meaning, 'thư viện phụ thuộc');
   });
 
-  test('thẻ cũ được lưu lại (sửa, chấm, hoàn tác, học lại) thì bỏ front/back', async () => {
-    putRaw('decks', [oldDeck]);
-    putRaw('cards', [oldCard]);
-    const { undo } = await repo.reviewCard('old-card', Rating.GOOD);
-    assert.equal(raw('cards')['old-card'].term, 'dependency');
-    assert.ok(!('front' in raw('cards')['old-card']));
-    await undo();
-    assert.ok(!('front' in raw('cards')['old-card']));
-    await repo.resetCard('old-card');
-    assert.deepEqual(
-      Object.keys(raw('cards')['old-card']).filter((k) => ['term', 'meaning', 'front', 'back'].includes(k)).sort(),
-      ['meaning', 'term'],
-    );
+  test('chạy 2 lần kết quả như nhau; thẻ mới không bị đổi', async () => {
+    putRaw('cards', [oldCard, newCard]);
+    assert.equal(await migrateCards(), 1);
+    const once = raw('cards');
+    assert.equal(await migrateCards(), 0);
+    assert.deepEqual(raw('cards'), once);
+    assert.deepEqual(once['new-card'], newCard);
+  });
+
+  test('repo không còn nhận { front, back }', async () => {
+    const deck = await repo.createDeck({ name: 'A' });
+    await assert.rejects(repo.createCard({ deckId: deck.id, front: 'x', back: 'y' }), { name: 'ValidationError' });
   });
 });
 

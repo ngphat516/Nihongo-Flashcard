@@ -16,6 +16,23 @@
 
 ---
 
+## 2026-11-18 — Bỏ lớp tương thích front/back (L6b)
+
+- **Người làm:** kakushi, cùng Claude.
+- **Đã xong:**
+  - Xóa `core/card-compat.js`; `core/repo.js` bỏ mọi chỗ gọi `readCard` / `writeCard`. API giữ nguyên tên và chữ ký; thẻ trả ra không còn kèm `front` / `back`, gửi `{ front, back }` thì báo `ValidationError`.
+  - Thêm `core/migrate.js`: `migrateCards()` đổi thẻ cũ sang trường mới và ghi lại.
+  - `tests/repo.test.js`: bỏ 4 test lớp tương thích, thêm 4 test (đổi đúng và giữ tiến độ, `term` thắng `front`, chạy 2 lần như nhau và thẻ mới không đổi, repo từ chối `{ front, back }`). `npm test` 74 → 74.
+  - Tài liệu: bỏ các chỗ "tạm tới L6b" trong architecture, product, conventions; L6, L6b, L15 → Xong; điền tên Daika, At vào bảng Phân việc; product.md chuyển mục "Thẻ tiếng Nhật" ra khỏi "Đã chốt, chưa làm".
+  - Nhánh `core/bo-lop-tuong-thich`.
+- **Kiểm tra:** `npm test` 74/74. Grep L6b không ra dòng nào trong `pages/`, `core/`. L15 trên nhánh này, từ `?reset`:
+  - 1440px: tạo bộ "L15 1440" ở Tạo thẻ (thẻ có furigana, `reading`, `example`; thẻ chỉ có kana; màu `lavender`) → Album hiện furigana, tìm "loi hua" ra 1/2 thẻ, sửa nghĩa giữ trạng thái Mới → Học hiện furigana, chấm Tốt rồi hoàn tác (Z) về Mới, xóa lượt ôn → bìa `lavender` ở Trang chủ, Album, Học.
+  - 375px: Album tìm "cam on" ra 1/2 thẻ, sửa cách đọc lưu được, không cuộn ngang; Học lật, chấm, hoàn tác được, 4 nút chấm điểm vẫn trên màn hình.
+  - Thẻ cũ `{ front, back }` ghi tay vào localStorage: mở Album thì được đổi sang `term` / `meaning`, hiện đúng ở Album và Học.
+  - Console không lỗi.
+- **Quyết định:** thẻ cũ `front` / `back` trong localStorage được **chuyển đổi một lần** (cách A), không bắt người dùng `?reset`. `repo.js` gọi `migrateCards()` ở lần đọc thẻ đầu tiên sau khi mở trang (`getCards`, `getCard`, `getDeckOverview`), giữ promise để chỉ chạy một lần mỗi trang. Đặt trong `repo.js` vì mọi trang đều đọc thẻ qua đây, trang không phải tự gọi; không chạy lúc import module để test Node còn kịp cài localStorage giả.
+- **Tiếp theo:** Leader review (sửa `core/`); rồi L7.
+
 ## 2026-11-18 — Làm rõ đợt 2 song song, lộ trình sau đợt 2
 
 - **Người làm:** kakushi, cùng Claude.
