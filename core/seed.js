@@ -11,67 +11,67 @@ import { isLearning } from './queue.js';
 
 const SAMPLE_DECKS = [
   {
-    name: 'Tiếng Anh – Từ vựng IT',
-    description: 'Từ vựng chuyên ngành hay gặp khi đọc tài liệu',
+    name: 'JLPT N5 – Từ vựng',
+    description: 'Từ vựng tiếng Nhật cơ bản kèm cách đọc và ví dụ',
     startDaysAgo: 120, // học từ 4 tháng trước → heatmap dài, nhiều thẻ đã thuộc
     cards: [
-      ['algorithm', 'thuật toán'],
-      ['bandwidth', 'băng thông'],
-      ['compiler', 'trình biên dịch'],
-      ['database', 'cơ sở dữ liệu'],
-      ['debug', 'gỡ lỗi'],
-      ['deploy', 'triển khai (đưa lên môi trường chạy thật)'],
-      ['encryption', 'mã hóa'],
-      ['framework', 'khung phát triển'],
-      ['interface', 'giao diện'],
-      ['latency', 'độ trễ'],
-      ['repository', 'kho mã nguồn'],
-      ['request', 'yêu cầu (gửi lên máy chủ)'],
-      ['response', 'phản hồi (máy chủ trả về)'],
-      ['scalable', 'có khả năng mở rộng'],
-      ['server', 'máy chủ'],
-      ['syntax', 'cú pháp'],
-      ['variable', 'biến'],
-      ['inheritance', 'kế thừa'],
-      ['authentication', 'xác thực (bạn là ai)'],
-      ['authorization', 'phân quyền (bạn được làm gì)'],
-      ['cache', 'bộ nhớ đệm'],
-      ['dependency', 'thư viện phụ thuộc'],
+      ['約束[やくそく]', 'lời hứa, cuộc hẹn', 'やくそく', '約束[やくそく]を守[まも]る。'],
+      ['食[た]べる', 'ăn', 'たべる', '毎朝[まいあさ]パンを食[た]べる。'],
+      ['飲[の]む', 'uống', 'のむ', 'コーヒーを飲[の]みます。'],
+      ['見[み]る', 'xem, nhìn', 'みる', '映画[えいが]を見[み]る。'],
+      ['聞[き]く', 'nghe, hỏi', 'きく', '音楽[おんがく]を聞[き]く。'],
+      ['読[よ]む', 'đọc', 'よむ', '新聞[しんぶん]を読[よ]む。'],
+      ['書[か]く', 'viết', 'かく', '手紙[てがみ]を書[か]く。'],
+      ['話[はな]す', 'nói chuyện', 'はなす', '日本語[にほんご]で話[はな]す。'],
+      ['買[か]う', 'mua', 'かう', '本[ほん]を買[か]いました。'],
+      ['行[い]く', 'đi', 'いく', '学校[がっこう]へ行[い]く。'],
+      ['帰[かえ]る', 'về (nhà)', 'かえる', 'うちへ帰[かえ]ります。'],
+      ['勉強[べんきょう]', 'học tập', 'べんきょう', '毎日[まいにち]日本語[にほんご]を勉強[べんきょう]する。'],
+      ['友達[ともだち]', 'bạn bè', 'ともだち', '友達[ともだち]と遊[あそ]ぶ。'],
+      ['時間[じかん]', 'thời gian', 'じかん', '時間[じかん]がありません。'],
+      ['天気[てんき]', 'thời tiết', 'てんき', '今日[きょう]はいい天気[てんき]ですね。'],
+      ['電車[でんしゃ]', 'tàu điện', 'でんしゃ', '電車[でんしゃ]で会社[かいしゃ]に行[い]く。'],
+      ['駅[えき]', 'nhà ga', 'えき', '駅[えき]の前[まえ]で待[ま]つ。'],
+      ['図書館[としょかん]', 'thư viện', 'としょかん', '図書館[としょかん]で本[ほん]を借[か]りる。'],
+      ['人々[ひとびと]', 'mọi người', 'ひとびと', '町[まち]の人々[ひとびと]は親切[しんせつ]だ。'],
+      ['元気[げんき]', 'khỏe mạnh, tràn đầy năng lượng', 'げんき', 'お元気[げんき]ですか。'],
+      ['ゆっくり', 'chậm rãi, thong thả', '', 'ゆっくり話[はな]してください。'],
+      ['たくさん', 'nhiều', '', '本[ほん]をたくさん読[よ]む。'],
     ],
   },
   {
-    name: 'Cơ sở dữ liệu',
-    description: 'Ôn thi giữa kỳ',
+    name: '食べ物 – Đồ ăn & Quán ăn',
+    description: 'Món ăn, đồ uống và câu gọi món quen thuộc',
     startDaysAgo: 21, // mới học 3 tuần…
     pausedDays: 4, // …rồi bỏ ôn 4 hôm gần đây → hôm nay có nhiều thẻ tồn đọng cho trang Học
     cards: [
-      ['Khóa chính (primary key) là gì?', 'Thuộc tính (hoặc tập thuộc tính) xác định duy nhất mỗi dòng; không được NULL.'],
-      ['Khóa ngoại (foreign key) là gì?', 'Thuộc tính tham chiếu tới khóa chính của bảng khác, đảm bảo toàn vẹn tham chiếu.'],
-      ['Dạng chuẩn 1NF', 'Mọi thuộc tính chỉ chứa giá trị nguyên tố (không đa trị, không lặp nhóm).'],
-      ['Dạng chuẩn 2NF', 'Đạt 1NF và mọi thuộc tính không khóa phụ thuộc ĐẦY ĐỦ vào khóa chính.'],
-      ['Dạng chuẩn 3NF', 'Đạt 2NF và không có thuộc tính không khóa nào phụ thuộc BẮC CẦU vào khóa chính.'],
-      ['ACID gồm những gì?', 'Atomicity, Consistency, Isolation, Durability.'],
-      ['INNER JOIN trả về gì?', 'Chỉ những dòng khớp điều kiện ở cả hai bảng.'],
-      ['LEFT JOIN trả về gì?', 'Mọi dòng của bảng trái, kèm dòng khớp ở bảng phải (không khớp thì NULL).'],
-      ['Index dùng để làm gì?', 'Tăng tốc tìm kiếm; đổi lại tốn thêm bộ nhớ và làm chậm thao tác ghi.'],
-      ['Lọc sau khi GROUP BY dùng mệnh đề nào?', 'HAVING'],
-      ['View là gì?', 'Bảng ảo được định nghĩa bằng một câu truy vấn.'],
-      ['Xóa hết dữ liệu nhưng giữ cấu trúc bảng?', 'TRUNCATE TABLE'],
+      ['朝[あさ]ご飯[はん]', 'bữa sáng', 'あさごはん', '朝[あさ]ご飯[はん]はいつも7時[じ]です。'],
+      ['水[みず]', 'nước', 'みず', '冷[つめ]たい水[みず]をください。'],
+      ['お茶[ちゃ]', 'trà', 'おちゃ', '緑[みどり]のお茶[ちゃ]が好きです。'],
+      ['野菜[やさい]', 'rau củ', 'やさい', '新鮮[しんせん]な野菜[やさい]を買[か]う。'],
+      ['果物[くだもの]', 'trái cây, hoa quả', 'くだもの', '日本[にほん]の果物[くだもの]は甘[あま]い。'],
+      ['肉[にく]', 'thịt', 'にく', '牛肉[ぎゅうにく]と豚肉[ぶたにく]どちらが好[す]き？'],
+      ['魚[さかな]', 'cá', 'さかな', '港[みなと]で魚[さかな]を食[た]べる。'],
+      ['注文[ちゅうもん]', 'gọi món, đặt hàng', 'ちゅうもん', '注文[ちゅうもん]お願[ねが]いします。'],
+      ['会計[かいけい]', 'thanh toán, tính tiền', 'かいけい', 'お会計[かいけい]をお願[ねが]いします。'],
+      ['おいしい', 'ngon', '', 'このラーメンはとてもおいしい。'],
+      ['甘[あま]い', 'ngọt', 'あまい', '甘[あま]いお菓子[かし]が好きです。'],
+      ['辛[から]い', 'cay', 'からい', 'この料理[りょうり]は少[すこ]し辛[から]い。'],
     ],
   },
   {
-    name: 'Lịch sử Việt Nam',
-    description: 'Mốc thời gian quan trọng — bộ này để nguyên chưa học',
+    name: '挨拶 – Chào hỏi cơ bản',
+    description: 'Câu chào hỏi hằng ngày — bộ này để nguyên chưa học',
     startDaysAgo: 0, // chưa học → toàn thẻ mới
     cards: [
-      ['Ngô Quyền đánh thắng quân Nam Hán trên sông Bạch Đằng năm nào?', '938'],
-      ['Lý Thái Tổ dời đô về Thăng Long năm nào?', '1010'],
-      ['Ai lãnh đạo khởi nghĩa Lam Sơn?', 'Lê Lợi'],
-      ['Bộ luật Hồng Đức ra đời dưới triều vua nào?', 'Lê Thánh Tông'],
-      ['Quang Trung đại phá quân Thanh vào năm nào?', 'Xuân Kỷ Dậu 1789'],
-      ['Ngày Quốc khánh nước Việt Nam?', '2/9/1945'],
-      ['Chiến dịch Điện Biên Phủ kết thúc thắng lợi ngày nào?', '7/5/1954'],
-      ['Hiệp định Genève về Đông Dương được ký năm nào?', '1954'],
+      ['おはようございます', 'chào buổi sáng (lịch sự)', '', '先生[せんせい]、おはようございます。'],
+      ['こんにちは', 'xin chào (ban ngày)', '', 'みなさん、こんにちは。'],
+      ['こんばんは', 'chào buổi tối', '', 'こんばんは、いい夜[よる]ですね。'],
+      ['お休[やす]みなさい', 'chúc ngủ ngon', 'おやすみなさい', 'また明日[あした]、お休[やす]みなさい。'],
+      ['初[はじ]めまして', 'rất vui được gặp lần đầu', 'はじめまして', '初[はじ]めまして、アンです。'],
+      ['よろしくお願[ねが]いします', 'mong được giúp đỡ', 'よろしくおねがいします', 'これからよろしくお願[ねが]いします。'],
+      ['すみません', 'xin lỗi / cho tôi hỏi', '', 'すみません、駅[えき]はどこですか。'],
+      ['ありがとう', 'cảm ơn', '', '手伝[てつだ]ってくれてありがとう。'],
     ],
   },
 ];
@@ -89,9 +89,8 @@ export async function seedDemoData({ days = 120, now = Date.now(), random = Math
   SAMPLE_DECKS.forEach((sample, i) => {
     const deck = makeDeck({ ...sample, color: DECK_COLORS[i % DECK_COLORS.length] }, firstDay + i);
     decks.push(deck);
-    // Nội dung mẫu vẫn là 2 mặt (câu hỏi, đáp án) → term, meaning. Đổi sang bộ tiếng Nhật thật là L9.
-    sample.cards.forEach(([term, meaning], j) => {
-      cards.push(makeCard({ deckId: deck.id, term, meaning }, firstDay + i * 1000 + j));
+    sample.cards.forEach(([term, meaning, reading = '', example = ''], j) => {
+      cards.push(makeCard({ deckId: deck.id, term, meaning, reading, example }, firstDay + i * 1000 + j));
     });
   });
 
