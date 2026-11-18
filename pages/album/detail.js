@@ -13,7 +13,7 @@ import {
   updateCard,
   updateDeck,
 } from '../../core/repo.js';
-import { ValidationError } from '../../core/models.js';
+import { DECK_DIRECTIONS, ValidationError } from '../../core/models.js';
 import { STATE_LABELS, describeDue } from '../../core/queue.js';
 import { routes } from '../../core/routes.js';
 import { $, h } from '../../core/dom.js';
@@ -34,6 +34,8 @@ const SORTS = {
   created: (a, b) => b.createdAt - a.createdAt,
   due: (a, b) => (a.state === 'new') - (b.state === 'new') || a.due - b.due || a.createdAt - b.createdAt,
 };
+
+const directionLabels = { 'ja-vi': 'Nhật → Việt', 'vi-ja': 'Việt → Nhật' };
 
 const view = { deck: null, cards: [], filter: 'all', sort: 'created', query: '' };
 
@@ -57,6 +59,10 @@ export async function showDeckDetail(deckId) {
   view.deck = deck;
   view.cards = await getCards(deckId);
   document.title = `${deck.name} · Album · Nhớ Lâu`;
+  $('#deck-direction-options').replaceChildren(...DECK_DIRECTIONS.map((direction) =>
+    h('label', { class: 'album-direction-option' },
+      h('input', { type: 'radio', name: 'direction', value: direction }), directionLabels[direction]),
+  ));
   setupToolbar();
   await renderHeader();
   renderCards();
@@ -83,6 +89,7 @@ async function renderHeader() {
       ),
     ),
     deck.description && h('p', { class: 'album-description' }, deck.description),
+    h('p', { class: 'album-direction-summary muted' }, `Chiều học: ${directionLabels[deck.direction]}`),
     hasCards && h('div', { class: 'row album-summary' },
       h('span', { class: 'muted' }, `${cards.length} thẻ · Hôm nay cần học:`),
       h('div', { class: 'counts' },
@@ -101,7 +108,7 @@ function countItem(state, n, label) {
 async function editDeck() {
   const { deck } = view;
   const saved = await openForm($('#deck-dialog'), {
-    values: { name: deck.name, description: deck.description, newPerDay: deck.newPerDay, color: deck.color },
+    values: { name: deck.name, description: deck.description, newPerDay: deck.newPerDay, color: deck.color, direction: deck.direction },
     save: (data) => {
       // Ô số để trống: Number('') === 0 sẽ âm thầm tắt thẻ mới (lỗi B2), nên chặn ở đây
       if (data.newPerDay.trim() === '') throw new ValidationError('Hãy nhập số thẻ mới mỗi ngày (0 nếu không muốn học thẻ mới).');
