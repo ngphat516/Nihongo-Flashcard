@@ -16,6 +16,18 @@
 
 ---
 
+## 2026-11-18 — Bảo vệ main và CODEOWNERS (L2)
+
+- **Người làm:** Leader, cùng Claude.
+- **Đã xong:**
+  - Điền `.github/CODEOWNERS` bằng username thật, đã đối chiếu với danh sách collaborator của repo: Leader `ngphat516` (mặc định, `core/`, `styles/`), Daika `tanphat-trinh` (`pages/album/`), kakushi `phattnt` (`pages/create/`), At `Peter-Kohi` (`pages/study/`). Mỗi folder trang có thêm Leader.
+  - Ghi luật duyệt PR vào [conventions.md › Nhánh, commit, PR](conventions.md#nhánh-commit-pr).
+  - Nhánh `chore/bao-ve-main`.
+- **Quyết định:**
+  - Bảo vệ `main`: bắt buộc qua PR, 1 lượt duyệt, cần duyệt của Code Owners, bỏ duyệt cũ khi có commit mới, chặn force-push và xóa nhánh.
+  - Không bật "Do not allow bypassing the above settings": `core/`, `styles/` chỉ có Leader sở hữu, mà GitHub không cho tự duyệt PR của mình, nên Leader phải được bỏ qua.
+- **Tiếp theo:** merge PR này rồi bật bảo vệ `main` trong Settings › Branches (bật sau khi merge để PR này không bị kẹt), rồi chuyển L2 sang Xong.
+
 ## 2026-11-18 — Bỏ lớp tương thích front/back (L6b)
 
 - **Người làm:** kakushi, cùng Claude.
