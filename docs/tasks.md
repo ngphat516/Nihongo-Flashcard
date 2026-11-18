@@ -19,8 +19,7 @@ Bảng này là **trạng thái hiện tại**: còn việc gì, ai làm. Lịch
 **Đợt 2 (xong):** đợt 2 chỉ sửa giao diện. Trường thẻ, kiểm tra dữ liệu, furigana, màu bìa đều có trong `core/` từ `L6`. Vì vậy `A9 + A5`, `C9 + C8`, `S10` làm song song, không việc nào chờ việc nào. Các trang không import code của nhau, chỉ nối qua dữ liệu thẻ: Tạo thẻ ghi, Album và Học đọc, đều qua `core/repo.js`. Lúc làm từng trang thì dùng `?seed` ([bảng mẫu](architecture.md#dữ-liệu-mẫu-seed)) thay cho Tạo thẻ. Chỗ nối thật chỉ kiểm tra được khi chạy thử cả luồng sau merge. Đã merge PR #14 (C9 + C8 + L9), #12 (A9 + A5), #13 (S10).
 
 **Tiếp theo:**
-1. Bật bảo vệ `main` sau khi merge PR `CODEOWNERS` (`L2`).
-2. `C4`, `C5`, `C7`, `L13`, rồi kiểm thử cuối `L5`.
+1. `C4`, `C5`, `C7`, `L13`, rồi kiểm thử cuối `L5`.
 
 Không tự sửa `styles/` hay `core/` trong PR của trang; cần biến CSS hoặc hàm core mới thì báo Leader.
 
@@ -33,7 +32,7 @@ Không tự sửa `styles/` hay `core/` trong PR của trang; cần biến CSS h
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Ưu tiên | Trạng thái |
 |---|---|---|---|---|
 | L1 | Codebase nền | Cấu trúc thư mục, CSS chung, lớp lưu localStorage, thuật toán SM-2 + 37 test, dữ liệu mẫu, khung 4 trang | Bắt buộc | Xong |
-| L2 | Repo GitHub | Tạo repo, push codebase, bật bảo vệ nhánh `main` (bắt buộc qua PR), mời 3 thành viên, điền username thật vào `.github/CODEOWNERS` | Bắt buộc | Đang làm: CODEOWNERS xong, chờ bật bảo vệ trong Settings |
+| L2 | Repo GitHub | Tạo repo, push codebase, bật bảo vệ nhánh `main` (bắt buộc qua PR), mời 3 thành viên, điền username thật vào `.github/CODEOWNERS` | Bắt buộc | Xong |
 | L3 | Review & merge | Review mọi PR. Thay đổi trong phần chung phải qua Leader | Bắt buộc | Đang làm |
 | L4 | Hệ thống giao diện | `styles/tokens.css` + `styles/components.css` (nút, ô nhập, thống kê, bộ đếm, badge, thẻ lật, dialog, toast, trạng thái rỗng), font Noto Sans JP, trang `pages/styleguide/`. Chỉ CSS, không có JS cho component | Nên có | Xong |
 | L5 | Kiểm thử cuối | `npm test` qua hết, thử luồng tạo bộ → thêm thẻ → học → xem heatmap, thử trên điện thoại, làm hết mục [Trước khi nộp](conventions.md#trước-khi-nộp--deploy) | Bắt buộc | Chưa làm |
