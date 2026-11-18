@@ -16,6 +16,13 @@
 
 ---
 
+## 2026-11-18 — Bật bảo vệ main (L2 xong)
+
+- **Người làm:** Leader, cùng Claude.
+- **Đã xong:** ruleset `Main Protection` trong Settings › Rules, áp lên nhánh mặc định `main`: bắt buộc qua PR, 1 lượt duyệt, cần duyệt của Code Owners, bỏ duyệt cũ khi có commit mới, chặn force-push và xóa nhánh. Bypass: Repository admin, chỉ khi merge PR. Đã đọc lại cấu hình qua GitHub API.
+- **Quyết định:** dùng ruleset thay cho classic branch protection. Leader merge PR của chính mình sửa `core/`, `styles/`, `docs/` bằng ô "Merge without waiting for requirements to be met (bypass rules)"; không push thẳng vào `main` được nữa.
+- **Tiếp theo:** C4, C5, C7, L13, rồi L5.
+
 ## 2026-11-18 — Nút bật/tắt furigana (L7)
 
 - **Người làm:** Leader, cùng Claude.
