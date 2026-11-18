@@ -16,6 +16,19 @@
 
 ---
 
+## 2026-11-18 — Sắp xếp lại bảng việc
+
+- **Người làm:** Leader, cùng Claude.
+- **Đã xong:**
+  - `docs/tasks.md` sắp lại thành 4 phần: **Việc đang mở** (bảng ngắn Mã · Việc · Ai · Cần trước · Ưu tiên · Trạng thái, kèm việc làm song song ngay) lên đầu; **Chi tiết việc đang mở** theo từng việc (Làm gì / Hàm core / Xong khi); **Phân việc** và **Quy ước**; **Đã xong** gói trong `<details>` theo từng nhóm, giữ nguyên chữ các bảng cũ, bảng lỗi B1–B5 dưới tiêu đề "Lỗi đã biết trong `core/`".
+  - Đã so bằng script: không mất mã task nào, mọi dòng bảng trong "Đã xong" giống hệt bản cũ, link từ `architecture.md`, `conventions.md`, `process.md` tới `tasks.md` vẫn đúng.
+  - Nhánh `docs/sap-xep-tasks`.
+- **Quyết định:** 3 thay đổi nội dung có chủ ý:
+  - C4, C5: *Để sau* → *Chưa làm* (đã giao cho kakushi).
+  - Thêm tiêu chí "Xong khi" cho S11, A10, C4.
+  - Bỏ 3 dòng ghi chú "Đợt 2:" ở đầu mục Album, Tạo thẻ, Học (đợt 2 đã xong).
+- **Tiếp theo:** S11 (At), A10 (Daika), C4 (kakushi) làm song song.
+
 ## 2026-11-18 — Chiều học theo bộ (L8)
 
 - **Người làm:** Leader, cùng Claude.
