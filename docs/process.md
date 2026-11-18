@@ -16,6 +16,13 @@
 
 ---
 
+## 2026-11-18 — Đổi chiều học (S11)
+
+- **Người làm:** At, cùng Codex.
+- **Đã làm:** nút đổi chiều theo bộ trong phiên học, lưu qua updateDeck; đổi ngay thẻ hiện tại; hiển thị nghĩa trước ở chiều Việt → Nhật. Điều chỉnh chiều cao thẻ trên điện thoại để nút chấm không bị thanh điều hướng che.
+- **Kiểm tra:** npm test 85/85; Chrome thử bộ mẫu, lưu chiều qua tải lại, Space, mũi tên, chấm 1–4 và Z; ảnh desktop và 375px trong pages/study/screenshots. Không có lỗi console.
+- **Còn cần review:** trường hợp ví dụ rất dài ở cả hai chiều và học hết một lượt.
+
 ## 2026-11-18 — Sắp xếp lại bảng việc
 
 - **Người làm:** Leader, cùng Claude.

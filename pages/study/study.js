@@ -8,7 +8,7 @@ import { $, getParam, h, startPage } from '../../core/dom.js';
 import { renderFurigana } from '../../core/furigana.js';
 import { NotFoundError } from '../../core/models.js';
 import { LEARN_AHEAD_MS, isLearning } from '../../core/queue.js';
-import { getCards, getDeckOverview, getStudyQueue, reviewCard } from '../../core/repo.js';
+import { getCards, getDeckOverview, getStudyQueue, reviewCard, updateDeck } from '../../core/repo.js';
 import { routes } from '../../core/routes.js';
 import { Rating, RATINGS, RATING_LABELS, previewRatings } from '../../core/scheduler.js';
 
@@ -106,6 +106,8 @@ async function startSession(deckId) {
   let lastCardId = null;
   let busy = false;
   let wakeTimer;
+  let direction = 'ja-vi';
+  const directionButton = $('#study-direction');
 
   function showError(error) {
     errorBox.textContent = error.message;
@@ -122,9 +124,12 @@ async function startSession(deckId) {
     revealed = false;
     stage.classList.remove('is-flipped');
     stage.classList.add('is-resetting');
-    term.replaceChildren(renderFurigana(card.term));
+    const reverse = direction === 'vi-ja';
+    term.lang = reverse ? 'vi' : 'ja';
+    term.replaceChildren(reverse ? document.createTextNode(card.meaning) : renderFurigana(card.term));
     answerText.replaceChildren(
-      h('span', { class: 'study-card-text study-card-meaning' }, card.meaning),
+      h('span', { class: 'study-card-text study-card-meaning', lang: reverse ? 'ja' : 'vi' },
+        reverse ? renderFurigana(card.term) : card.meaning),
       card.reading && h('span', { class: 'study-card-reading', lang: 'ja' }, card.reading),
       card.example && h('span', { class: 'study-card-example' }, renderFurigana(card.example)),
     );
@@ -203,6 +208,8 @@ async function startSession(deckId) {
           cardIndex = 0;
         }
       }
+      direction = queue.deck.direction;
+      directionButton.textContent = direction === 'vi-ja' ? 'Việt → Nhật' : 'Nhật → Việt';
       $('#deck-name').textContent = queue.deck.name;
       $('#study-counts').replaceChildren(...countItems(queue.counts));
       if (card) showFront(card);
@@ -269,6 +276,17 @@ async function startSession(deckId) {
     });
   }
 
+  directionButton.addEventListener('keydown', (event) => {
+    if (event.key === ' ') event.stopPropagation();
+  });
+  directionButton.addEventListener('click', () => run(async () => {
+    const deck = await updateDeck(deckId, {
+      direction: direction === 'ja-vi' ? 'vi-ja' : 'ja-vi',
+    });
+    direction = deck.direction;
+    directionButton.textContent = direction === 'vi-ja' ? 'Việt → Nhật' : 'Nhật → Việt';
+    if (current) showFront(current);
+  }));
   stage.addEventListener('click', flipCard);
   previousCard.addEventListener('click', () => moveCard(-1));
   nextCard.addEventListener('click', () => moveCard(1));

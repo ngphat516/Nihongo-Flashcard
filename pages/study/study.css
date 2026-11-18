@@ -340,3 +340,11 @@
     visibility: hidden;
   }
 }
+
+.study-bar { flex-wrap: wrap; }
+.study-bar h1 { flex: 1 1 100%; }
+
+@media (max-width: 767px) {
+  .study-card .flashcard-face { min-height: 30vh; }
+}
+
