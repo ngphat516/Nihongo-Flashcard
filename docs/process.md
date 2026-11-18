@@ -16,6 +16,13 @@
 
 ---
 
+## 2026-11-18 — Sửa bố cục mobile trang Học
+
+- **Người làm:** At, cùng Codex.
+- **Đã làm:** media query max-width 767px đặt thẻ phẳng, hai mặt đổi bằng aria-hidden, bỏ chuyển động 3D trên mobile; chiều cao 40vh, chữ lớn hơn; bộ đếm gọn một hàng; ẩn Phím tắt, thêm khoảng đệm đáy theo tabbar và safe-area. Thanh nav chung đã có nền đặc và viền trên. Nút chấm tối thiểu 48px.
+- **Kiểm tra:** Chrome tại 360/375/390/430 × 800: không cuộn ngang, thẻ cao 320px, nút khoảng 55px, đáy nút 639px trước nav ở 736px. Đổi thẻ bằng phím mũi tên reset về mặt trước và transform none. Console không lỗi. Ảnh study-mobile-*.jpg, cập nhật s11-mobile.jpg.
+- **Quyết định:** chỉ sửa CSS trong media query mobile, desktop dùng các quy tắc hiện có.
+
 ## 2026-11-18 — Mở rộng trang Học trên desktop lớn
 
 - **Người làm:** At, cùng Codex.
