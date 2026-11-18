@@ -1,12 +1,12 @@
 # Ai phải duyệt PR đụng vào folder nào (GitHub tự gắn reviewer).
-# Cách bật: thay @leader, @thanhvien2... bằng username GitHub thật, rồi bỏ dấu # ở đầu các dòng dưới.
 # Dòng viết sau được ưu tiên hơn dòng viết trước.
+# Leader: ngphat516 · Daika (Album): tanphat-trinh · kakushi (Tạo thẻ): phattnt · At (Học): Peter-Kohi
 
-# * @leader
+* @ngphat516
 
-# /pages/album/  @thanhvien2 @leader
-# /pages/create/ @thanhvien3 @leader
-# /pages/study/  @thanhvien4 @leader
+/pages/album/  @tanphat-trinh @ngphat516
+/pages/create/ @phattnt @ngphat516
+/pages/study/  @Peter-Kohi @ngphat516
 
-# /core/   @leader
-# /styles/ @leader
+/core/   @ngphat516
+/styles/ @ngphat516

@@ -63,6 +63,8 @@ Thêm hoặc đổi class chung thì sửa cả bảng này và trang styleguide
 1. Mỗi người làm trên nhánh riêng: `feature/home`, `feature/album`, `feature/create`, `feature/study`. Việc chung (core, styles, tài liệu) dùng nhánh riêng, VD `core/the-tieng-nhat`, `docs/...`.
 2. Commit nhỏ, ghi mã task. VD: `album: lưới bìa album (A1)`.
 3. Xong vài task thì mở PR vào `main`, điền mẫu PR (`.github/pull_request_template.md`). Leader review rồi merge.
+   PR vào `main` cần 1 lượt duyệt; người sở hữu folder trong `.github/CODEOWNERS` được gắn reviewer tự động.
+   Leader (admin) được bỏ qua yêu cầu duyệt cho PR của chính mình sửa `core/`, `styles/`, vì GitHub không cho tự duyệt PR của mình mà hai folder này chỉ có Leader sở hữu.
 4. Mỗi PR cập nhật trạng thái trong [tasks.md](tasks.md) và thêm một mục vào [process.md](process.md).
 
 ## Định nghĩa "xong một task"
