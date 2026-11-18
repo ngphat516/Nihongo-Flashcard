@@ -29,7 +29,7 @@ core/                   phần lõi dùng chung
   repo.js               ★ API dữ liệu cho các trang
   scheduler.js          thuật toán SM-2 (hàm thuần)
   queue.js              chọn thẻ tiếp theo, đếm thẻ cần học, nhãn trạng thái
-  models.js             cấu trúc Deck / Card / ReviewLog + kiểm tra dữ liệu, DECK_COLORS, JLPT_LEVELS
+  models.js             cấu trúc Deck / Card / ReviewLog + kiểm tra dữ liệu, DECK_COLORS, DECK_DIRECTIONS, JLPT_LEVELS
   furigana.js           cú pháp 漢字[かんじ]: parseFurigana, plainFurigana, renderFurigana
   migrate.js            đổi thẻ cũ front/back sang trường mới một lần (chỉ repo.js dùng)
   storage.js            đọc/ghi localStorage
@@ -104,13 +104,14 @@ Các trường của `Deck`, `Card`, `ReviewLog` và giới hạn độ dài: xe
 
 | Bản ghi | Trường nội dung | Ghi chú |
 |---|---|---|
-| `Deck` | `name`, `description`, `newPerDay`, `color` | `color` là một trong `DECK_COLORS` (`pink`, `peach`, `yellow`, `green`, `sky`, `lavender`) |
+| `Deck` | `name`, `description`, `newPerDay`, `color`, `direction` | `color` là một trong `DECK_COLORS` (`pink`, `peach`, `yellow`, `green`, `sky`, `lavender`); `direction` là một trong `DECK_DIRECTIONS`: `'ja-vi'` Nhật → Việt (mặc định) hoặc `'vi-ja'` Việt → Nhật, lịch ôn dùng chung cho cả 2 chiều |
 | `Card` | `term`, `meaning`, `reading`, `example`, `jlpt` | `term`, `meaning` bắt buộc; `jlpt` là `''` hoặc `N5`…`N1`; furigana `漢字[かんじ]` trong `term`, `example` |
 | `Card` (tiến độ) | `state`, `due`, `interval`, `ease`, `step`, `reps`, `lapses`, `lastReview` | do `scheduler.js` tính |
 
 - **Dữ liệu cũ (trước L6):**
   - Thẻ chỉ có `front` / `back`: ở lần đọc thẻ đầu tiên sau khi mở trang, `repo.js` gọi `migrateCards()` (`core/migrate.js`) đổi sang `term` / `meaning`, điền `''` cho trường thiếu, bỏ `front` / `back` rồi ghi lại. Chạy lại nhiều lần không đổi gì thêm.
   - Bộ chưa có `color`: đọc ra màu theo thứ tự danh sách (`DECK_COLORS[i % 6]`); khi bộ được lưu lại thì ghi màu.
+  - Bộ chưa có `direction` (tạo trước L8): đọc ra `'ja-vi'`; khi bộ được lưu lại thì ghi.
 
 - **Xóa bộ thẻ:** xóa luôn thẻ trong bộ, nhưng **giữ** lượt ôn, để heatmap và chuỗi ngày không bị mất.
 - **Dung lượng:** localStorage khoảng 5 MB. Mỗi lượt ôn chiếm khoảng 300 byte, và mỗi lần chấm điểm ghi lại cả bảng `reviewLogs`. Chứa được khoảng 16 nghìn lượt ôn (khoảng 5 tháng nếu ôn 100 lượt/ngày). Đầy thì `storage.js` báo lỗi "Bộ nhớ trình duyệt đã đầy".
@@ -125,7 +126,7 @@ Mở bất kỳ trang nào kèm `?seed` (hoặc gọi `dev.seed()` trong Console
 |---|---|---|---|
 | `JLPT N5 – Từ vựng` | `pink` | 22 thẻ, học từ 120 ngày trước (đủ Mới / Đang học / Ôn tập; có kanji + furigana, okurigana, `々`, và từ thuần kana `reading: ''`) | Heatmap 12 tháng & biểu đồ 6 tháng (Trang chủ); tìm kiếm & lọc 4 trường, sửa thẻ giữ tiến độ SM-2 (Album `A9`, Tạo thẻ `C9`) |
 | `食べ物 – Đồ ăn & Quán ăn` | `peach` | 12 thẻ, học 21 ngày trước, nghỉ 4 ngày gần đây (nhiều thẻ đến hạn hôm nay) | Vòng học SM-2, mặt trước/sau furigana, 4 nút chấm điểm và hoàn tác (Học `S10`) |
-| `挨拶 – Chào hỏi cơ bản` | `yellow` | 8 thẻ, chưa học lần nào (`due.new === 8`) | Bộ thẻ mới nguyên, giới hạn thẻ mới mỗi ngày; tạo thêm bộ mới sẽ tự chọn màu kế tiếp (`green`) |
+| `挨拶 – Chào hỏi cơ bản` | `yellow` | 8 thẻ, chưa học lần nào (`due.new === 8`). **Chiều học `'vi-ja'`** (2 bộ kia `'ja-vi'`) | Bộ thẻ mới nguyên, giới hạn thẻ mới mỗi ngày; tạo thêm bộ mới sẽ tự chọn màu kế tiếp (`green`); học chiều Việt → Nhật (`S11`, `A10`) |
 
 ## API `core/repo.js`
 
@@ -133,8 +134,8 @@ Mở bất kỳ trang nào kèm `?seed` (hoặc gọi `dev.seed()` trong Console
 |---|---|---|
 | `getDecks()` | `Deck[]` | cũ trước mới sau |
 | `getDeck(id)` | `Deck \| null` | |
-| `createDeck({ name, description, newPerDay, color })` | `Deck` | `newPerDay` bỏ trống thì 20; `color` bỏ trống thì màu kế tiếp sau bộ tạo gần nhất |
-| `updateDeck(id, { name?, description?, newPerDay?, color? })` | `Deck` | chỉ truyền trường cần đổi; `newPerDay` rỗng → `ValidationError` |
+| `createDeck({ name, description, newPerDay, color, direction })` | `Deck` | `newPerDay` bỏ trống thì 20; `color` bỏ trống thì màu kế tiếp sau bộ tạo gần nhất; `direction` không truyền thì `'ja-vi'` |
+| `updateDeck(id, { name?, description?, newPerDay?, color?, direction? })` | `Deck` | chỉ truyền trường cần đổi; `newPerDay` rỗng → `ValidationError`; đổi `direction` không đụng tiến độ thẻ |
 | `deleteDeck(id)` | — | xóa luôn thẻ, giữ lịch sử ôn |
 | `getCards(deckId?)` | `Card[]` | không truyền id → mọi thẻ |
 | `getCard(id)` | `Card \| null` | |

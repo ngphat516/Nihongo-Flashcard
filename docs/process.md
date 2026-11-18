@@ -16,6 +16,23 @@
 
 ---
 
+## 2026-11-18 — Chiều học theo bộ (L8)
+
+- **Người làm:** Leader, cùng Claude.
+- **Đã xong:**
+  - `core/models.js`: `DECK_DIRECTIONS = ['ja-vi', 'vi-ja']`, `Deck.direction`; `makeDeck` không nhận chiều thì `'ja-vi'`; `validateDeck` báo lỗi với giá trị lạ.
+  - `core/repo.js`: `createDeck`, `updateDeck` nhận `direction` (`updateDeck` chỉ đổi khi được truyền). Hàm nội bộ `withColors` đổi tên thành `withDefaults`, điền cả màu lẫn chiều cho bộ cũ khi đọc ra; mọi đường đọc bộ đi qua đây.
+  - `core/seed.js`: bộ `挨拶 – Chào hỏi cơ bản` là `'vi-ja'` (câu chào phải tự nói ra, và bộ còn thẻ mới nên học thử chiều này được ngay); 2 bộ kia mặc định.
+  - Test 79 → 85. Không sửa `pages/`, `styles/`, `scheduler.js`, `queue.js` hay lịch sử ôn.
+  - Chia phần giao diện: `S11` (Học), `A10` (Album), `C10` (Tạo thẻ) trong [tasks.md](tasks.md).
+  - Nhánh `core/chieu-hoc-theo-bo`.
+- **Quyết định:**
+  - **Theo bộ**, không theo buổi học: đổi theo buổi thì một lần đổi ảnh hưởng mọi bộ, mà mỗi bộ hợp với một chiều khác nhau.
+  - **Lịch ôn dùng chung** cho cả 2 chiều: tách lịch riêng phải sửa `scheduler.js`, `queue.js` và lịch sử ôn, nặng gần bằng L6.
+  - Mặc định Nhật → Việt. Bộ cũ chưa có `direction` đọc ra Nhật → Việt, chỉ ghi khi bộ được lưu lại.
+  - Chi tiết ở [product.md › Đổi chiều học](product.md#đổi-chiều-học); mục "Chiều học" đã bỏ khỏi "Chưa chốt".
+- **Tiếp theo:** `S11` (At) và `A10` (Daika) song song; kakushi `C4` → `C5` → `C7` → `C10`.
+
 ## 2026-11-18 — Bật bảo vệ main (L2 xong)
 
 - **Người làm:** Leader, cùng Claude.
