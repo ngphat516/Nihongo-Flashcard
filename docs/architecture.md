@@ -33,8 +33,9 @@ core/                   phần lõi dùng chung
   furigana.js           cú pháp 漢字[かんじ]: parseFurigana, plainFurigana, renderFurigana
   migrate.js            đổi thẻ cũ front/back sang trường mới một lần (chỉ repo.js dùng)
   storage.js            đọc/ghi localStorage
+  preferences.js        lựa chọn hiển thị của người học (bật/tắt furigana), key localStorage riêng
   date.js               ngày học (bắt đầu 4h sáng), định dạng thời gian
-  dom.js                h() tạo element an toàn, $(), getParam(), startPage()
+  dom.js                h() tạo element an toàn, $(), getParam(), startPage() (kèm nối nút furigana)
   routes.js             link giữa các trang
   seed.js               dữ liệu mẫu (test cũng dùng)
 dev/
@@ -97,6 +98,8 @@ Trang được import những module nào: xem [conventions.md › Code](convent
 
 Ba "bảng" trong localStorage, key có tiền tố `nholau:`: `decks`, `cards`, `reviewLogs`. Mỗi bảng lưu thành một object JSON `{ [id]: bản ghi }`.
 
+Ngoài ra, lựa chọn bật/tắt furigana (L7) nằm ở key riêng `nholau-furigana` (`'on'` / `'off'`, không có key thì coi như bật), đọc/ghi qua `core/preferences.js`, không đi qua `storage.js`. Key không có tiền tố `nholau:`, nên `?reset` không xóa lựa chọn này.
+
 Các trường của `Deck`, `Card`, `ReviewLog` và giới hạn độ dài: xem chú thích trong [`core/models.js`](../core/models.js), đó là nguồn chính xác nhất. Tóm tắt:
 
 | Bản ghi | Trường nội dung | Ghi chú |
@@ -152,7 +155,8 @@ Ngoài ra trang hay dùng:
 - `scheduler.js`: `previewRatings(card)` (thời gian ghi trên 4 nút), `RATING_LABELS`.
 - `queue.js`: `STATE_LABELS`, `describeDue(card)` ("Ngày mai", "Sau 5 ngày").
 - `date.js`: `dayKey()`, `daysBetween()`, `formatSpan()`.
-- `dom.js`: `h()`, `$()`, `$$()`, `getParam()`, `startPage()`.
+- `dom.js`: `h()`, `$()`, `$$()`, `getParam()`, `startPage()`. `startPage()` tự nối nút bật/tắt furigana `.rail-furigana`: đặt `aria-pressed`, bấm thì đổi `data-furigana="off"` trên `<html>` (CSS ẩn `<rt>`), không vẽ lại trang. Trang không phải viết gì thêm.
+- `preferences.js`: `isFuriganaOn()`, `setFuriganaOn(on)`. localStorage lỗi hoặc bị chặn thì coi như bật.
 - `models.js`: `DECK_COLORS` (6 màu bìa theo thứ tự), `JLPT_LEVELS`, `ValidationError`, `NotFoundError`.
 - `furigana.js`: `renderFurigana(text)` dựng `<span lang="ja">` có `<ruby>`; `plainFurigana(text)` bỏ phần `[..]` để tìm kiếm, so trùng; `parseFurigana(text)` trả mảng đoạn.
 

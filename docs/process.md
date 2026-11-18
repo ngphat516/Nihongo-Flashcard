@@ -16,6 +16,21 @@
 
 ---
 
+## 2026-11-18 — Nút bật/tắt furigana (L7)
+
+- **Người làm:** Leader, cùng Claude.
+- **Đã xong:**
+  - `core/preferences.js` (file mới): `isFuriganaOn()`, `setFuriganaOn(on)`, lưu ở key riêng `nholau-furigana`, mặc định bật, localStorage lỗi thì coi như bật.
+  - `startPage()` trong `core/dom.js` tự nối nút `.rail-furigana` ở cả 4 trang: đặt `aria-pressed`, bấm thì đổi `data-furigana="off"` trên `<html>`. Không sửa JS của trang nào.
+  - `styles/components.css`: tắt thì ẩn `<rt>` và bỏ giãn dòng gấp đôi của khối chứa `<ruby>`.
+  - Xóa chú thích "L7: … chưa có tác dụng" ở `index.html` của 4 trang. Styleguide giữ chú thích vì trang này không gọi `startPage()`, nút ở đó vẫn chưa có tác dụng.
+  - Test 74 → 79. Đã thử trên Chrome (1440px và 375px): tắt ở Album thì mất furigana ở mặt trước, mặt sau, tìm kiếm vẫn chạy; sang Học, Tạo thẻ, Trang chủ vẫn tắt; tải lại vẫn tắt; bật lại thì hiện ở mọi trang. Tab tới được nút, Space/Enter đổi được, trình đọc màn hình đọc đúng trạng thái. Console không có lỗi.
+  - Nhánh `core/furigana-bat-tat`.
+- **Quyết định:**
+  - File riêng `preferences.js` thay vì thêm vào `storage.js`: đây là lựa chọn hiển thị, không phải dữ liệu thẻ/bộ, và không được bị `?reset` xóa.
+  - Trang Học bắt Space ở `document` để lật thẻ, nên lúc đầu Space ở nút furigana bị nuốt. Nút tự chặn Space lan lên `document` (`stopPropagation`), nên Space ở nút đổi furigana, Space ở chỗ khác vẫn lật thẻ. Không phải sửa `study.js`.
+- **Tiếp theo:** C4, C5, C7, L13, rồi L5.
+
 ## 2026-11-18 — Bảo vệ main và CODEOWNERS (L2)
 
 - **Người làm:** Leader, cùng Claude.
