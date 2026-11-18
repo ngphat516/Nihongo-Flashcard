@@ -436,9 +436,14 @@ rt {
   font-weight: 400;
   color: var(--text-2);
 }
-/* Chừa chỗ phía trên cho furigana để không đè lên dòng trước */
-:where(*):has(> ruby) {
+/* Chừa chỗ phía trên cho furigana để không đè lên dòng trước.
+   Chỉ khi furigana đang bật; :where() giữ độ ưu tiên như cũ để CSS của trang vẫn đè được. */
+:where(:root:not([data-furigana='off'])) :where(*):has(> ruby) {
   line-height: 2;
+}
+/* Nút tắt furigana (L7, core/dom.js gắn data-furigana="off" lên <html>): chỉ còn chữ */
+[data-furigana='off'] rt {
+  display: none;
 }
 
 /* ---------- Thông báo trên trang ---------- */

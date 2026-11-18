@@ -4,6 +4,7 @@
  * QUY TẮC: nội dung người dùng nhập (tên bộ, mặt thẻ...) chỉ được đưa vào trang bằng h() hoặc
  * textContent. KHÔNG dùng innerHTML với dữ liệu người dùng (lỗi bảo mật XSS).
  */
+import { isFuriganaOn, setFuriganaOn } from './preferences.js';
 
 /**
  * Tạo element an toàn.
@@ -49,9 +50,11 @@ export function getParam(name) {
 
 /**
  * Chạy hàm khởi động của trang. Lỗi chưa bắt sẽ hiện thành hộp thông báo trên trang
- * thay vì chỉ nằm im trong Console.
+ * thay vì chỉ nằm im trong Console. Kèm theo: nối nút bật/tắt furigana ở cột điều hướng (L7),
+ * nên trang nào gọi startPage() cũng có nút chạy, không phải tự viết.
  */
 export function startPage(init) {
+  setupFuriganaToggle();
   Promise.resolve()
     .then(init)
     .catch((err) => {
@@ -59,4 +62,30 @@ export function startPage(init) {
       const box = h('div', { class: 'alert alert-error', role: 'alert' }, err?.message ?? String(err));
       document.querySelector('main')?.prepend(box);
     });
+}
+
+/**
+ * Nút bật/tắt furigana (.rail-furigana) chung cho cả web.
+ * Tắt: <html data-furigana="off">, CSS ẩn <rt> (styles/components.css), không phải vẽ lại thẻ.
+ * aria-pressed="true" nghĩa là đang hiện furigana. Trang không có nút thì chỉ áp lựa chọn đã lưu.
+ */
+function setupFuriganaToggle() {
+  let on = isFuriganaOn();
+  const button = document.querySelector('.rail-furigana');
+  const apply = () => {
+    if (on) document.documentElement.removeAttribute('data-furigana');
+    else document.documentElement.setAttribute('data-furigana', 'off');
+    button?.setAttribute('aria-pressed', String(on));
+  };
+  apply();
+  button?.addEventListener('click', () => {
+    on = !on; // giữ trong biến: localStorage bị chặn thì nút vẫn đổi được tới khi tải lại trang
+    setFuriganaOn(on);
+    apply();
+  });
+  // Trang có phím tắt Space bắt ở document (trang Học: lật thẻ) sẽ nuốt Space khi đang focus nút.
+  // Không cho Space từ nút lan lên document; trình duyệt vẫn tự bấm nút như mọi nút khác.
+  button?.addEventListener('keydown', (event) => {
+    if (event.key === ' ') event.stopPropagation();
+  });
 }
