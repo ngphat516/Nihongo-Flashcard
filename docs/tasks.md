@@ -19,7 +19,9 @@ Bảng này là **trạng thái hiện tại**: còn việc gì, ai làm. Lịch
 **Đợt 2 (xong):** đợt 2 chỉ sửa giao diện. Trường thẻ, kiểm tra dữ liệu, furigana, màu bìa đều có trong `core/` từ `L6`. Vì vậy `A9 + A5`, `C9 + C8`, `S10` làm song song, không việc nào chờ việc nào. Các trang không import code của nhau, chỉ nối qua dữ liệu thẻ: Tạo thẻ ghi, Album và Học đọc, đều qua `core/repo.js`. Lúc làm từng trang thì dùng `?seed` ([bảng mẫu](architecture.md#dữ-liệu-mẫu-seed)) thay cho Tạo thẻ. Chỗ nối thật chỉ kiểm tra được khi chạy thử cả luồng sau merge. Đã merge PR #14 (C9 + C8 + L9), #12 (A9 + A5), #13 (S10).
 
 **Tiếp theo:**
-1. `C4`, `C5`, `C7`, `L13`, rồi kiểm thử cuối `L5`.
+1. Sau `L8`, làm song song: `S11` (At) và `A10` (Daika).
+2. kakushi: `C4` → `C5` → `C7` → `C10`.
+3. `L13`, rồi kiểm thử cuối `L5`.
 
 Không tự sửa `styles/` hay `core/` trong PR của trang; cần biến CSS hoặc hàm core mới thì báo Leader.
 
@@ -40,7 +42,7 @@ Không tự sửa `styles/` hay `core/` trong PR của trang; cần biến CSS h
 | L6b | Bỏ lớp tương thích `front`/`back` | Cần A9, C9, S10 đã merge vào `main`, làm sau L15. Không cần chờ A5, C8. Xóa `core/card-compat.js` và các chỗ gọi `readCard` / `writeCard` trong `core/repo.js`, bỏ nhóm test "lớp tương thích" trong `tests/repo.test.js`. Thẻ cũ còn `front`/`back` trong localStorage phải được xử lý: chuyển đổi một lần khi mở app, hoặc chấp nhận bỏ; chọn cách nào thì ghi vào [process.md](process.md). Xong khi `grep -rnE '\.(front\|back)([^-[:alnum:]_]\|$)\|\b(front\|back):' pages core` không còn dòng nào khớp (lệnh này bỏ qua class `.back-link`) và `npm test` xanh | Bắt buộc | Xong |
 | L15 | Chạy thử luồng sau đợt 2 | Trên `main` sau khi merge A9, C9, S10, bắt đầu từ `?reset`: tạo bộ ở Tạo thẻ với thẻ có furigana, `reading`, `example` và chọn màu bìa → Album hiển thị đúng, tìm và sửa được → Học hiển thị đúng furigana, chấm, hoàn tác → màu bìa khớp ở Trang chủ, Album, Học. Thử ở 1440px và 375px; Console không lỗi. Làm trước L6b | Bắt buộc | Xong |
 | L7 | Furigana bật/tắt | Nút bật/tắt furigana chung cho cả web ([product.md](product.md#furigana-bậttắt)): nút đã có sẵn ở cuối cột điều hướng (`.rail-furigana`, L12). Gợi ý: thêm hàm đọc/ghi trạng thái vào `core/` (lưu `localStorage`, mặc định bật), ở cả 4 trang khởi tạo `aria-pressed` và gắn `data-furigana="off"` lên `document.documentElement` kèm rule ẩn `rt` trong `styles/components.css` để không phải render lại thẻ. Cần L6 trước | Nên có | Xong |
-| L8 | Đổi chiều học | Nhật → Việt / Việt → Nhật ([product.md](product.md#đổi-chiều-học)). Cách lưu lịch ôn chưa chốt | Nên có | Chưa làm |
+| L8 | Chiều học theo bộ (`core/`) | `deck.direction`: `'ja-vi'` Nhật → Việt (mặc định) / `'vi-ja'` Việt → Nhật, theo từng bộ ([product.md](product.md#đổi-chiều-học)). `DECK_DIRECTIONS` trong `core/models.js`; `createDeck`, `updateDeck` nhận `direction`, giá trị lạ báo `ValidationError`; bộ cũ đọc ra `'ja-vi'`, chỉ ghi khi lưu lại. Lịch ôn dùng chung, không đổi scheduler/queue. Bộ mẫu `挨拶` là `'vi-ja'`. Giao diện: `S11`, `A10`, `C10` | Nên có | Xong |
 | L9 | Dữ liệu mẫu tiếng Nhật | Thay 3 bộ mẫu trong `core/seed.js` bằng bộ tiếng Nhật. Làm sau L6 | Nên có | Xong |
 | L10 | Bộ tài liệu | `docs/` (product, architecture, conventions, tasks, process), `AGENTS.md` + `CLAUDE.md`, rút gọn README | Nên có | Xong |
 | L11 | Màu và chữ mới | Màu chính matcha, nền xám ánh lục, heatmap xanh, 6 màu bìa pastel, font Plus Jakarta Sans + Noto Sans JP, class `chip` và `cover`, cập nhật styleguide, viết [design.md](design.md) | Nên có | Xong |
@@ -97,6 +99,7 @@ Mục đích: xem, tìm, sửa các bộ thẻ và thẻ. Trang có 2 chế đ�
 | A7 | Học lại từ đầu | Nút đưa một thẻ về trạng thái Mới | `resetCard()` | Nếu kịp | Xong |
 | A8 | Trường hợp đặc biệt | Chưa có bộ nào: lời nhắc + nút tạo bộ. `?deck=` sai id: thông báo + link về lưới. Bộ chưa có thẻ: nút "Thêm thẻ đầu tiên" | `getDeck()` trả `null` | Bắt buộc | Xong |
 | A9 | Thẻ tiếng Nhật | Cần L6. **Mặt trước:** từ chữ to, có furigana (`renderFurigana(card.term)`). **Mặt sau:** nghĩa, kèm cách đọc và câu ví dụ có furigana nếu có. Trường trống thì không hiện. **Tìm kiếm** trên từ và ví dụ đã bỏ furigana (`plainFurigana()`), nghĩa, cách đọc; vẫn không phân biệt hoa thường và dấu. **Câu xác nhận xóa** dùng `plainFurigana(card.term)`. **Hộp thoại sửa thẻ** (`#card-dialog`) có 4 ô: Từ, Nghĩa, Cách đọc, Ví dụ; dưới ô Từ có gợi ý "Ghi cách đọc trong ngoặc vuông sau kanji, VD 約束[やくそく]"; lưu bằng `updateCard(id, { term, meaning, reading, example })`. **Màu bìa:** bỏ hằng `COVER_COLORS` trong `album.js`, bìa dùng `deck.color`. **Xong khi:** furigana hiện đúng; gõ từ hoặc nghĩa đều tìm ra thẻ; sửa thẻ không đổi trạng thái và hạn ôn | `renderFurigana()`, `plainFurigana()`, `updateCard()` | Bắt buộc | Xong |
+| A10 | Chiều học trong hộp sửa bộ | Cần L8. Trong `#deck-dialog` (cạnh color-picker của A5): chọn Nhật → Việt / Việt → Nhật (radio, dùng được bằng bàn phím), chọn sẵn `deck.direction`, lưu bằng `updateDeck(id, { direction })`. Trang chi tiết bộ hiện chiều đang dùng. Thẻ trong lưới Album vẫn hiện mặt trước là từ (Album là nơi xem thẻ, không đảo) | `updateDeck()` | Nên có | Chưa làm |
 
 ---
 
@@ -117,6 +120,7 @@ Mục đích: soạn một bộ thẻ. `pages/create/` tạo bộ mới; `pages/
 | C7 | Xuất / nhập file | Xuất một bộ ra file `.json` hoặc `.csv` (`term`, `meaning`, `reading`, `example`) và nhập lại vào bộ | `getCards()`, `createCards()` | Nếu kịp | Chưa làm |
 | C8 | Chọn màu bìa | Trong form tạo bộ: 6 ô màu (radio, có tên màu cho trình đọc màn hình), chọn sẵn màu kế tiếp: màu sau màu của bộ cuối trong `getDecks()`, theo thứ tự `DECK_COLORS` ([design.md](design.md#màu-bìa-bộ-thẻ)). Dùng `color-picker`. Cần L6, L14 | `createDeck({ color })` | Nên có | Xong |
 | C9 | Ô nhập thẻ tiếng Nhật | Cần L6. Mỗi dòng thẻ có 4 ô: Từ, Nghĩa, Cách đọc, Ví dụ, và nút xóa. Ô Từ và ô Ví dụ gắn `lang="ja"`, có gợi ý cú pháp `約束[やくそく]`, `日本語[にほんご]勉強[べんきょう]` (mỗi từ kanji một cặp ngoặc). Lưu bằng `createCards()` / `updateCard()` với `{ term, meaning, reading, example }`; kiểm tra "đã sửa chưa" so cả 4 ô. Báo lỗi "Nhập từ." / "Nhập nghĩa.". So trùng bằng `plainFurigana(term)`, không phân biệt hoa thường. Tab ở ô Ví dụ của dòng cuối thì thêm dòng mới. **Xong khi:** lưu được thẻ đủ 4 ô, thẻ chỉ có từ + nghĩa, thẻ chỉ có kana; sửa thẻ cũ không mất tiến độ | `createCards()`, `updateCard()`, `plainFurigana()` | Bắt buộc | Xong |
+| C10 | Chiều học khi tạo bộ | Cần L8. Trong form bộ thẻ (cạnh color-picker của C8): chọn chiều, mặc định Nhật → Việt; mở bộ cũ chọn sẵn `deck.direction` và lưu khi đổi | `createDeck()`, `updateDeck()` | Nếu kịp | Chưa làm |
 
 ---
 
@@ -138,3 +142,4 @@ Mục đích: học theo thuật toán SM-2. `pages/study/` để chọn bộ, `
 | S8 | Hiệu ứng lật | Lật 3D bằng CSS, tắt khi người dùng bật giảm chuyển động. Nút to, dễ bấm trên điện thoại | — | Nên có | Xong |
 | S9 | Phát âm | Nút đọc mặt trước bằng `speechSynthesis` | — | — | Bỏ: app không có âm thanh ([product.md](product.md#không-làm)) |
 | S10 | Thẻ tiếng Nhật khi học | Cần L6. **Mặt trước:** từ có furigana. **Mặt sau:** nghĩa, kèm cách đọc và câu ví dụ có furigana nếu có. Trường trống thì không hiện. Câu ví dụ dài thì xuống dòng trong thẻ, không đẩy 4 nút chấm điểm ra khỏi màn hình ở bề rộng 375px. **Hoàn tác** dùng thẳng thẻ do `await undo()` trả về, bỏ biến `restoredCard` (B3 đã sửa). **Bìa** dùng `deck.color` thay cho hằng `COVER_COLORS`. **Xong khi:** học hết một lượt với `?seed`; phím Space, 1–4, ← →, Z vẫn chạy như cũ | `renderFurigana()`, `reviewCard()`, `undo()` | Bắt buộc | Xong |
+| S11 | Đổi chiều học | Cần L8. Đảo mặt trước/mặt sau theo `deck.direction` ([product.md › Đổi chiều học](product.md#đổi-chiều-học)). Nút đổi chiều trên trang Học (màn chọn bộ hoặc thanh trên phiên học), bấm thì lưu bằng `updateDeck(id, { direction })` và đổi ngay thẻ đang hiện; lịch ôn dùng chung, `reviewCard()` như cũ. Phím tắt, hoàn tác, ví dụ dài ở 375px vẫn đúng ở cả 2 chiều | `getDeck()`, `updateDeck()` | Nên có | Chưa làm |
