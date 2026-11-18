@@ -16,6 +16,12 @@
 
 ---
 
+## 2026-11-18 — Mở rộng trang Học trên desktop lớn
+
+- **Người làm:** At, cùng Codex.
+- **Đã làm:** media query từ 1920px trong study.css: khung 80vw tối đa 1600px, thẻ cao tối thiểu 55vh, tăng chữ và nút bằng clamp, cột phụ chiếm khoảng 24%. Quy tắc mới chỉ áp dụng từ 1920px theo yêu cầu.
+- **Kiểm tra:** Chrome ở bề rộng CSS 1366×768, 1920×1080, 2560×1440; khung lần lượt 1040/1536/1600px, không cuộn ngang, bốn nút chấm trong màn hình. Mặt sau ở 1920px và console qua. Ảnh study-wide-*.jpg trong pages/study/screenshots.
+
 ## 2026-11-18 — Đổi chiều học (S11)
 
 - **Người làm:** At, cùng Codex.
