@@ -11,6 +11,7 @@ import {
   CARD_FIELDS,
   COLLECTIONS,
   DECK_COLORS,
+  DECK_DIRECTIONS,
   NotFoundError,
   ValidationError,
   cleanText,
@@ -34,7 +35,7 @@ const byCreated = (a, b) => a.createdAt - b.createdAt;
 
 /** Mọi bộ thẻ, cũ trước mới sau. */
 export async function getDecks() {
-  return withColors((await storage.list(DECKS)).sort(byCreated));
+  return withDefaults((await storage.list(DECKS)).sort(byCreated));
 }
 
 /** Một bộ thẻ theo id, hoặc null. */
@@ -45,15 +46,19 @@ export async function getDeck(id) {
 /**
  * Tạo bộ mới. `newPerDay` bỏ trống thì 20.
  * `color` bỏ trống thì lấy màu kế tiếp sau màu của bộ tạo gần nhất (chưa có bộ nào thì 'pink').
+ * `direction` ('ja-vi' | 'vi-ja') không truyền thì 'ja-vi'; giá trị khác → ValidationError.
  */
-export async function createDeck({ name, description, newPerDay, color } = {}) {
+export async function createDeck({ name, description, newPerDay, color, direction } = {}) {
   const last = (await getDecks()).at(-1);
   const nextColor = last ? DECK_COLORS[(DECK_COLORS.indexOf(last.color) + 1) % DECK_COLORS.length] : DECK_COLORS[0];
-  return storage.put(DECKS, makeDeck({ name, description, newPerDay, color: isBlank(color) ? nextColor : color }));
+  return storage.put(DECKS, makeDeck({ name, description, newPerDay, color: isBlank(color) ? nextColor : color, direction }));
 }
 
-/** Sửa tên / mô tả / số thẻ mới mỗi ngày / màu bìa. Chỉ truyền trường cần đổi. */
-export async function updateDeck(id, { name, description, newPerDay, color } = {}) {
+/**
+ * Sửa tên / mô tả / số thẻ mới mỗi ngày / màu bìa / chiều học. Chỉ truyền trường cần đổi
+ * (`undefined` = giữ nguyên). Đổi chiều học không đụng tới thẻ hay tiến độ học.
+ */
+export async function updateDeck(id, { name, description, newPerDay, color, direction } = {}) {
   const deck = await requireDeck(id);
   const next = { ...deck, updatedAt: Date.now() };
   if (name !== undefined) next.name = cleanText(name);
@@ -64,6 +69,7 @@ export async function updateDeck(id, { name, description, newPerDay, color } = {
     next.newPerDay = Number(newPerDay);
   }
   if (color !== undefined) next.color = color;
+  if (direction !== undefined) next.direction = direction;
   validateDeck(next);
   return storage.put(DECKS, next);
 }
@@ -237,12 +243,23 @@ function cardsReady() {
 }
 
 /**
- * Bộ cũ (tạo trước L6) chưa có màu: đọc ra màu theo thứ tự trong danh sách, giống cách các trang
- * tính trước đây (COVER_COLORS[i % 6]), để giao diện không đổi màu. Màu chỉ ghi xuống khi bộ được lưu lại.
+ * Điền trường mà bộ cũ chưa có, chỉ khi đọc ra; chỉ ghi xuống khi bộ được lưu lại.
+ * Mọi đường đọc bộ (getDecks, getDeck, requireDeck, getDeckOverview) đều đi qua đây.
+ *   - color (bộ tạo trước L6): màu theo thứ tự trong danh sách, giống cách các trang tính trước đây
+ *     (COVER_COLORS[i % 6]), để giao diện không đổi màu.
+ *   - direction (bộ tạo trước L8): 'ja-vi', chiều các trang vẫn hiện từ trước tới nay.
  */
-function withColors(decks) {
-  return decks.map((deck, i) =>
-    DECK_COLORS.includes(deck.color) ? deck : { ...deck, color: DECK_COLORS[i % DECK_COLORS.length] });
+function withDefaults(decks) {
+  return decks.map((deck, i) => {
+    const hasColor = DECK_COLORS.includes(deck.color);
+    const hasDirection = DECK_DIRECTIONS.includes(deck.direction);
+    if (hasColor && hasDirection) return deck;
+    return {
+      ...deck,
+      color: hasColor ? deck.color : DECK_COLORS[i % DECK_COLORS.length],
+      direction: hasDirection ? deck.direction : DECK_DIRECTIONS[0],
+    };
+  });
 }
 
 async function requireDeck(id) {

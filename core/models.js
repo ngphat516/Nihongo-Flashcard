@@ -20,6 +20,9 @@ export const LIMITS = Object.freeze({
 /** 6 màu bìa, theo thứ tự bộ mới lấy màu (docs/design.md › Màu bìa bộ thẻ). Lưu tên màu, không lưu mã màu. */
 export const DECK_COLORS = Object.freeze(['pink', 'peach', 'yellow', 'green', 'sky', 'lavender']);
 
+/** Chiều học của bộ: 'ja-vi' Nhật → Việt (mặc định), 'vi-ja' Việt → Nhật. Lịch ôn dùng chung cho cả 2 chiều. */
+export const DECK_DIRECTIONS = Object.freeze(['ja-vi', 'vi-ja']);
+
 /** Cấp JLPT của thẻ. '' = không ghi cấp. */
 export const JLPT_LEVELS = Object.freeze(['', 'N5', 'N4', 'N3', 'N2', 'N1']);
 
@@ -34,6 +37,8 @@ export const DEFAULT_NEW_PER_DAY = 20;
  * @property {string} description
  * @property {number} newPerDay   số thẻ mới tối đa được học mỗi ngày
  * @property {string} color       màu bìa, một trong DECK_COLORS
+ * @property {string} direction   chiều học, một trong DECK_DIRECTIONS: 'ja-vi' mặt trước là từ (mặc định),
+ *                                'vi-ja' mặt trước là nghĩa. Tiến độ SM-2 của thẻ dùng chung cho cả 2 chiều
  * @property {number} createdAt   timestamp (ms)
  * @property {number} updatedAt   timestamp (ms)
  */
@@ -118,15 +123,17 @@ export function newId() {
 /**
  * Bộ thẻ mới. `newPerDay` bỏ trống ('', null, undefined) thì lấy DEFAULT_NEW_PER_DAY.
  * `color` bỏ trống thì lấy màu đầu tiên; repo.createDeck tự chọn màu kế tiếp trước khi gọi hàm này.
+ * `direction` không truyền thì 'ja-vi'.
  * @returns {Deck}
  */
-export function makeDeck({ name, description = '', newPerDay, color } = {}, now = Date.now()) {
+export function makeDeck({ name, description = '', newPerDay, color, direction = DECK_DIRECTIONS[0] } = {}, now = Date.now()) {
   const deck = {
     id: newId(),
     name: cleanText(name),
     description: cleanText(description),
     newPerDay: isBlank(newPerDay) ? DEFAULT_NEW_PER_DAY : Number(newPerDay),
     color: color ?? DECK_COLORS[0],
+    direction,
     createdAt: now,
     updatedAt: now,
   };
@@ -148,6 +155,9 @@ export function validateDeck(deck) {
   }
   if (!DECK_COLORS.includes(deck.color)) {
     throw new ValidationError(`Màu bìa phải là một trong: ${DECK_COLORS.join(', ')}.`);
+  }
+  if (!DECK_DIRECTIONS.includes(deck.direction)) {
+    throw new ValidationError(`Chiều học phải là một trong: ${DECK_DIRECTIONS.join(', ')}.`);
   }
 }
 

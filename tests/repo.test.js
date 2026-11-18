@@ -87,6 +87,70 @@ describe('màu bìa', () => {
   });
 });
 
+describe('chiều học', () => {
+  test('bộ mới mặc định ja-vi; tạo với vi-ja được', async () => {
+    assert.equal((await repo.createDeck({ name: 'A' })).direction, 'ja-vi');
+    const viJa = await repo.createDeck({ name: 'B', direction: 'vi-ja' });
+    assert.equal(viJa.direction, 'vi-ja');
+    assert.equal((await repo.getDeck(viJa.id)).direction, 'vi-ja');
+  });
+
+  test('updateDeck đổi được chiều; không truyền direction thì giữ nguyên', async () => {
+    const deck = await repo.createDeck({ name: 'A' });
+    assert.equal((await repo.updateDeck(deck.id, { direction: 'vi-ja' })).direction, 'vi-ja');
+    await repo.updateDeck(deck.id, { name: 'A mới' });
+    assert.equal((await repo.getDeck(deck.id)).direction, 'vi-ja');
+    assert.equal((await repo.updateDeck(deck.id, { direction: 'ja-vi' })).direction, 'ja-vi');
+  });
+
+  test('giá trị lạ khi tạo hoặc sửa → ValidationError; direction: undefined là "không đổi"', async () => {
+    for (const direction of ['en-vi', '', null]) {
+      await assert.rejects(repo.createDeck({ name: 'A', direction }), { name: 'ValidationError' }, `tạo: ${direction}`);
+    }
+    const deck = await repo.createDeck({ name: 'A', direction: 'vi-ja' });
+    for (const direction of ['en-vi', '', null]) {
+      await assert.rejects(repo.updateDeck(deck.id, { direction }), { name: 'ValidationError' }, `sửa: ${direction}`);
+    }
+    const kept = await repo.updateDeck(deck.id, { direction: undefined });
+    assert.equal(kept.direction, 'vi-ja');
+    assert.equal((await repo.getDeck(deck.id)).direction, 'vi-ja');
+  });
+
+  test('bộ cũ chưa có direction: đọc ra ja-vi, chỉ ghi khi lưu lại bộ', async () => {
+    const old = { id: 'old', name: 'Cũ', description: '', newPerDay: 20, color: 'sky', createdAt: 1, updatedAt: 1 };
+    putRaw('decks', [old]);
+
+    assert.equal((await repo.getDecks())[0].direction, 'ja-vi');
+    assert.equal((await repo.getDeck('old')).direction, 'ja-vi');
+    assert.equal((await repo.getDeckOverview())[0].deck.direction, 'ja-vi');
+    assert.equal((await repo.getStudyQueue('old')).deck.direction, 'ja-vi'); // qua requireDeck
+    assert.ok(!('direction' in raw('decks').old), 'đọc thôi thì chưa ghi direction');
+
+    await repo.updateDeck('old', { name: 'Cũ đổi tên' });
+    assert.equal(raw('decks').old.direction, 'ja-vi');
+    assert.equal(raw('decks').old.color, 'sky'); // màu đã có thì giữ nguyên
+  });
+
+  test('đổi chiều không làm đổi tiến độ học của thẻ trong bộ', async () => {
+    const deck = await repo.createDeck({ name: 'A' });
+    const card = await repo.createCard({ deckId: deck.id, term: '約束[やくそく]', meaning: 'lời hứa' });
+    await repo.reviewCard(card.id, Rating.GOOD);
+    const before = await repo.getCard(card.id);
+    const logsBefore = (await repo.getReviewLogs()).length;
+
+    await repo.updateDeck(deck.id, { direction: 'vi-ja' });
+    assert.deepEqual(await repo.getCard(card.id), before);
+    assert.equal((await repo.getReviewLogs()).length, logsBefore);
+  });
+
+  test('dữ liệu mẫu có đúng 1 bộ vi-ja', async () => {
+    await seedDemoData();
+    const decks = await repo.getDecks();
+    assert.deepEqual(decks.filter((d) => d.direction === 'vi-ja').map((d) => d.name), ['挨拶 – Chào hỏi cơ bản']);
+    assert.ok(Object.values(raw('decks')).every((d) => ['ja-vi', 'vi-ja'].includes(d.direction)), 'bộ mẫu lưu sẵn direction');
+  });
+});
+
 describe('thẻ', () => {
   test('tạo thẻ tiếng Nhật đủ trường; trường không bắt buộc mặc định rỗng', async () => {
     const deck = await repo.createDeck({ name: 'N5' });

@@ -62,6 +62,9 @@ const SAMPLE_DECKS = [
   {
     name: '挨拶 – Chào hỏi cơ bản',
     description: 'Câu chào hỏi hằng ngày — bộ này để nguyên chưa học',
+    // Việt → Nhật: câu chào là thứ phải tự nói ra, và bộ còn thẻ mới nên ?seed là học thử chiều này được ngay.
+    // 2 bộ còn lại để mặc định Nhật → Việt.
+    direction: 'vi-ja',
     startDaysAgo: 0, // chưa học → toàn thẻ mới
     cards: [
       ['おはようございます', 'chào buổi sáng (lịch sự)', '', '先生[せんせい]、おはようございます。'],
