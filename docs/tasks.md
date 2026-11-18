@@ -1,11 +1,82 @@
 # Bảng việc
 
-Bảng này là **trạng thái hiện tại**: còn việc gì, ai làm. Lịch sử đã làm gì xem [process.md](process.md).
+Trạng thái hiện tại: còn việc gì, ai làm. Đã làm gì, khi nào thì xem [process.md](process.md).
 
-- **Trạng thái:** Chưa làm · Đang làm · Xong · Để sau · Bỏ. Bắt đầu hay xong một task thì sửa cột này trong cùng PR.
-- **Ưu tiên:** **Bắt buộc** = phải có để demo · **Nên có** = làm sau khi xong phần bắt buộc · **Nếu kịp** = điểm cộng.
-- **Xong một task khi** đạt [định nghĩa "xong"](conventions.md#định-nghĩa-xong-một-task).
-- Hàm core nhắc tới bên dưới có chú thích ở đầu file `pages/<trang>/<trang>.js` và trong [architecture.md › API](architecture.md#api-corerepojs).
+## Việc đang mở
+
+| Mã | Việc | Ai | Cần trước | Ưu tiên | Trạng thái |
+|---|---|---|---|---|---|
+| S11 | Đổi chiều học | At | L8 ✅ | Nên có | Chưa làm |
+| A10 | Chiều học trong hộp sửa bộ | Daika | L8 ✅ | Nên có | Chưa làm |
+| C4 | Xem trước thẻ | kakushi | — | Nên có | Chưa làm |
+| C5 | Nhập nhiều thẻ | kakushi | C4 | Nên có | Chưa làm |
+| C7 | Xuất / nhập file | kakushi | C5 | Nếu kịp | Chưa làm |
+| C10 | Chiều học khi tạo bộ | kakushi | C7, L8 ✅ | Nếu kịp | Chưa làm |
+| L13 | Tinh chỉnh giao diện | Leader | — | Nếu kịp | Chưa làm |
+| L5 | Kiểm thử cuối | Leader | các việc trên | Bắt buộc | Chưa làm |
+| L3 | Review & merge | Leader | — | Bắt buộc | Làm liên tục |
+
+**Làm song song ngay:** S11 (At), A10 (Daika), C4 (kakushi). Ba việc sửa 3 trang khác nhau, chỉ dùng hàm có sẵn trong `core/`, không ai chờ ai. kakushi làm lần lượt C4 → C5 → C7 → C10 vì cùng sửa `pages/create/`.
+
+Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong PR đầu tiên; xong thì đổi thành **Xong** và chuyển dòng đó xuống phần [Đã xong](#đã-xong).
+
+---
+
+## Chi tiết việc đang mở
+
+### S11 · Đổi chiều học · At · `pages/study/`
+
+- **Làm gì:** đảo mặt thẻ theo `deck.direction` ([product.md › Đổi chiều học](product.md#đổi-chiều-học)).
+  - `'ja-vi'` (Nhật → Việt, mặc định): mặt trước là từ có furigana; mặt sau là nghĩa, kèm cách đọc và ví dụ.
+  - `'vi-ja'` (Việt → Nhật): mặt trước là nghĩa; mặt sau là từ có furigana, kèm cách đọc và ví dụ.
+- **Nút đổi chiều** trên trang Học (màn chọn bộ hoặc thanh trên phiên học). Bấm thì lưu bằng `updateDeck(id, { direction })` và đổi ngay thẻ đang hiện.
+- **Lịch ôn dùng chung:** chấm điểm vẫn gọi `reviewCard()` như cũ.
+- **Hàm core:** `getDeck()`, `updateDeck()`, `renderFurigana()`.
+- **Xong khi:** với `?seed`, bộ 挨拶 (`'vi-ja'`) hiện nghĩa ở mặt trước; đổi chiều xong tải lại vẫn giữ; Space, 1–4, ← →, Z và hoàn tác đúng ở cả 2 chiều; ví dụ dài ở 375px không đẩy 4 nút chấm ra khỏi màn hình.
+
+### A10 · Chiều học trong hộp sửa bộ · Daika · `pages/album/`
+
+- **Làm gì:** trong `#deck-dialog`, cạnh ô chọn màu bìa (A5), thêm lựa chọn Nhật → Việt / Việt → Nhật. Dùng radio, chọn được bằng bàn phím, chọn sẵn `deck.direction`.
+- Lưu bằng `updateDeck(id, { direction })`. Trang chi tiết bộ ghi chiều đang dùng.
+- Thẻ trong lưới Album **không đảo**: mặt trước vẫn là từ (Album là nơi xem thẻ).
+- **Hàm core:** `updateDeck()`, `DECK_DIRECTIONS`.
+- **Xong khi:** đổi chiều ở Album thì trang Học dùng chiều mới; mở lại hộp sửa bộ thấy đúng chiều đã lưu; Esc hủy không đổi gì.
+
+### C4 · Xem trước thẻ · kakushi · `pages/create/`
+
+- **Làm gì:** khung thẻ cập nhật theo lúc gõ, lấy dữ liệu dòng đang focus bằng `fieldsOf(row)` ở `card-rows.js`. Bấm để lật, nhìn giống thẻ ở trang Học.
+- **Hàm core:** `renderFurigana()`.
+- **Xong khi:** gõ ở dòng nào thì khung hiện dòng đó; furigana hiện đúng và theo nút bật/tắt furigana (L7); ở 375px không cuộn ngang.
+
+### C5 · Nhập nhiều thẻ · kakushi · `pages/create/`
+
+- **Làm gì:** ô dán văn bản, mỗi dòng một thẻ, các trường cách nhau bằng `|` hoặc Tab, tối đa 4 cột: `term`, `meaning`, `reading`, `example` (dán thẳng từ Excel / Quizlet).
+- Có bảng xem trước, dòng lỗi tô đỏ, bỏ chọn được từng dòng, rồi thêm thành các dòng thẻ của C2 (`cards.add({ term, meaning, reading, example })`).
+- **Hàm core:** `plainFurigana()` (so trùng).
+
+### C7 · Xuất / nhập file · kakushi · `pages/create/`
+
+- **Làm gì:** xuất một bộ ra file `.json` hoặc `.csv` (`term`, `meaning`, `reading`, `example`), và nhập lại vào bộ.
+- **Hàm core:** `getCards()`, `createCards()`.
+
+### C10 · Chiều học khi tạo bộ · kakushi · `pages/create/`
+
+- **Làm gì:** trong form bộ thẻ, cạnh ô chọn màu (C8), cho chọn chiều học, mặc định Nhật → Việt. Mở bộ cũ thì chọn sẵn `deck.direction`, lưu khi đổi.
+- **Hàm core:** `createDeck()`, `updateDeck()`, `DECK_DIRECTIONS`.
+
+### L13 · Tinh chỉnh giao diện · Leader · `styles/`
+
+- **Làm gì:** thử trên bìa thật rồi chốt bo góc, bóng, cỡ tiêu đề lớn ([design.md](design.md#chốt-khi-làm-prototype)); sửa `tokens.css`.
+
+### L5 · Kiểm thử cuối · Leader
+
+- **Làm gì:** `npm test` qua hết; thử luồng tạo bộ → thêm thẻ → học → xem heatmap; thử trên điện thoại; làm hết mục [Trước khi nộp](conventions.md#trước-khi-nộp--deploy).
+
+### L3 · Review & merge · Leader
+
+- Review mọi PR. Thay đổi trong phần chung (`core/`, `styles/`) phải qua Leader. `main` đã bật bảo vệ: PR cần 1 lượt duyệt, người sở hữu folder trong `.github/CODEOWNERS` được gắn reviewer tự động.
+
+---
 
 ## Phân việc
 
@@ -16,28 +87,30 @@ Bảng này là **trạng thái hiện tại**: còn việc gì, ai làm. Lịch
 | **Thành viên 3 (kakushi)** | **Tạo thẻ** | `pages/create/` |
 | **Thành viên 4 (At)** | **Học** | `pages/study/` |
 
-**Đợt 2 (xong):** đợt 2 chỉ sửa giao diện. Trường thẻ, kiểm tra dữ liệu, furigana, màu bìa đều có trong `core/` từ `L6`. Vì vậy `A9 + A5`, `C9 + C8`, `S10` làm song song, không việc nào chờ việc nào. Các trang không import code của nhau, chỉ nối qua dữ liệu thẻ: Tạo thẻ ghi, Album và Học đọc, đều qua `core/repo.js`. Lúc làm từng trang thì dùng `?seed` ([bảng mẫu](architecture.md#dữ-liệu-mẫu-seed)) thay cho Tạo thẻ. Chỗ nối thật chỉ kiểm tra được khi chạy thử cả luồng sau merge. Đã merge PR #14 (C9 + C8 + L9), #12 (A9 + A5), #13 (S10).
+- **Không tự sửa `styles/` hay `core/` trong PR của trang.** Cần biến CSS hay hàm core mới thì báo Leader.
+- Các trang không import code của nhau. Chúng chỉ nối qua dữ liệu: Tạo thẻ ghi, Album và Học đọc, đều qua `core/repo.js`. Lúc làm từng trang thì test bằng `?seed` ([bảng mẫu](architecture.md#dữ-liệu-mẫu-seed)), không cần chờ trang khác.
 
-**Tiếp theo:**
-1. Sau `L8`, làm song song: `S11` (At) và `A10` (Daika).
-2. kakushi: `C4` → `C5` → `C7` → `C10`.
-3. `L13`, rồi kiểm thử cuối `L5`.
+## Quy ước
 
-Không tự sửa `styles/` hay `core/` trong PR của trang; cần biến CSS hoặc hàm core mới thì báo Leader.
-
-> Leader nhận Trang chủ vì nhẹ nhất, để còn thời gian review và giữ phần core.
+- **Trạng thái:** Chưa làm · Đang làm · Xong · Để sau · Bỏ. Sửa trong cùng PR với việc đó.
+- **Ưu tiên:** **Bắt buộc** = phải có để demo · **Nên có** = làm sau phần bắt buộc · **Nếu kịp** = điểm cộng.
+- **Xong một việc khi** đạt [định nghĩa "xong"](conventions.md#định-nghĩa-xong-một-task).
+- Hàm core có chú thích ở đầu file `pages/<trang>/<trang>.js` và trong [architecture.md › API](architecture.md#api-corerepojs).
 
 ---
 
-## Leader: nền chung
+## Đã xong
+
+Bấm để mở. Mô tả giữ nguyên lúc giao việc, dùng để tra lại tính năng đã làm.
+
+<details>
+<summary><b>Leader: nền chung</b> — L1, L2, L4, L6, L6b, L15, L7, L8, L9, L10, L11, L12, L14</summary>
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Ưu tiên | Trạng thái |
 |---|---|---|---|---|
 | L1 | Codebase nền | Cấu trúc thư mục, CSS chung, lớp lưu localStorage, thuật toán SM-2 + 37 test, dữ liệu mẫu, khung 4 trang | Bắt buộc | Xong |
 | L2 | Repo GitHub | Tạo repo, push codebase, bật bảo vệ nhánh `main` (bắt buộc qua PR), mời 3 thành viên, điền username thật vào `.github/CODEOWNERS` | Bắt buộc | Xong |
-| L3 | Review & merge | Review mọi PR. Thay đổi trong phần chung phải qua Leader | Bắt buộc | Đang làm |
 | L4 | Hệ thống giao diện | `styles/tokens.css` + `styles/components.css` (nút, ô nhập, thống kê, bộ đếm, badge, thẻ lật, dialog, toast, trạng thái rỗng), font Noto Sans JP, trang `pages/styleguide/`. Chỉ CSS, không có JS cho component | Nên có | Xong |
-| L5 | Kiểm thử cuối | `npm test` qua hết, thử luồng tạo bộ → thêm thẻ → học → xem heatmap, thử trên điện thoại, làm hết mục [Trước khi nộp](conventions.md#trước-khi-nộp--deploy) | Bắt buộc | Chưa làm |
 | L6 | Thẻ tiếng Nhật + màu bìa | Đổi `Card` từ `front`/`back` sang `term`, `meaning`, `reading`, `example`, `jlpt` + cú pháp furigana `漢字[かんじ]` (chi tiết: [product.md](product.md#thẻ-tiếng-nhật)). Thêm `Deck.color` ([product.md](product.md#màu-bìa-bộ-thẻ)): `DECK_COLORS` trong `models.js` theo thứ tự ở [design.md](design.md#màu-bìa-bộ-thẻ), `createDeck` không truyền màu thì lấy màu kế tiếp, `updateDeck` đổi được màu, màu lạ báo `ValidationError`, bộ cũ chưa có màu thì đọc ra theo thứ tự. Sửa `models.js`, `repo.js`, `seed.js`, test, chú thích đầu file các trang. Album, Tạo thẻ, Học đều đang dùng thẻ 2 mặt: phần đổi ở mỗi trang là A9, C9, S10 bên dưới | Bắt buộc | Xong |
 | L6b | Bỏ lớp tương thích `front`/`back` | Cần A9, C9, S10 đã merge vào `main`, làm sau L15. Không cần chờ A5, C8. Xóa `core/card-compat.js` và các chỗ gọi `readCard` / `writeCard` trong `core/repo.js`, bỏ nhóm test "lớp tương thích" trong `tests/repo.test.js`. Thẻ cũ còn `front`/`back` trong localStorage phải được xử lý: chuyển đổi một lần khi mở app, hoặc chấp nhận bỏ; chọn cách nào thì ghi vào [process.md](process.md). Xong khi `grep -rnE '\.(front\|back)([^-[:alnum:]_]\|$)\|\b(front\|back):' pages core` không còn dòng nào khớp (lệnh này bỏ qua class `.back-link`) và `npm test` xanh | Bắt buộc | Xong |
 | L15 | Chạy thử luồng sau đợt 2 | Trên `main` sau khi merge A9, C9, S10, bắt đầu từ `?reset`: tạo bộ ở Tạo thẻ với thẻ có furigana, `reading`, `example` và chọn màu bìa → Album hiển thị đúng, tìm và sửa được → Học hiển thị đúng furigana, chấm, hoàn tác → màu bìa khớp ở Trang chủ, Album, Học. Thử ở 1440px và 375px; Console không lỗi. Làm trước L6b | Bắt buộc | Xong |
@@ -47,26 +120,12 @@ Không tự sửa `styles/` hay `core/` trong PR của trang; cần biến CSS h
 | L10 | Bộ tài liệu | `docs/` (product, architecture, conventions, tasks, process), `AGENTS.md` + `CLAUDE.md`, rút gọn README | Nên có | Xong |
 | L11 | Màu và chữ mới | Màu chính matcha, nền xám ánh lục, heatmap xanh, 6 màu bìa pastel, font Plus Jakarta Sans + Noto Sans JP, class `chip` và `cover`, cập nhật styleguide, viết [design.md](design.md) | Nên có | Xong |
 | L12 | Cột điều hướng | Thay header ngang bằng cột icon bên trái, dưới 768px thành thanh tab ở đáy; nút furigana (chưa có tác dụng) ở cuối cột; sửa cả 4 file HTML, `base.css`, styleguide ([design.md › Bố cục khung](design.md#bố-cục-khung)). Kèm khung 2 cột của Trang chủ | Nên có | Xong |
-| L13 | Tinh chỉnh giao diện | Thử trên bìa thật rồi chốt bo góc, bóng, cỡ tiêu đề lớn ([design.md](design.md#chốt-khi-làm-prototype)); sửa `tokens.css`. Album (A1) đã có bìa thật nên làm được | Nếu kịp | Chưa làm |
 | L14 | Thành phần chọn màu và furigana | Trong `styles/components.css`: class `color-picker` (6 chấm tròn 32px theo thứ tự `DECK_COLORS`, vùng bấm 44px, màu lấy từ `cover-<màu>`, ô đang chọn có viền `--cover-ink` và dấu ✓, radio vẫn dùng được bằng bàn phím và trình đọc màn hình) và kiểu chữ furigana (`rt` cỡ 0.5em, màu `--text-2`, giãn dòng để không đè dòng trên). Có mẫu trong styleguide, ghi ở [bảng class](conventions.md#class-dùng-chung) và [design.md › Thành phần](design.md#thành-phần) | Bắt buộc | Xong |
 
-### Lỗi đã biết trong `core/`
+</details>
 
-Tìm được khi review ngày 10/11/2026, **đã sửa cùng L6** (14/11/2026), mỗi lỗi có một test chứng minh. Trước đó vài trang đã tự tránh lỗi trong code của trang (ghi ở cột "Lỗi"): giờ các chỗ tránh đó bỏ được, không bắt buộc.
-
-| Mã | Lỗi | Chỗ sửa | Trạng thái |
-|---|---|---|---|
-| B1 | `h('select', { value })` không chọn sẵn được option, vì `value` được gán trước khi thêm `<option>`. C1 đã tránh bằng cách gán `select.value` sau khi thêm option | `core/dom.js` `h()`: gán `value`/`checked` sau `append` | Xong |
-| B2 | Ô "số thẻ mới/ngày" để trống thì âm thầm thành 0 (`Number('') === 0`), bộ đó không bao giờ có thẻ mới. A5 và C1 đã tránh bằng cách tự báo lỗi khi ô trống | `core/models.js` `makeDeck`, `core/repo.js` `updateDeck`: tạo bộ thì `''`/`null` → 20; sửa bộ thì báo `ValidationError` | Xong |
-| B3 | Hoàn tác có thể hiện thẻ khác thay vì thẻ vừa hoàn tác (khi có thẻ đang học khác vừa đến giờ). S7 đã tránh: trang Học tự giữ thẻ vừa hoàn tác (`restoredCard`) và hiện lại thẻ đó | `undo()` trả về thẻ đã khôi phục; trang Học hiện thẳng thẻ đó (gợi ý vòng học ở đầu `pages/study/study.js`) | Xong |
-| B4 | `getDeck('constructor')` trả về một hàm thay vì `null`, nên `?deck=constructor` không báo "Không tìm thấy". C1 đã tránh bằng cách tìm bộ trong `getDecks()`. Album vẫn hiện một bộ tên "Object"; Học báo "Xong rồi!" | `core/storage.js` `get()`: `Object.hasOwn(map, id) ? map[id] : null` | Xong |
-| B5 | Điểm nhỏ: chú thích sai trong `fuzzRange` (ghi `[23, 27]`, đúng là `[22, 28]`); `formatSpan` hiện "60 phút"/"24 giờ" ở ranh giới (làm tròn trước rồi mới so sánh); `reviewCard` ghi thẻ trước rồi mới ghi lượt ôn (nên ghi lượt ôn trước) | `core/scheduler.js`, `core/date.js`, `core/repo.js` | Xong |
-
----
-
-## Trang chủ: `index.html` + `pages/home/` (Leader)
-
-Mục đích: nhìn tổng quan tiến độ, vào học nhanh.
+<details>
+<summary><b>Trang chủ: `index.html` + `pages/home/` (Leader)</b> — H1, H2, H3, H4, H5, H6, H7, H8, H9</summary>
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Hàm core | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
@@ -80,13 +139,10 @@ Mục đích: nhìn tổng quan tiến độ, vào học nhanh.
 | H8 | Biểu đồ lượt ôn | 6 tháng gần nhất, mỗi cột chồng "Học mới" (`prevState === 'new'`) và "Ôn lại", màu `--chart-new` / `--chart-review`, có chú thích; rê chuột hoặc focus hiện số. Không dùng thư viện ([design.md](design.md#thành-phần)) | `getReviewLogs({ from })` | Nên có | Xong |
 | H9 | Màu bìa theo bộ | Bìa dùng `deck.color` thay cho hằng `COVER_COLORS` trong `pages/home/home.js`; màu mỗi bộ trùng với Album | `getDeckOverview()` | Bắt buộc | Xong |
 
----
+</details>
 
-## Album: `pages/album/` (Thành viên 2)
-
-Mục đích: xem, tìm, sửa các bộ thẻ và thẻ. Trang có 2 chế độ: `pages/album/` (lưới bộ) và `pages/album/?deck=<id>` (chi tiết một bộ).
-
-> **Đợt 2:** đổi trang sang thẻ tiếng Nhật và `deck.color` ở A9, thêm màu bìa ở A5.
+<details>
+<summary><b>Album: `pages/album/` (Daika)</b> — A1, A2, A3, A4, A5, A6, A7, A8, A9</summary>
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Hàm core | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
@@ -99,36 +155,25 @@ Mục đích: xem, tìm, sửa các bộ thẻ và thẻ. Trang có 2 chế đ�
 | A7 | Học lại từ đầu | Nút đưa một thẻ về trạng thái Mới | `resetCard()` | Nếu kịp | Xong |
 | A8 | Trường hợp đặc biệt | Chưa có bộ nào: lời nhắc + nút tạo bộ. `?deck=` sai id: thông báo + link về lưới. Bộ chưa có thẻ: nút "Thêm thẻ đầu tiên" | `getDeck()` trả `null` | Bắt buộc | Xong |
 | A9 | Thẻ tiếng Nhật | Cần L6. **Mặt trước:** từ chữ to, có furigana (`renderFurigana(card.term)`). **Mặt sau:** nghĩa, kèm cách đọc và câu ví dụ có furigana nếu có. Trường trống thì không hiện. **Tìm kiếm** trên từ và ví dụ đã bỏ furigana (`plainFurigana()`), nghĩa, cách đọc; vẫn không phân biệt hoa thường và dấu. **Câu xác nhận xóa** dùng `plainFurigana(card.term)`. **Hộp thoại sửa thẻ** (`#card-dialog`) có 4 ô: Từ, Nghĩa, Cách đọc, Ví dụ; dưới ô Từ có gợi ý "Ghi cách đọc trong ngoặc vuông sau kanji, VD 約束[やくそく]"; lưu bằng `updateCard(id, { term, meaning, reading, example })`. **Màu bìa:** bỏ hằng `COVER_COLORS` trong `album.js`, bìa dùng `deck.color`. **Xong khi:** furigana hiện đúng; gõ từ hoặc nghĩa đều tìm ra thẻ; sửa thẻ không đổi trạng thái và hạn ôn | `renderFurigana()`, `plainFurigana()`, `updateCard()` | Bắt buộc | Xong |
-| A10 | Chiều học trong hộp sửa bộ | Cần L8. Trong `#deck-dialog` (cạnh color-picker của A5): chọn Nhật → Việt / Việt → Nhật (radio, dùng được bằng bàn phím), chọn sẵn `deck.direction`, lưu bằng `updateDeck(id, { direction })`. Trang chi tiết bộ hiện chiều đang dùng. Thẻ trong lưới Album vẫn hiện mặt trước là từ (Album là nơi xem thẻ, không đảo) | `updateDeck()` | Nên có | Chưa làm |
 
----
+</details>
 
-## Tạo thẻ: `pages/create/` (Thành viên 3)
-
-Mục đích: soạn một bộ thẻ. `pages/create/` tạo bộ mới; `pages/create/?deck=<id>` mở bộ đó để sửa và thêm thẻ (nút "Thêm thẻ" ở Album dẫn tới đây).
-
-> **Đợt 2:** đổi ô nhập sang thẻ tiếng Nhật ở C9, chọn màu bìa ở C8.
+<details>
+<summary><b>Tạo thẻ: `pages/create/` (kakushi)</b> — C1, C2, C3, C6, C8, C9</summary>
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Hàm core | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
 | C1 | Chọn / tạo bộ | Dropdown "Bộ thẻ" gồm "+ Bộ mới" và các bộ có sẵn (ẩn khi chưa có bộ nào), chọn sẵn theo `?deck=`. Đổi bộ thì cập nhật `?deck=`, còn thay đổi chưa lưu thì hỏi trước. Ô tên (bắt buộc), mô tả, số thẻ mới/ngày (mặc định 20). `?deck=` sai id thì báo rồi chuyển sang tạo bộ mới. Lưu bộ mới xong thì trang chuyển sang sửa bộ đó, có link "Xem trong album" và "Học ngay" | `getDecks()`, `createDeck()`, `updateDeck()` | Bắt buộc | Xong |
 | C2 | Soạn thẻ | Mỗi dòng một thẻ: từ, nghĩa (ô tự cao theo nội dung), nút xóa. Bộ mới có sẵn 3 dòng trống; nút "Thêm thẻ"; Tab ở ô nghĩa của dòng cuối thì thêm dòng. Lưu một lần bằng nút trên thanh dính ở đáy hoặc **Ctrl+Enter**, báo bằng toast. Sửa thẻ giữ nguyên tiến độ học. Xóa thẻ đã lưu (thùng rác hoặc xóa trắng cả từ và nghĩa) thì hỏi xác nhận lúc lưu. Rời trang khi chưa lưu thì trình duyệt hỏi | `getCards()`, `createCards()`, `updateCard()`, `deleteCard()` | Bắt buộc | Xong |
 | C3 | Kiểm tra dữ liệu | Thiếu tên bộ, số thẻ mới/ngày sai, dòng thiếu từ hoặc nghĩa: báo ngay dưới ô, không lưu gì, đưa con trỏ tới ô sai đầu tiên. Từ trùng một thẻ phía trên (không phân biệt hoa thường): nhắc dưới ô, vẫn cho lưu. Lỗi từ repo hiện `err.message` bằng toast | — | Bắt buộc | Xong |
-| C4 | Xem trước | Khung thẻ cập nhật theo lúc gõ dòng đang focus (lấy dữ liệu bằng `fieldsOf(row)` ở `card-rows.js`, mặt trước dùng `renderFurigana()`), bấm để lật, nhìn giống trang Học | `renderFurigana()` | Nên có | Để sau |
-| C5 | Nhập nhiều thẻ | Ô dán văn bản, mỗi dòng một thẻ, các trường cách nhau bằng `\|` hoặc Tab (tối đa 4 cột: `term`, `meaning`, `reading`, `example`). Có bảng xem trước, dòng lỗi tô đỏ, bỏ chọn được từng dòng, rồi thêm thành dòng thẻ bằng `cards.add({ term, meaning, reading, example })` | `plainFurigana()` | Nên có | Để sau |
 | C6 | Thẻ vừa thêm | Bỏ: danh sách thẻ của C2 hiện mọi thẻ trong bộ, xóa được từng thẻ, có link "Xem trong album" | — | Nên có | Bỏ |
-| C7 | Xuất / nhập file | Xuất một bộ ra file `.json` hoặc `.csv` (`term`, `meaning`, `reading`, `example`) và nhập lại vào bộ | `getCards()`, `createCards()` | Nếu kịp | Chưa làm |
 | C8 | Chọn màu bìa | Trong form tạo bộ: 6 ô màu (radio, có tên màu cho trình đọc màn hình), chọn sẵn màu kế tiếp: màu sau màu của bộ cuối trong `getDecks()`, theo thứ tự `DECK_COLORS` ([design.md](design.md#màu-bìa-bộ-thẻ)). Dùng `color-picker`. Cần L6, L14 | `createDeck({ color })` | Nên có | Xong |
 | C9 | Ô nhập thẻ tiếng Nhật | Cần L6. Mỗi dòng thẻ có 4 ô: Từ, Nghĩa, Cách đọc, Ví dụ, và nút xóa. Ô Từ và ô Ví dụ gắn `lang="ja"`, có gợi ý cú pháp `約束[やくそく]`, `日本語[にほんご]勉強[べんきょう]` (mỗi từ kanji một cặp ngoặc). Lưu bằng `createCards()` / `updateCard()` với `{ term, meaning, reading, example }`; kiểm tra "đã sửa chưa" so cả 4 ô. Báo lỗi "Nhập từ." / "Nhập nghĩa.". So trùng bằng `plainFurigana(term)`, không phân biệt hoa thường. Tab ở ô Ví dụ của dòng cuối thì thêm dòng mới. **Xong khi:** lưu được thẻ đủ 4 ô, thẻ chỉ có từ + nghĩa, thẻ chỉ có kana; sửa thẻ cũ không mất tiến độ | `createCards()`, `updateCard()`, `plainFurigana()` | Bắt buộc | Xong |
-| C10 | Chiều học khi tạo bộ | Cần L8. Trong form bộ thẻ (cạnh color-picker của C8): chọn chiều, mặc định Nhật → Việt; mở bộ cũ chọn sẵn `deck.direction` và lưu khi đổi | `createDeck()`, `updateDeck()` | Nếu kịp | Chưa làm |
 
----
+</details>
 
-## Học: `pages/study/` (Thành viên 4)
-
-Mục đích: học theo thuật toán SM-2. `pages/study/` để chọn bộ, `pages/study/?deck=<id>` để học.
-
-> **Đợt 2:** đổi trang Học sang thẻ tiếng Nhật và `deck.color` ở S10.
+<details>
+<summary><b>Học: `pages/study/` (At)</b> — S1, S2, S3, S4, S5, S6, S7, S8, S9, S10</summary>
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Hàm core | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
@@ -142,4 +187,22 @@ Mục đích: học theo thuật toán SM-2. `pages/study/` để chọn bộ, `
 | S8 | Hiệu ứng lật | Lật 3D bằng CSS, tắt khi người dùng bật giảm chuyển động. Nút to, dễ bấm trên điện thoại | — | Nên có | Xong |
 | S9 | Phát âm | Nút đọc mặt trước bằng `speechSynthesis` | — | — | Bỏ: app không có âm thanh ([product.md](product.md#không-làm)) |
 | S10 | Thẻ tiếng Nhật khi học | Cần L6. **Mặt trước:** từ có furigana. **Mặt sau:** nghĩa, kèm cách đọc và câu ví dụ có furigana nếu có. Trường trống thì không hiện. Câu ví dụ dài thì xuống dòng trong thẻ, không đẩy 4 nút chấm điểm ra khỏi màn hình ở bề rộng 375px. **Hoàn tác** dùng thẳng thẻ do `await undo()` trả về, bỏ biến `restoredCard` (B3 đã sửa). **Bìa** dùng `deck.color` thay cho hằng `COVER_COLORS`. **Xong khi:** học hết một lượt với `?seed`; phím Space, 1–4, ← →, Z vẫn chạy như cũ | `renderFurigana()`, `reviewCard()`, `undo()` | Bắt buộc | Xong |
-| S11 | Đổi chiều học | Cần L8. Đảo mặt trước/mặt sau theo `deck.direction` ([product.md › Đổi chiều học](product.md#đổi-chiều-học)). Nút đổi chiều trên trang Học (màn chọn bộ hoặc thanh trên phiên học), bấm thì lưu bằng `updateDeck(id, { direction })` và đổi ngay thẻ đang hiện; lịch ôn dùng chung, `reviewCard()` như cũ. Phím tắt, hoàn tác, ví dụ dài ở 375px vẫn đúng ở cả 2 chiều | `getDeck()`, `updateDeck()` | Nên có | Chưa làm |
+
+</details>
+
+### Lỗi đã biết trong `core/`
+
+<details>
+<summary>B1–B5, đã sửa cùng L6 (14/11/2026)</summary>
+
+Tìm được khi review ngày 10/11/2026, **đã sửa cùng L6** (14/11/2026), mỗi lỗi có một test chứng minh. Trước đó vài trang đã tự tránh lỗi trong code của trang (ghi ở cột "Lỗi"): giờ các chỗ tránh đó bỏ được, không bắt buộc.
+
+| Mã | Lỗi | Chỗ sửa | Trạng thái |
+|---|---|---|---|
+| B1 | `h('select', { value })` không chọn sẵn được option, vì `value` được gán trước khi thêm `<option>`. C1 đã tránh bằng cách gán `select.value` sau khi thêm option | `core/dom.js` `h()`: gán `value`/`checked` sau `append` | Xong |
+| B2 | Ô "số thẻ mới/ngày" để trống thì âm thầm thành 0 (`Number('') === 0`), bộ đó không bao giờ có thẻ mới. A5 và C1 đã tránh bằng cách tự báo lỗi khi ô trống | `core/models.js` `makeDeck`, `core/repo.js` `updateDeck`: tạo bộ thì `''`/`null` → 20; sửa bộ thì báo `ValidationError` | Xong |
+| B3 | Hoàn tác có thể hiện thẻ khác thay vì thẻ vừa hoàn tác (khi có thẻ đang học khác vừa đến giờ). S7 đã tránh: trang Học tự giữ thẻ vừa hoàn tác (`restoredCard`) và hiện lại thẻ đó | `undo()` trả về thẻ đã khôi phục; trang Học hiện thẳng thẻ đó (gợi ý vòng học ở đầu `pages/study/study.js`) | Xong |
+| B4 | `getDeck('constructor')` trả về một hàm thay vì `null`, nên `?deck=constructor` không báo "Không tìm thấy". C1 đã tránh bằng cách tìm bộ trong `getDecks()`. Album vẫn hiện một bộ tên "Object"; Học báo "Xong rồi!" | `core/storage.js` `get()`: `Object.hasOwn(map, id) ? map[id] : null` | Xong |
+| B5 | Điểm nhỏ: chú thích sai trong `fuzzRange` (ghi `[23, 27]`, đúng là `[22, 28]`); `formatSpan` hiện "60 phút"/"24 giờ" ở ranh giới (làm tròn trước rồi mới so sánh); `reviewCard` ghi thẻ trước rồi mới ghi lượt ôn (nên ghi lượt ôn trước) | `core/scheduler.js`, `core/date.js`, `core/repo.js` | Xong |
+
+</details>
