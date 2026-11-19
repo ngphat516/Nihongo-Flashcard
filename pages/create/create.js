@@ -19,6 +19,7 @@
  *
  * Thẻ tiếng Nhật (C9): createCards / updateCard nhận { term, meaning, reading, example }.
  * Màu bìa (C8): chọn màu từ DECK_COLORS qua .color-picker; tạo bộ mới chọn sẵn màu kế tiếp.
+ * Chiều học (C10): radio name="direction" (DECK_DIRECTIONS), mặc định Nhật → Việt; xem trước đổi theo ngay.
  * Kanji chưa có [cách đọc] (reading.js): nhắc dưới ô Từ / Ví dụ, nút "Thêm cách đọc" chèn [] để gõ.
  * So trùng thẻ dùng plainFurigana(term) (furigana.js) để 約束[やくそく] trùng với 約束.
  */
@@ -31,7 +32,7 @@ import {
   updateCard,
   updateDeck,
 } from '../../core/repo.js';
-import { DECK_COLORS, cleanText, LIMITS } from '../../core/models.js';
+import { DECK_COLORS, DECK_DIRECTIONS, cleanText, LIMITS } from '../../core/models.js';
 import { routes } from '../../core/routes.js';
 import { $, getParam, h, startPage } from '../../core/dom.js';
 import { renderFurigana } from '../../core/furigana.js';
@@ -122,6 +123,16 @@ function setSelectedColor(color) {
   if (form.elements.color) form.elements.color.value = valid;
 }
 
+// ------------------------------ Chiều học (C10) ------------------------------
+
+function getSelectedDirection() {
+  return form.elements.direction?.value || DECK_DIRECTIONS[0];
+}
+
+function setSelectedDirection(direction) {
+  form.elements.direction.value = DECK_DIRECTIONS.includes(direction) ? direction : DECK_DIRECTIONS[0];
+}
+
 // ------------------------------ Mở bộ ------------------------------
 
 async function openDeck(target) {
@@ -131,6 +142,7 @@ async function openDeck(target) {
   limitInput.value = deck.newPerDay;
   descInput.value = deck.description;
   setSelectedColor(deck.color);
+  setSelectedDirection(deck.direction);
   cards.clear();
   deckCards.forEach((card) => cards.add(card));
   cards.add();
@@ -143,6 +155,7 @@ function openNewDeck() {
   limitInput.value = DEFAULT_NEW_PER_DAY;
   descInput.value = '';
   setSelectedColor(nextDeckColor());
+  setSelectedDirection(DECK_DIRECTIONS[0]);
   cards.clear();
   for (let i = 0; i < BLANK_ROWS_FOR_NEW_DECK; i++) cards.add();
   afterOpen();
@@ -195,7 +208,7 @@ function refresh() {
 }
 
 function showPreview() {
-  preview.show(activeRow && fieldsOf(activeRow), activeRow, deck?.direction);
+  preview.show(activeRow && fieldsOf(activeRow), activeRow, getSelectedDirection());
   const filled = rows.filter(hasContent);
   const position = filled.indexOf(activeRow);
   $('#preview-count').textContent = filled.length
@@ -230,17 +243,19 @@ function deckFields() {
     description: cleanText(descInput.value),
     newPerDay: limitInput.value.trim(),
     color: getSelectedColor(),
+    direction: getSelectedDirection(),
   };
 }
 
 function isDeckChanged() {
-  const { name, description, newPerDay, color } = deckFields();
+  const { name, description, newPerDay, color, direction } = deckFields();
   if (!deck) return Boolean(name || description) || newPerDay !== String(DEFAULT_NEW_PER_DAY);
   return (
     name !== deck.name ||
     description !== deck.description ||
     newPerDay !== String(deck.newPerDay) ||
-    color !== deck.color
+    color !== deck.color ||
+    direction !== (deck.direction ?? DECK_DIRECTIONS[0])
   );
 }
 
@@ -408,7 +423,7 @@ function showReview(index) {
   if (index < 0 || index >= reviewRows.length) return;
   reviewIndex = index;
   const row = reviewRows[index];
-  review.show(fieldsOf(row), row, deck?.direction);
+  review.show(fieldsOf(row), row, getSelectedDirection());
   const total = reviewRows.length;
   $('#review-bar').style.width = `${((index + 1) / total) * 100}%`;
   // Thẻ cuối: báo hết bộ, nút Sau thành "Xem lại từ đầu" (mũi tên → vẫn dừng ở đây)
@@ -573,7 +588,7 @@ function applyImportedDeck(info) {
   if (info.description !== undefined) descInput.value = info.description;
   if (info.newPerDay !== undefined) limitInput.value = info.newPerDay;
   if (info.color) setSelectedColor(info.color);
-  if (info.direction && form.elements.direction) form.elements.direction.value = info.direction;
+  if (info.direction) setSelectedDirection(info.direction);
   setError(nameInput, null);
   setError(limitInput, null);
   $('#page-title').textContent = info.name || 'Bộ thẻ mới';

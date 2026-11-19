@@ -15,7 +15,8 @@
   }
   .create-deck-picker,
   .create-deck-desc,
-  .create-deck-color {
+  .create-deck-color,
+  .create-deck-direction {
     grid-column: 1 / -1;
   }
 }
@@ -24,6 +25,29 @@
 }
 .create-deck-desc .input {
   min-height: 64px;
+}
+/* Chiều học (C10): giống hộp sửa bộ ở Album */
+.create-deck-direction {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.create-direction-option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  cursor: pointer;
+}
+.create-direction-option input {
+  accent-color: var(--primary);
+}
+.create-deck-direction legend {
+  padding: 0;
+}
+.create-deck-direction .field-hint {
+  margin: 0;
 }
 .create-deck-desc .muted,
 .create-card .field-label .muted {

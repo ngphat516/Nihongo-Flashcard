@@ -94,7 +94,7 @@ Trang được import những module nào: xem [conventions.md › Code](convent
 - `fieldsOf(row)` → `{ term, meaning, reading, example }` đã `cleanText()`.
 - `snapshot(card)`, `hasContent(row)`, `isRowChanged(row)`, `autosizeRow(row)`.
 
-Cùng folder: `preview.js` (C4) dựng thẻ xem trước, `createPreview(root)` trả về `show(fields, key, direction)` và `flip()`, dùng cho cả khung bên cạnh và hộp thoại Xem thử cả bộ; `paste.js` (C5) có hàm thuần `parsePaste(text, existingTerms)` tách văn bản dán thành thẻ kèm lỗi và nhắc trùng, test ở `tests/paste.test.js`; `reading.js` có `missingReadings(text)` tìm cụm kanji chưa có `[cách đọc]` và `addReadingBrackets(text)`, test ở `tests/reading.test.js`.
+Cùng folder: `preview.js` (C4) dựng thẻ xem trước, `createPreview(root)` trả về `show(fields, key, direction)` và `flip()`, dùng cho cả khung bên cạnh và hộp thoại Xem thử cả bộ; `paste.js` (C5) có hàm thuần `parsePaste(text, existingTerms)` tách văn bản dán thành thẻ kèm lỗi và nhắc trùng, test ở `tests/paste.test.js`; `reading.js` có `missingReadings(text)` tìm cụm kanji chưa có `[cách đọc]` và `addReadingBrackets(text)`, test ở `tests/reading.test.js`; `file-io.js` (C7) có hàm thuần `cardsToCsv`, `cardsToJson`, `readCardFile(fileName, text, existingTerms)` (đọc `.csv` / `.tsv` / `.txt` / `.json`, kết quả qua `checkRows()` của `paste.js` để dùng chung bảng xem trước), test ở `tests/file-io.test.js`.
 
 ## Dữ liệu
 
