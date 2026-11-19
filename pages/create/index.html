@@ -114,7 +114,8 @@
           Ghi cách đọc trong ngoặc vuông ngay sau kanji, VD <span lang="ja">約束[やくそく]</span>, <span lang="ja">日本語[にほんご]勉強[べんきょう]</span> (mỗi từ kanji một cặp ngoặc).
         </p>
 
-        <!-- Xem trước (C4): preview.js điền nội dung dòng thẻ đang gõ. Màn rộng: cột phải, dính khi cuộn. -->
+        <!-- Xem trước (C4): preview.js vẽ dòng thẻ đang gõ; ‹ › chuyển giữa các thẻ đã gõ.
+             Chỉ hiện từ 1024px (cột phải, dính khi cuộn); màn hẹp dùng nút Xem thử trên thanh Lưu. -->
         <aside class="create-preview" id="preview" aria-labelledby="preview-title">
           <p class="create-preview-title" id="preview-title">Xem trước</p>
           <button class="flashcard create-preview-card" type="button" aria-describedby="preview-hint">
@@ -129,6 +130,11 @@
               </span>
             </span>
           </button>
+          <div class="create-preview-nav">
+            <button class="btn btn-ghost btn-sm create-preview-step" id="preview-prev" type="button" aria-label="Thẻ trước"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+            <span class="create-preview-count" id="preview-count" aria-live="polite"></span>
+            <button class="btn btn-ghost btn-sm create-preview-step" id="preview-next" type="button" aria-label="Thẻ sau"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+          </div>
           <p class="field-hint create-preview-hint" id="preview-hint">Bấm thẻ để lật. Giống thẻ trên trang Học.</p>
         </aside>
 
@@ -147,7 +153,13 @@
 
       <div class="create-savebar">
         <p class="create-status" id="status"></p>
-        <button class="btn btn-primary" id="save" type="submit" title="Lưu (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">Lưu</button>
+        <div class="create-savebar-actions">
+          <button class="btn create-review-open" id="open-review" type="button" aria-haspopup="dialog" title="Lật thử lần lượt các thẻ đã gõ, như trên trang Học">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></svg>
+            Xem thử
+          </button>
+          <button class="btn btn-primary" id="save" type="submit" title="Lưu (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">Lưu</button>
+        </div>
       </div>
     </form>
 
@@ -212,6 +224,39 @@
       <div class="dialog-actions">
         <button class="btn" id="paste-cancel" type="button">Hủy</button>
         <button class="btn btn-primary" id="paste-add" type="button" disabled>Thêm thẻ</button>
+      </div>
+    </dialog>
+
+    <!-- Xem thử cả bộ: lật lần lượt các thẻ đã gõ (chưa cần lưu), như trên trang Học. -->
+    <dialog class="dialog create-review" id="review-dialog" aria-labelledby="review-title">
+      <div class="create-review-head">
+        <h2 class="dialog-title" id="review-title">Xem thử cả bộ</h2>
+        <span class="create-review-count" id="review-count" aria-live="polite"></span>
+      </div>
+      <div class="create-review-progress" aria-hidden="true"><span id="review-bar"></span></div>
+      <div class="create-review-stage" id="review-stage">
+          <button class="flashcard create-preview-card" type="button" aria-describedby="review-hint">
+            <span class="flashcard-inner">
+              <span class="flashcard-face flashcard-front">
+                <span class="create-preview-label">Mặt trước</span>
+                <span class="create-preview-front"></span>
+              </span>
+              <span class="flashcard-face flashcard-back" aria-hidden="true">
+                <span class="create-preview-label">Mặt sau</span>
+                <span class="create-preview-back"></span>
+              </span>
+            </span>
+          </button>
+      </div>
+      <p class="field-hint create-review-hint" id="review-hint"><kbd>Space</kbd> lật thẻ · <kbd>←</kbd> <kbd>→</kbd> thẻ trước, thẻ sau · <kbd>Esc</kbd> đóng</p>
+      <div class="create-review-nav">
+        <button class="btn" id="review-prev" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg> Trước</button>
+        <button class="btn" id="review-flip" type="button">Lật</button>
+        <button class="btn" id="review-next" type="button">Sau <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+      </div>
+      <div class="dialog-actions create-review-actions">
+        <button class="btn btn-ghost" id="review-edit" type="button">Sửa thẻ này</button>
+        <button class="btn btn-primary" id="review-close" type="button">Xong</button>
       </div>
     </dialog>
 

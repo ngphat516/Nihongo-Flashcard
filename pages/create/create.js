@@ -11,7 +11,8 @@
  * Module trong folder: card-rows.js (các dòng thẻ), feedback.js (báo lỗi, toast, hộp xác nhận),
  * preview.js (thẻ xem trước, C4), paste.js (tách văn bản dán thành thẻ, C5).
  *
- * Xem trước (C4): khung thẻ hiện dòng đang focus hoặc đang gõ, theo chiều học của bộ.
+ * Xem trước (C4): khung thẻ hiện dòng đang focus hoặc đang gõ, theo chiều học của bộ; ‹ › chuyển
+ * giữa các thẻ đã gõ, dòng đang xem được tô viền. "Xem thử cả bộ" (#review-dialog) lật lần lượt cả bộ.
  * Dán nhiều thẻ (C5): hộp thoại #paste-dialog, xem trước thành bảng, thêm vào các dòng thẻ (chưa lưu).
  *
  * Thẻ tiếng Nhật (C9): createCards / updateCard nhận { term, meaning, reading, example }.
@@ -63,6 +64,8 @@ const pasteAdd = $('#paste-add');
 const cards = createCardRows($('#cards'), $('#card-template'));
 const { rows } = cards;
 const preview = createPreview($('#preview'));
+const reviewDialog = $('#review-dialog');
+const review = createPreview(reviewDialog);
 
 let decks = [];
 /** Bộ đang sửa; null khi đang tạo bộ mới. */
@@ -74,6 +77,9 @@ let saving = false;
 let activeRow = null;
 /** Kết quả parsePaste() của ô dán, thêm `selected`. */
 let pasted = [];
+/** Thẻ đang xem trong hộp thoại Xem thử: vị trí trong `reviewRows`. */
+let reviewRows = [];
+let reviewIndex = 0;
 
 startPage(async () => {
   decks = await getDecks();
@@ -178,7 +184,33 @@ function refresh() {
 }
 
 function showPreview() {
-  preview.show(activeRow && fieldsOf(activeRow), activeRow ? rows.indexOf(activeRow) : null, deck?.direction);
+  preview.show(activeRow && fieldsOf(activeRow), activeRow, deck?.direction);
+  const filled = rows.filter(hasContent);
+  const position = filled.indexOf(activeRow);
+  $('#preview-count').textContent = filled.length
+    ? position >= 0 ? `Thẻ ${position + 1} / ${filled.length}` : `${filled.length} thẻ`
+    : '';
+  $('#preview-prev').disabled = !neighbour(-1);
+  $('#preview-next').disabled = !neighbour(1);
+  $('#open-review').disabled = !filled.length;
+  for (const row of rows) row.el.classList.toggle('is-previewing', row === activeRow && filled.length > 1);
+}
+
+/** Dòng có nội dung liền trước (-1) hoặc liền sau (1) dòng đang xem trước. */
+function neighbour(step) {
+  const from = activeRow ? rows.indexOf(activeRow) : step > 0 ? -1 : rows.length;
+  for (let i = from + step; i >= 0 && i < rows.length; i += step) {
+    if (hasContent(rows[i])) return rows[i];
+  }
+  return null;
+}
+
+function stepPreview(step) {
+  const row = neighbour(step);
+  if (!row) return;
+  activeRow = row;
+  showPreview();
+  row.el.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
 }
 
 function deckFields() {
@@ -229,6 +261,16 @@ function bindEvents() {
       showPreview();
     }
   });
+  $('#preview-prev').addEventListener('click', () => stepPreview(-1));
+  $('#preview-next').addEventListener('click', () => stepPreview(1));
+  $('#open-review').addEventListener('click', openReview);
+  $('#review-prev').addEventListener('click', () => showReview(reviewIndex - 1));
+  $('#review-next').addEventListener('click', () => showReview(reviewIndex + 1));
+  $('#review-flip').addEventListener('click', () => review.flip());
+  $('#review-edit').addEventListener('click', editReviewed);
+  $('#review-close').addEventListener('click', () => reviewDialog.close());
+  reviewDialog.addEventListener('keydown', onReviewKeydown);
+  bindReviewSwipe($('#review-stage'));
   $('#open-paste').addEventListener('click', openPaste);
   pasteInput.addEventListener('input', updatePaste);
   pasteInput.addEventListener('keydown', (event) => {
@@ -315,6 +357,72 @@ async function onSelectDeck() {
   } catch (err) {
     showFailure(err, 'Không mở được bộ thẻ');
   }
+}
+
+// ------------------------------ Xem thử cả bộ ------------------------------
+
+function openReview() {
+  reviewRows = rows.filter(hasContent);
+  if (!reviewRows.length) return;
+  reviewDialog.showModal();
+  showReview(Math.max(0, reviewRows.indexOf(activeRow)));
+  $('#review-stage .flashcard').focus();
+}
+
+function showReview(index) {
+  if (index < 0 || index >= reviewRows.length) return;
+  reviewIndex = index;
+  const row = reviewRows[index];
+  review.show(fieldsOf(row), row, deck?.direction);
+  const total = reviewRows.length;
+  $('#review-count').textContent = `Thẻ ${index + 1} / ${total}`;
+  $('#review-bar').style.width = `${((index + 1) / total) * 100}%`;
+  $('#review-prev').disabled = index === 0;
+  $('#review-next').disabled = index === total - 1;
+}
+
+function onReviewKeydown(event) {
+  if (event.isComposing || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (event.key === 'ArrowLeft') showReview(reviewIndex - 1);
+  else if (event.key === 'ArrowRight') showReview(reviewIndex + 1);
+  else if (event.key === ' ' && !event.target.closest('.flashcard')) review.flip(); // thẻ là <button>: Space tự lật
+  else return;
+  event.preventDefault();
+}
+
+/** Vuốt ngang trên thẻ (điện thoại): sang trái là thẻ sau, sang phải là thẻ trước. Vuốt xong thì không lật. */
+function bindReviewSwipe(stage) {
+  let start = null;
+  let swiped = false;
+  stage.addEventListener('pointerdown', (event) => {
+    start = event.pointerType === 'mouse' ? null : { x: event.clientX, y: event.clientY };
+    swiped = false;
+  });
+  stage.addEventListener('pointerup', (event) => {
+    if (!start) return;
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
+    start = null;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    swiped = true;
+    showReview(reviewIndex + (dx < 0 ? 1 : -1));
+  });
+  stage.addEventListener('pointercancel', () => { start = null; });
+  stage.addEventListener('click', (event) => {
+    if (!swiped) return;
+    swiped = false;
+    event.stopPropagation();
+  }, true);
+}
+
+/** Đóng hộp thoại, đưa con trỏ tới ô Từ của thẻ đang xem để sửa. */
+function editReviewed() {
+  const row = reviewRows[reviewIndex];
+  reviewDialog.close();
+  activeRow = row;
+  showPreview();
+  row.term.focus({ preventScroll: true });
+  row.el.scrollIntoView({ block: 'center' });
 }
 
 // ------------------------------ Dán nhiều thẻ (C5) ------------------------------

@@ -20,10 +20,11 @@
 
 - **Người làm:** kakushi.
 - **Đã xong:** nhánh `feature/create-c4-c5`.
-  - C4: khung "Xem trước" hiện dòng thẻ đang focus hoặc đang gõ, giống thẻ trang Học, theo chiều học của bộ; bấm để lật; furigana theo nút bật/tắt (L7). Từ 1024px là cột phải dính khi cuộn, nhỏ hơn thì nằm trên danh sách thẻ.
+  - C4: khung "Xem trước" hiện dòng thẻ đang focus hoặc đang gõ, giống thẻ trang Học, theo chiều học của bộ; bấm để lật; furigana theo nút bật/tắt (L7). Nút `‹ Thẻ 2 / 4 ›` chuyển giữa các thẻ đã gõ, dòng đang xem được tô viền. Chỉ hiện từ 1024px (cột phải dính khi cuộn).
+  - Nút "Xem thử" trên thanh Lưu mở hộp thoại lật lần lượt cả bộ (chưa cần lưu), bắt đầu từ thẻ đang sửa: Space lật, ← → chuyển thẻ, điện thoại vuốt ngang; "Sửa thẻ này" đóng hộp thoại và đưa con trỏ tới dòng đó.
   - C5: nút "Dán nhiều thẻ" cạnh "Thêm thẻ" mở hộp thoại; mỗi dòng một thẻ, cột `từ | nghĩa | cách đọc | ví dụ` cách bằng `|` hoặc Tab. Bảng xem trước: dòng lỗi (thiếu từ/nghĩa, quá 4 cột, quá dài) tô đỏ và không thêm, dòng trùng có nhắc, bỏ chọn được từng dòng. Thẻ điền vào dòng trống, chưa lưu cho tới khi bấm Lưu.
-- **Kiểm tra:** `npm test` 91/91 (thêm `tests/paste.test.js`). Chrome 1280px và 375px với `?seed` và `?reset`: khung theo đúng dòng, lật, tắt furigana ẩn chữ nhỏ; dán 5 dòng có 2 lỗi, bỏ chọn 1, thêm 2 rồi Lưu vào bộ; không cuộn ngang; console không lỗi.
-- **Quyết định:** bố cục chọn sau khi thử 3 phương án trên prototype (cột bên + hộp thoại).
+- **Kiểm tra:** `npm test` 91/91 (thêm `tests/paste.test.js`). Chrome 1280px và 375px với `?seed` và `?reset`: khung theo đúng dòng, lật, tắt furigana ẩn chữ nhỏ, ‹ › đi qua 4 thẻ; Xem thử mở đúng thẻ đang sửa, Space / → / vuốt / Sửa thẻ này chạy đúng; dán 5 dòng có 2 lỗi, bỏ chọn 1, thêm 2 rồi Lưu vào bộ; không cuộn ngang; console không lỗi.
+- **Quyết định:** bố cục chọn sau khi thử 3 phương án trên prototype (cột bên + hộp thoại). Xem nhiều thẻ: chọn mũi tên trên khung xem trước + hộp thoại Xem thử cả bộ. Màn hẹp ẩn khung xem trước vì nằm trên danh sách, gõ tới thẻ thứ 2 là trôi khỏi màn hình; thay bằng nút Xem thử trên thanh Lưu dính đáy.
 - **Tiếp theo:** C7 xuất / nhập file, dùng lại `parsePaste` cho file `.csv`.
 
 ## 2026-11-18 — Sửa bố cục mobile trang Học

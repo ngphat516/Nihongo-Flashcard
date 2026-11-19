@@ -161,9 +161,10 @@ textarea.create-card-input {
 }
 
 /* ---------- Xem trước (C4) ----------
-   Điện thoại: nằm trên danh sách thẻ. Từ 1024px: cột phải 280px, dính khi cuộn qua danh sách. */
+   Từ 1024px: cột phải 280px, dính khi cuộn qua danh sách. Màn hẹp thì ẩn: khung nằm trên danh sách,
+   gõ tới thẻ thứ 2 là đã trôi khỏi màn hình; thay bằng nút Xem thử trên thanh Lưu. */
 .create-preview {
-  margin-bottom: var(--space-4);
+  display: none;
 }
 @media (min-width: 1024px) {
   .create-cards-section {
@@ -182,6 +183,7 @@ textarea.create-card-input {
   .create-cards-section > .create-cards { grid-area: list; }
   .create-cards-section > .create-card-actions { grid-area: actions; align-self: start; }
   .create-preview {
+    display: block;
     grid-area: preview;
     align-self: start;
     position: sticky;
@@ -249,9 +251,95 @@ textarea.create-card-input {
   color: var(--muted);
   font-size: var(--text-sm);
 }
+.create-preview-missing {
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-style: italic;
+}
 .create-preview-hint {
   margin: var(--space-2) 0 0;
   font-size: var(--text-xs);
+}
+.create-preview-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+}
+.create-preview-step {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+}
+.create-preview-step:disabled {
+  visibility: hidden;
+}
+.create-preview-count {
+  color: var(--text-2);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+/* Dòng thẻ đang hiện trong khung xem trước (chỉ tô khi có từ 2 thẻ trở lên và khung đang hiện) */
+@media (min-width: 1024px) {
+  .create-card.is-previewing {
+    border-color: var(--text-2);
+    box-shadow: inset 3px 0 0 var(--text-2);
+  }
+}
+
+/* ---------- Xem thử cả bộ ---------- */
+.create-review {
+  width: min(560px, calc(100% - 2 * var(--space-4)));
+}
+.create-review-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.create-review-count {
+  color: var(--text-2);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.create-review-progress {
+  height: 4px;
+  margin: var(--space-3) 0 var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.create-review-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--text-2);
+  transition: width var(--duration-normal) ease;
+}
+.create-review-stage {
+  touch-action: pan-y; /* vuốt ngang để chuyển thẻ, vuốt dọc vẫn cuộn */
+}
+.create-review .flashcard-face {
+  min-height: 280px;
+}
+.create-review-hint {
+  margin: var(--space-3) 0 0;
+  text-align: center;
+}
+.create-review-nav {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.create-review-nav .btn {
+  gap: var(--space-1);
+}
+.create-review-actions {
+  justify-content: space-between;
+}
+@media (pointer: coarse) {
+  .create-review-hint { display: none; } /* điện thoại không có phím */
 }
 
 /* ---------- Dán nhiều thẻ (C5) ---------- */
@@ -354,6 +442,10 @@ textarea.create-card-input {
 }
 .create-savebar .btn-primary {
   min-width: 96px;
+}
+.create-savebar-actions {
+  display: flex;
+  gap: var(--space-2);
 }
 
 /* Thanh Lưu cao 64px. Toast nằm trên thanh thay vì đè lên nó; khi Tab tới hay focus một ô,
