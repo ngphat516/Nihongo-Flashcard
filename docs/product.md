@@ -100,7 +100,7 @@ Các quyết định này đã chốt nhưng code chưa có. Ai làm thì cập 
 - **Lịch ôn dùng chung:** mỗi thẻ vẫn chỉ có một tiến độ SM-2; chấm ở chiều nào cũng cập nhật tiến độ đó.
 - **Đổi ở đâu:** trang Học (nút đổi chiều), hộp sửa bộ ở Album; tùy chọn khi tạo bộ ở Tạo thẻ.
 - `deck.direction` lưu `'ja-vi'` (Nhật → Việt) hoặc `'vi-ja'` (Việt → Nhật). Bộ tạo trước khi có trường này đọc ra Nhật → Việt.
-- **Trạng thái:** `core/` đã xong (`L8`): `DECK_DIRECTIONS` trong `core/models.js`; `createDeck` không truyền chiều thì `'ja-vi'`; `updateDeck` đổi được chiều; giá trị lạ báo `ValidationError`. Bộ cũ chưa có chiều chỉ được ghi khi bộ được lưu lại. Các trang chưa làm: Học (`S11`), Album (`A10`). Tạo thẻ (`C10`): chọn chiều học trong form bộ thẻ, xem trước đổi theo.
+- **Trạng thái:** `core/` đã xong (`L8`): `DECK_DIRECTIONS` trong `core/models.js`; `createDeck` không truyền chiều thì `'ja-vi'`; `updateDeck` đổi được chiều; giá trị lạ báo `ValidationError`. Bộ cũ chưa có chiều chỉ được ghi khi bộ được lưu lại. Các trang chưa làm: Học (`S11`), Album (`A10`), Tạo thẻ (`C10`).
 
 ## Chưa chốt
 

@@ -26,6 +26,7 @@
 - **Kiểm tra:** `npm test` 107/107 (thêm `tests/file-io.test.js`, `checkRows()` tách khỏi `parsePaste()`). Chrome 1280px và 375px: xuất CSV / JSON (chặn tải thật, đọc lại Blob: có BOM, đúng 4 thẻ), nhập CSV tiêu đề tiếng Việt dấu `;` có 1 dòng lỗi và 1 dòng trùng, nhập JSON vào bộ mới điền đủ thông tin bộ, file `.xlsx` báo lỗi; đổi sang Việt → Nhật thì khung xem trước hiện nghĩa, Lưu rồi tải lại vẫn chọn đúng; không cuộn ngang.
 - **Quyết định:** nhập file dùng chung bảng xem trước với Dán nhiều thẻ thay vì lưu thẳng, để người dùng thấy lỗi và bỏ dòng trước khi thêm. Xuất chỉ lấy 4 trường của thẻ, không có tiến độ học. Thông tin bộ trong file chỉ dùng khi tạo bộ mới chưa có tên, không ghi đè bộ đang sửa.
 - **Tiếp theo:** review và gộp nhánh `feature/create-c4-c5` (C4, C5, C7, C10).
+- **Vướng mắc:** nhờ Leader cập nhật `architecture.md` (module mới trong `pages/create/`: `preview.js`, `paste.js`, `reading.js`, `file-io.js` và test của chúng) và dòng trạng thái C10 trong `product.md › Đổi chiều học`; PR trang không sửa các file này.
 
 ## 2026-11-19 — Xem trước thẻ và dán nhiều thẻ (C4, C5)
 
