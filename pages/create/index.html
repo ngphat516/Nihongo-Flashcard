@@ -108,16 +108,41 @@
         </fieldset>
       </section>
 
-      <section class="section" aria-labelledby="cards-title">
+      <section class="section create-cards-section" aria-labelledby="cards-title">
         <h2 class="section-title" id="cards-title">Thẻ</h2>
         <p class="field-hint create-cards-hint" id="cards-hint">
           Ghi cách đọc trong ngoặc vuông ngay sau kanji, VD <span lang="ja">約束[やくそく]</span>, <span lang="ja">日本語[にほんご]勉強[べんきょう]</span> (mỗi từ kanji một cặp ngoặc).
         </p>
+
+        <!-- Xem trước (C4): preview.js điền nội dung dòng thẻ đang gõ. Màn rộng: cột phải, dính khi cuộn. -->
+        <aside class="create-preview" id="preview" aria-labelledby="preview-title">
+          <p class="create-preview-title" id="preview-title">Xem trước</p>
+          <button class="flashcard create-preview-card" type="button" aria-describedby="preview-hint">
+            <span class="flashcard-inner">
+              <span class="flashcard-face flashcard-front">
+                <span class="create-preview-label">Mặt trước</span>
+                <span class="create-preview-front"></span>
+              </span>
+              <span class="flashcard-face flashcard-back" aria-hidden="true">
+                <span class="create-preview-label">Mặt sau</span>
+                <span class="create-preview-back"></span>
+              </span>
+            </span>
+          </button>
+          <p class="field-hint create-preview-hint" id="preview-hint">Bấm thẻ để lật. Giống thẻ trên trang Học.</p>
+        </aside>
+
         <ol class="create-cards" id="cards"></ol>
-        <button class="btn create-add" id="add-card" type="button">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-          Thêm thẻ
-        </button>
+        <div class="create-card-actions">
+          <button class="btn create-add" id="add-card" type="button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Thêm thẻ
+          </button>
+          <button class="btn create-paste-open" id="open-paste" type="button" aria-haspopup="dialog">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
+            Dán nhiều thẻ
+          </button>
+        </div>
       </section>
 
       <div class="create-savebar">
@@ -159,6 +184,36 @@
         </button>
       </li>
     </template>
+
+    <!-- Dán nhiều thẻ (C5): create.js tách bằng paste.js, điền bảng xem trước, thêm thành dòng thẻ. -->
+    <dialog class="dialog create-paste" id="paste-dialog" aria-labelledby="paste-title">
+      <h2 class="dialog-title" id="paste-title">Dán nhiều thẻ</h2>
+      <div class="field">
+        <label class="field-label" for="paste-input">Mỗi dòng một thẻ</label>
+        <textarea class="input create-paste-input" id="paste-input" rows="7" lang="ja" spellcheck="false" aria-describedby="paste-hint" placeholder="約束[やくそく] | lời hứa | やくそく | 約束[やくそく]を守[まも]る。"></textarea>
+        <span class="field-hint" id="paste-hint">Cột theo thứ tự <strong>từ | nghĩa | cách đọc | ví dụ</strong>, cách nhau bằng <kbd>|</kbd> hoặc Tab. Dán thẳng từ Excel, Google Sheets hay Quizlet được; cách đọc và ví dụ có thể bỏ trống.</span>
+      </div>
+      <p class="create-paste-summary" id="paste-summary" role="status"></p>
+      <div class="create-paste-scroll" id="paste-preview" hidden>
+        <table class="create-paste-table">
+          <thead>
+            <tr>
+              <th scope="col"><span class="visually-hidden">Thêm</span></th>
+              <th scope="col">Dòng</th>
+              <th scope="col">Từ</th>
+              <th scope="col">Nghĩa</th>
+              <th scope="col">Cách đọc</th>
+              <th scope="col">Ví dụ</th>
+            </tr>
+          </thead>
+          <tbody id="paste-rows"></tbody>
+        </table>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn" id="paste-cancel" type="button">Hủy</button>
+        <button class="btn btn-primary" id="paste-add" type="button" disabled>Thêm thẻ</button>
+      </div>
+    </dialog>
 
     <dialog class="dialog" id="confirm" aria-labelledby="confirm-title">
       <form method="dialog">

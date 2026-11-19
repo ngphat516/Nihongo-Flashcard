@@ -138,13 +138,193 @@ textarea.create-card-input {
   flex: none;
 }
 
+.create-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
 .create-add {
-  width: 100%;
+  flex: 1 1 200px;
   border-style: dashed;
   color: var(--text-2);
 }
 .create-add:hover {
   color: var(--text);
+}
+.create-paste-open {
+  flex: 1 1 160px;
+}
+@media (min-width: 640px) {
+  .create-paste-open {
+    flex-grow: 0;
+  }
+}
+
+/* ---------- Xem trước (C4) ----------
+   Điện thoại: nằm trên danh sách thẻ. Từ 1024px: cột phải 280px, dính khi cuộn qua danh sách. */
+.create-preview {
+  margin-bottom: var(--space-4);
+}
+@media (min-width: 1024px) {
+  .create-cards-section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    grid-template-areas:
+      'title preview'
+      'hint preview'
+      'list preview'
+      'actions preview';
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: var(--space-5);
+  }
+  .create-cards-section > .section-title { grid-area: title; }
+  .create-cards-section > .create-cards-hint { grid-area: hint; }
+  .create-cards-section > .create-cards { grid-area: list; }
+  .create-cards-section > .create-card-actions { grid-area: actions; align-self: start; }
+  .create-preview {
+    grid-area: preview;
+    align-self: start;
+    position: sticky;
+    top: var(--space-5);
+    margin-bottom: 0;
+  }
+}
+.create-preview-title {
+  margin: 0 0 var(--space-2);
+  color: var(--text-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.create-preview-card .flashcard-face {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  min-height: 200px;
+  padding: var(--space-4);
+  white-space: normal;
+}
+.create-preview-card .flashcard-back {
+  background: var(--primary-soft);
+}
+.create-preview-label {
+  align-self: start;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.create-preview-front,
+.create-preview-back {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: center;
+  max-width: 100%;
+  min-width: 0;
+}
+.create-preview-text {
+  max-width: 100%;
+  font-size: var(--text-card);
+  line-height: 1.35;
+  white-space: pre-wrap;
+}
+.create-preview-meaning {
+  font-size: var(--text-xl);
+  white-space: pre-wrap;
+}
+.create-preview-reading,
+.create-preview-example {
+  color: var(--text-2);
+  white-space: pre-wrap;
+}
+.create-preview-reading {
+  font-size: var(--text-base);
+}
+.create-preview-example {
+  font-size: var(--text-sm);
+  max-block-size: 6em;
+  overflow-y: auto;
+}
+.create-preview-empty {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.create-preview-hint {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+}
+
+/* ---------- Dán nhiều thẻ (C5) ---------- */
+.create-paste {
+  width: min(840px, calc(100% - 2 * var(--space-4)));
+}
+.create-paste-input {
+  min-height: 140px;
+  resize: vertical;
+  white-space: pre;
+  overflow-x: auto;
+}
+.create-paste-summary {
+  margin: var(--space-3) 0 var(--space-2);
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+.create-paste-summary:empty {
+  display: none;
+}
+.create-paste-scroll {
+  max-height: 300px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.create-paste-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+.create-paste-table th,
+.create-paste-table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.create-paste-table th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.create-paste-table tr:last-child td {
+  border-bottom: 0;
+}
+.create-paste-table td:nth-child(3) {
+  min-width: 6em;
+}
+.create-paste-table .is-error td {
+  background: color-mix(in srgb, var(--danger) 8%, var(--surface));
+  color: var(--danger);
+}
+.create-paste-table .is-off td {
+  color: var(--muted);
+}
+.create-paste-line {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.create-paste-error,
+.create-paste-note {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+.create-paste-note {
+  color: var(--text-2);
 }
 
 /* ---------- Thanh Lưu ---------- */

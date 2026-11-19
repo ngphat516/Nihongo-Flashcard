@@ -16,6 +16,16 @@
 
 ---
 
+## 2026-11-19 — Xem trước thẻ và dán nhiều thẻ (C4, C5)
+
+- **Người làm:** kakushi.
+- **Đã xong:** nhánh `feature/create-c4-c5`.
+  - C4: khung "Xem trước" hiện dòng thẻ đang focus hoặc đang gõ, giống thẻ trang Học, theo chiều học của bộ; bấm để lật; furigana theo nút bật/tắt (L7). Từ 1024px là cột phải dính khi cuộn, nhỏ hơn thì nằm trên danh sách thẻ.
+  - C5: nút "Dán nhiều thẻ" cạnh "Thêm thẻ" mở hộp thoại; mỗi dòng một thẻ, cột `từ | nghĩa | cách đọc | ví dụ` cách bằng `|` hoặc Tab. Bảng xem trước: dòng lỗi (thiếu từ/nghĩa, quá 4 cột, quá dài) tô đỏ và không thêm, dòng trùng có nhắc, bỏ chọn được từng dòng. Thẻ điền vào dòng trống, chưa lưu cho tới khi bấm Lưu.
+- **Kiểm tra:** `npm test` 91/91 (thêm `tests/paste.test.js`). Chrome 1280px và 375px với `?seed` và `?reset`: khung theo đúng dòng, lật, tắt furigana ẩn chữ nhỏ; dán 5 dòng có 2 lỗi, bỏ chọn 1, thêm 2 rồi Lưu vào bộ; không cuộn ngang; console không lỗi.
+- **Quyết định:** bố cục chọn sau khi thử 3 phương án trên prototype (cột bên + hộp thoại).
+- **Tiếp theo:** C7 xuất / nhập file, dùng lại `parsePaste` cho file `.csv`.
+
 ## 2026-11-18 — Sửa bố cục mobile trang Học
 
 - **Người làm:** At, cùng Codex.

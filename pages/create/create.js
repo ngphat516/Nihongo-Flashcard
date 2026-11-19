@@ -8,7 +8,11 @@
  * hết các ô trước rồi mới ghi qua repo.js, nên một lượt lưu không dừng giữa chừng vì nhập sai.
  * Thẻ đã lưu bị xóa (bấm thùng rác hoặc xóa trắng cả 4 ô) thì hỏi xác nhận một lần trước khi lưu.
  *
- * Module trong folder: card-rows.js (các dòng thẻ), feedback.js (báo lỗi, toast, hộp xác nhận).
+ * Module trong folder: card-rows.js (các dòng thẻ), feedback.js (báo lỗi, toast, hộp xác nhận),
+ * preview.js (thẻ xem trước, C4), paste.js (tách văn bản dán thành thẻ, C5).
+ *
+ * Xem trước (C4): khung thẻ hiện dòng đang focus hoặc đang gõ, theo chiều học của bộ.
+ * Dán nhiều thẻ (C5): hộp thoại #paste-dialog, xem trước thành bảng, thêm vào các dòng thẻ (chưa lưu).
  *
  * Thẻ tiếng Nhật (C9): createCards / updateCard nhận { term, meaning, reading, example }.
  * Màu bìa (C8): chọn màu từ DECK_COLORS qua .color-picker; tạo bộ mới chọn sẵn màu kế tiếp.
@@ -26,6 +30,7 @@ import {
 import { DECK_COLORS, cleanText, LIMITS } from '../../core/models.js';
 import { routes } from '../../core/routes.js';
 import { $, getParam, h, startPage } from '../../core/dom.js';
+import { renderFurigana } from '../../core/furigana.js';
 import {
   autosize,
   autosizeRow,
@@ -36,6 +41,8 @@ import {
   snapshot,
 } from './card-rows.js';
 import { confirmDialog, setError, showFailure, toast } from './feedback.js';
+import { createPreview } from './preview.js';
+import { parsePaste } from './paste.js';
 
 const DEFAULT_NEW_PER_DAY = 20;
 const BLANK_ROWS_FOR_NEW_DECK = 3;
@@ -49,9 +56,13 @@ const addButton = $('#add-card');
 const saveButton = $('#save');
 const statusText = $('#status');
 const notice = $('#notice');
+const pasteDialog = $('#paste-dialog');
+const pasteInput = $('#paste-input');
+const pasteAdd = $('#paste-add');
 
 const cards = createCardRows($('#cards'), $('#card-template'));
 const { rows } = cards;
+const preview = createPreview($('#preview'));
 
 let decks = [];
 /** Bộ đang sửa; null khi đang tạo bộ mới. */
@@ -59,6 +70,10 @@ let deck = null;
 /** id các thẻ đã lưu mà người dùng bấm xóa; chỉ xóa thật khi Lưu. */
 let removedIds = [];
 let saving = false;
+/** Dòng đang hiện trong khung xem trước. */
+let activeRow = null;
+/** Kết quả parsePaste() của ô dán, thêm `selected`. */
+let pasted = [];
 
 startPage(async () => {
   decks = await getDecks();
@@ -155,9 +170,15 @@ function renderHeader() {
 /** Cập nhật số thứ tự, cảnh báo trùng và thanh Lưu. Gọi sau mỗi thay đổi. */
 function refresh() {
   cards.refresh();
+  if (!rows.includes(activeRow)) activeRow = rows.find(hasContent) ?? null;
+  showPreview();
   const dirty = isDirty();
   statusText.textContent = `${rows.filter(hasContent).length} thẻ${dirty ? ' · Chưa lưu' : ''}`;
   statusText.classList.toggle('is-dirty', dirty);
+}
+
+function showPreview() {
+  preview.show(activeRow && fieldsOf(activeRow), activeRow ? rows.indexOf(activeRow) : null, deck?.direction);
 }
 
 function deckFields() {
@@ -201,6 +222,23 @@ function bindEvents() {
     const button = event.target.closest('.create-card-delete');
     if (button) deleteRow(cards.find(button));
   });
+  $('#cards').addEventListener('focusin', (event) => {
+    const row = cards.find(event.target);
+    if (row && row !== activeRow) {
+      activeRow = row;
+      showPreview();
+    }
+  });
+  $('#open-paste').addEventListener('click', openPaste);
+  pasteInput.addEventListener('input', updatePaste);
+  pasteInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey) && !event.isComposing) {
+      event.preventDefault();
+      addPasted();
+    }
+  });
+  pasteAdd.addEventListener('click', addPasted);
+  $('#paste-cancel').addEventListener('click', () => pasteDialog.close());
   addButton.addEventListener('click', () => {
     cards.add().term.focus();
     refresh();
@@ -230,7 +268,10 @@ function deleteRow(row) {
 function onInput(event) {
   const input = event.target;
   if (input === select) return;
-  if (input.classList.contains('create-card-input')) autosize(input);
+  if (input.classList.contains('create-card-input')) {
+    autosize(input);
+    activeRow = cards.find(input);
+  }
   setError(input, null);
   refresh();
 }
@@ -274,6 +315,80 @@ async function onSelectDeck() {
   } catch (err) {
     showFailure(err, 'Không mở được bộ thẻ');
   }
+}
+
+// ------------------------------ Dán nhiều thẻ (C5) ------------------------------
+
+function openPaste() {
+  pasteInput.value = '';
+  updatePaste();
+  pasteDialog.showModal();
+  pasteInput.focus();
+}
+
+function updatePaste() {
+  const terms = rows.filter(hasContent).map((row) => fieldsOf(row).term);
+  pasted = parsePaste(pasteInput.value, terms).map((item) => ({ ...item, selected: !item.error }));
+  renderPaste();
+}
+
+function renderPaste() {
+  $('#paste-rows').replaceChildren(...pasted.map((item) => {
+    const { card, error, duplicate } = item;
+    const message = error || duplicate;
+    return h('tr', { class: error ? 'is-error' : item.selected ? '' : 'is-off' },
+      h('td', {}, h('input', {
+        type: 'checkbox',
+        checked: item.selected,
+        disabled: Boolean(error),
+        'aria-label': `Thêm dòng ${item.line}`,
+        onchange: (event) => {
+          item.selected = event.target.checked;
+          renderPaste();
+        },
+      })),
+      h('td', { class: 'create-paste-line' }, item.line),
+      h('td', {},
+        card.term ? renderFurigana(card.term) : null,
+        message && h('span', { class: error ? 'create-paste-error' : 'create-paste-note' }, message)),
+      h('td', {}, card.meaning),
+      h('td', { lang: 'ja' }, card.reading),
+      h('td', {}, card.example ? renderFurigana(card.example) : null),
+    );
+  }));
+
+  const picked = pasted.filter((item) => item.selected).length;
+  const errors = pasted.filter((item) => item.error).length;
+  const duplicates = pasted.filter((item) => item.duplicate).length;
+  $('#paste-summary').textContent = pasted.length
+    ? [
+        `${pasted.length} dòng, sẽ thêm ${picked} thẻ`,
+        errors && `${errors} dòng lỗi không thêm được`,
+        duplicates && `${duplicates} dòng trùng từ`,
+      ].filter(Boolean).join(' · ')
+    : '';
+  $('#paste-preview').hidden = !pasted.length;
+  pasteAdd.textContent = picked ? `Thêm ${picked} thẻ` : 'Thêm thẻ';
+  pasteAdd.disabled = !picked;
+}
+
+/** Điền các dòng đã chọn vào dòng thẻ trống (chưa lưu), hết dòng trống thì thêm dòng mới. */
+function addPasted() {
+  const picked = pasted.filter((item) => item.selected).map((item) => item.card);
+  if (!picked.length) return;
+  const blanks = rows.filter((row) => !row.id && !hasContent(row));
+  const added = picked.map((card) => {
+    const row = blanks.shift() ?? cards.add();
+    for (const field of Object.keys(card)) row[field].value = card[field];
+    autosizeRow(row);
+    return row;
+  });
+  if (hasContent(rows.at(-1))) cards.add();
+  pasteDialog.close();
+  activeRow = added[0];
+  refresh();
+  added[0].el.scrollIntoView({ block: 'center' });
+  toast(`Đã thêm ${added.length} thẻ. Bấm Lưu để lưu vào bộ.`);
 }
 
 // ------------------------------ Lưu ------------------------------

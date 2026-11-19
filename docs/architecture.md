@@ -94,6 +94,8 @@ Trang được import những module nào: xem [conventions.md › Code](convent
 - `fieldsOf(row)` → `{ term, meaning, reading, example }` đã `cleanText()`.
 - `snapshot(card)`, `hasContent(row)`, `isRowChanged(row)`, `autosizeRow(row)`.
 
+Cùng folder: `preview.js` (C4) dựng thẻ xem trước, `createPreview(root).show(fields, index, direction)`; `paste.js` (C5) có hàm thuần `parsePaste(text, existingTerms)` tách văn bản dán thành thẻ kèm lỗi và nhắc trùng, test ở `tests/paste.test.js`.
+
 ## Dữ liệu
 
 Ba "bảng" trong localStorage, key có tiền tố `nholau:`: `decks`, `cards`, `reviewLogs`. Mỗi bảng lưu thành một object JSON `{ [id]: bản ghi }`.
