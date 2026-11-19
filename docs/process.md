@@ -16,6 +16,12 @@
 
 ---
 
+## 2026-11-19 — Furigana đủ trong dữ liệu mẫu
+
+- **Người làm:** kakushi.
+- **Đã xong:** thêm furigana cho chữ 好 trong 2 câu ví dụ bộ 食べ物 (`core/seed.js`); thêm test trong `tests/repo.test.js`: mọi kanji ở từ và câu ví dụ của thẻ mẫu phải có `[cách đọc]`.
+- **Kiểm tra:** `npm test` 86/86; gỡ phần sửa thì test mới báo đúng 2 câu. Trình duyệt với `?seed`: trang Album và Học của cả 3 bộ không còn kanji thiếu furigana.
+
 ## 2026-11-18 — Sửa bố cục mobile trang Học
 
 - **Người làm:** At, cùng Codex.
