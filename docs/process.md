@@ -16,6 +16,25 @@
 
 ---
 
+## 2026-11-18 — Sửa bố cục mobile trang Học
+
+- **Người làm:** At, cùng Codex.
+- **Đã làm:** media query max-width 767px đặt thẻ phẳng, hai mặt đổi bằng aria-hidden, bỏ chuyển động 3D trên mobile; chiều cao 40vh, chữ lớn hơn; bộ đếm gọn một hàng; ẩn Phím tắt, thêm khoảng đệm đáy theo tabbar và safe-area. Thanh nav chung đã có nền đặc và viền trên. Nút chấm tối thiểu 48px.
+- **Kiểm tra:** Chrome tại 360/375/390/430 × 800: không cuộn ngang, thẻ cao 320px, nút khoảng 55px, đáy nút 639px trước nav ở 736px. Đổi thẻ bằng phím mũi tên reset về mặt trước và transform none. Console không lỗi. Ảnh study-mobile-*.jpg, cập nhật s11-mobile.jpg.
+- **Quyết định:** chỉ sửa CSS trong media query mobile, desktop dùng các quy tắc hiện có.
+
+## 2026-11-18 — Mở rộng trang Học trên desktop lớn
+
+- **Người làm:** At, cùng Codex.
+- **Đã làm:** media query từ 1920px trong study.css: khung 80vw tối đa 1600px, thẻ cao tối thiểu 55vh, tăng chữ và nút bằng clamp, cột phụ chiếm khoảng 24%. Quy tắc mới chỉ áp dụng từ 1920px theo yêu cầu.
+- **Kiểm tra:** Chrome ở bề rộng CSS 1366×768, 1920×1080, 2560×1440; khung lần lượt 1040/1536/1600px, không cuộn ngang, bốn nút chấm trong màn hình. Mặt sau ở 1920px và console qua. Ảnh study-wide-*.jpg trong pages/study/screenshots.
+
+## 2026-11-18 — Đổi chiều học (S11)
+
+- **Người làm:** At, cùng Codex.
+- **Đã làm:** nút đổi chiều theo bộ trong phiên học, lưu qua updateDeck; đổi ngay thẻ hiện tại; hiển thị nghĩa trước ở chiều Việt → Nhật. Điều chỉnh chiều cao thẻ trên điện thoại để nút chấm không bị thanh điều hướng che.
+- **Kiểm tra:** npm test 85/85; Chrome thử bộ mẫu, lưu chiều qua tải lại, Space, mũi tên, chấm 1–4 và Z; ảnh desktop và 375px trong pages/study/screenshots. Không có lỗi console.
+- **Còn cần review:** trường hợp ví dụ rất dài ở cả hai chiều và học hết một lượt.
 ## 2026-11-18 — Chọn chiều học trong hộp sửa bộ (A10)
 
 - **Người làm:** Banana (`tanphat-trinh`).

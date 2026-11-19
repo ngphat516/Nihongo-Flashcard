@@ -340,3 +340,131 @@
     visibility: hidden;
   }
 }
+
+.study-bar { flex-wrap: wrap; }
+.study-bar h1 { flex: 1 1 100%; }
+
+@media (max-width: 767px) {
+  .study-card .flashcard-face { min-height: 30vh; }
+}
+
+/* Khung học rộng cho desktop lớn, giữ các breakpoint hiện có bên dưới. */
+@media (min-width: 1920px) {
+  .study-main {
+    width: 80vw;
+    max-width: 100rem;
+    padding-block: clamp(2rem, 2vw, 3rem);
+    font-size: clamp(1rem, calc(1vw + 0.5rem), 1.375rem);
+  }
+
+  .study-session {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24%);
+    gap: clamp(1.5rem, 1.5vw, 2.5rem);
+  }
+
+  .study-workspace { gap: clamp(1rem, 1vw, 1.5rem); }
+  .study-bar h1 { flex: 1 1 auto; font-size: clamp(2rem, 1.5vw, 2.5rem); }
+
+  .study-main .btn,
+  .study-queue h2,
+  .study-rate-heading h2,
+  .study-shortcuts h2 { font-size: 1em; }
+
+  .study-main .btn { padding: 0.75em 1em; }
+  .study-main .panel { padding: clamp(1.25rem, 1.25vw, 2rem); }
+
+  .study-card .flashcard-face {
+    min-height: 55vh;
+    padding: clamp(2rem, 2vw, 3rem);
+  }
+
+  .study-card-text { font-size: clamp(3.5rem, 3.5vw, 6rem); }
+  .study-card-meaning { font-size: clamp(2rem, 2.5vw, 4rem); }
+  .study-card-reading { font-size: clamp(1.5rem, 1.25vw, 2rem); }
+  .study-card-example { font-size: clamp(1.25rem, 1vw, 1.75rem); }
+
+  .study-card-label,
+  .study-card-hint,
+  .study-card-nav,
+  .study-shortcuts dl,
+  .study-rate-heading p { font-size: 0.875em; }
+
+  .study-shortcuts kbd,
+  .study-queue-counts .count { font-size: 0.75em; }
+  .study-queue-counts b { font-size: 2em; }
+
+  .study-ratings { gap: clamp(0.75rem, 0.75vw, 1.25rem); }
+  .study-ratings .btn { min-height: 5rem; padding: 0.75em; }
+  .study-ratings .btn small { font-size: 0.75em; }
+}
+
+@media (max-width: 767px) {
+  .study-main {
+    padding-bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom, 0px) + var(--space-4));
+  }
+
+  .study-session,
+  .study-workspace { gap: var(--space-2); }
+
+  .study-shortcuts { display: none; }
+
+  .study-queue {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .study-queue h2 {
+    max-width: 5rem;
+    font-size: var(--text-xs);
+  }
+
+  .study-queue-counts {
+    flex: 1;
+    margin: 0;
+    gap: var(--space-1);
+  }
+
+  .study-queue-counts .count {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: var(--space-1);
+    padding: var(--space-1);
+    white-space: nowrap;
+    font-size: var(--text-xs);
+  }
+
+  .study-queue-counts b { font-size: var(--text-base); }
+
+  /* Hai mặt dùng chung ô grid; đổi mặt tức thì để thẻ luôn nằm phẳng. */
+  .study-card,
+  .study-card .flashcard-inner,
+  .study-card.is-flipped .flashcard-inner,
+  .study-card .flashcard-face {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    transform: none;
+    perspective: none;
+    transform-style: flat;
+    transition: none;
+  }
+
+  .study-card .flashcard-face {
+    min-height: 40vh;
+    padding: var(--space-4);
+    gap: var(--space-2);
+  }
+
+  .study-card .flashcard-face[aria-hidden='true'] { visibility: hidden; }
+  .study-card-text { font-size: clamp(1.75rem, 7vw, 2.25rem); }
+  .study-card-meaning { font-size: clamp(1.5rem, 6vw, 2rem); }
+  .study-card-example { font-size: var(--text-lg); max-block-size: 5rem; }
+
+  .study-rate-panel { padding: var(--space-3); gap: var(--space-2); }
+  .study-rate-heading p { display: none; }
+  .study-ratings { gap: var(--space-2); }
+  .study-ratings .btn { min-height: 48px; }
+}
