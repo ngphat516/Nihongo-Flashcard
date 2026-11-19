@@ -47,6 +47,10 @@
         <div class="row" id="deck-links" hidden>
           <a class="btn" id="link-album" href="../album/">Xem trong album</a>
           <a class="btn" id="link-study" href="../study/">Học ngay</a>
+          <button class="btn" id="open-export" type="button" aria-haspopup="dialog">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+            Xuất file
+          </button>
         </div>
       </div>
 
@@ -148,6 +152,12 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
             Dán nhiều thẻ
           </button>
+          <button class="btn create-import-open" id="open-import" type="button" aria-describedby="import-hint">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+            Nhập file
+          </button>
+          <span class="visually-hidden" id="import-hint">Nhận file .csv, .tsv, .txt hoặc .json</span>
+          <input class="visually-hidden" id="import-file" type="file" accept=".csv,.tsv,.txt,.json" tabindex="-1" aria-hidden="true">
         </div>
       </section>
 
@@ -205,14 +215,16 @@
       </li>
     </template>
 
-    <!-- Dán nhiều thẻ (C5): create.js tách bằng paste.js, điền bảng xem trước, thêm thành dòng thẻ. -->
+    <!-- Dán nhiều thẻ (C5) và Nhập file (C7) dùng chung hộp thoại: create.js tách bằng paste.js / file-io.js,
+         điền bảng xem trước, thêm thành dòng thẻ. Nhập file thì ẩn ô dán (#paste-field), hiện #paste-file-hint. -->
     <dialog class="dialog create-paste" id="paste-dialog" aria-labelledby="paste-title">
       <h2 class="dialog-title" id="paste-title">Dán nhiều thẻ</h2>
-      <div class="field">
+      <div class="field" id="paste-field">
         <label class="field-label" for="paste-input">Mỗi dòng một thẻ</label>
         <textarea class="input create-paste-input" id="paste-input" rows="7" lang="ja" spellcheck="false" aria-describedby="paste-hint" placeholder="約束[やくそく] | lời hứa | やくそく | 約束[やくそく]を守[まも]る。"></textarea>
         <span class="field-hint" id="paste-hint">Cột theo thứ tự <strong>từ | nghĩa | cách đọc | ví dụ</strong>, cách nhau bằng <kbd>|</kbd> hoặc Tab. Dán thẳng từ Excel, Google Sheets hay Quizlet được; cách đọc và ví dụ có thể bỏ trống.</span>
       </div>
+      <p class="field-hint" id="paste-file-hint" hidden></p>
       <p class="create-paste-summary" id="paste-summary" role="status"></p>
       <div class="create-paste-scroll" id="paste-preview" hidden>
         <table class="create-paste-table">
@@ -236,6 +248,26 @@
     </dialog>
 
     <!-- Xem thử cả bộ: lật lần lượt các thẻ đã gõ (chưa cần lưu), như trên trang Học. -->
+    <!-- Xuất file (C7): tải bản đã lưu của bộ. -->
+    <dialog class="dialog create-export" id="export-dialog" aria-labelledby="export-title" aria-describedby="export-text">
+      <h2 class="dialog-title" id="export-title">Xuất bộ thẻ</h2>
+      <p id="export-text"></p>
+      <p class="alert create-export-unsaved" id="export-unsaved" hidden>Có thay đổi chưa lưu. File chỉ có bản đã lưu; bấm Lưu trước nếu muốn xuất cả thay đổi.</p>
+      <div class="create-export-options">
+        <button class="create-export-option" id="export-csv" type="button">
+          <span class="create-export-name">CSV</span>
+          <span class="create-export-desc">Mở bằng Excel, Google Sheets; nhập vào Anki, Quizlet.</span>
+        </button>
+        <button class="create-export-option" id="export-json" type="button">
+          <span class="create-export-name">JSON</span>
+          <span class="create-export-desc">Giữ cả tên, mô tả, màu bìa của bộ. Dùng để sao lưu hoặc chuyển sang máy khác.</span>
+        </button>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn" id="export-close" type="button">Đóng</button>
+      </div>
+    </dialog>
+
     <dialog class="dialog create-review" id="review-dialog" aria-labelledby="review-title">
       <div class="create-review-head">
         <h2 class="dialog-title" id="review-title">Xem thử cả bộ</h2>

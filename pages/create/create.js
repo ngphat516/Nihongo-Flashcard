@@ -14,6 +14,8 @@
  * Xem trước (C4): khung thẻ hiện dòng đang focus hoặc đang gõ, theo chiều học của bộ; ‹ › chuyển
  * giữa các thẻ đã gõ, dòng đang xem được tô viền. "Xem thử cả bộ" (#review-dialog) lật lần lượt cả bộ.
  * Dán nhiều thẻ (C5): hộp thoại #paste-dialog, xem trước thành bảng, thêm vào các dòng thẻ (chưa lưu).
+ * Xuất / nhập file (C7, file-io.js): Xuất file tải bản đã lưu (.csv hoặc .json). Nhập file đọc file rồi
+ * mở chung hộp thoại với Dán nhiều thẻ (ẩn ô dán); bộ mới chưa có tên thì lấy tên, màu... từ file JSON.
  *
  * Thẻ tiếng Nhật (C9): createCards / updateCard nhận { term, meaning, reading, example }.
  * Màu bìa (C8): chọn màu từ DECK_COLORS qua .color-picker; tạo bộ mới chọn sẵn màu kế tiếp.
@@ -45,6 +47,7 @@ import {
 import { confirmDialog, setError, showFailure, toast } from './feedback.js';
 import { createPreview } from './preview.js';
 import { parsePaste } from './paste.js';
+import { MAX_FILE_BYTES, cardsToCsv, cardsToJson, exportFileName, readCardFile } from './file-io.js';
 import { addReadingBrackets } from './reading.js';
 
 const DEFAULT_NEW_PER_DAY = 20;
@@ -62,6 +65,8 @@ const notice = $('#notice');
 const pasteDialog = $('#paste-dialog');
 const pasteInput = $('#paste-input');
 const pasteAdd = $('#paste-add');
+const importInput = $('#import-file');
+const exportDialog = $('#export-dialog');
 
 const cards = createCardRows($('#cards'), $('#card-template'));
 const { rows } = cards;
@@ -77,8 +82,12 @@ let removedIds = [];
 let saving = false;
 /** Dòng đang hiện trong khung xem trước. */
 let activeRow = null;
-/** Kết quả parsePaste() của ô dán, thêm `selected`. */
+/** Kết quả parsePaste() của ô dán (hoặc readCardFile() của file nhập), thêm `selected`. */
 let pasted = [];
+/** Thông tin bộ trong file JSON đang nhập (tên, màu...); null khi dán hoặc file không có. */
+let importedDeck = null;
+/** Thẻ đã lưu của bộ, đọc lúc mở hộp thoại Xuất file. */
+let exportCards = [];
 /** Thẻ đang xem trong hộp thoại Xem thử: vị trí trong `reviewRows`. */
 let reviewRows = [];
 let reviewIndex = 0;
@@ -287,6 +296,16 @@ function bindEvents() {
   });
   pasteAdd.addEventListener('click', addPasted);
   $('#paste-cancel').addEventListener('click', () => pasteDialog.close());
+  pasteDialog.addEventListener('close', () => { importedDeck = null; });
+  $('#open-import').addEventListener('click', () => {
+    importInput.value = '';
+    importInput.click();
+  });
+  importInput.addEventListener('change', () => importFile(importInput.files[0]));
+  $('#open-export').addEventListener('click', openExport);
+  $('#export-csv').addEventListener('click', () => exportAs('csv'));
+  $('#export-json').addEventListener('click', () => exportAs('json'));
+  $('#export-close').addEventListener('click', () => exportDialog.close());
   addButton.addEventListener('click', () => {
     cards.add().term.focus();
     refresh();
@@ -448,10 +467,18 @@ function editReviewed() {
 // ------------------------------ Dán nhiều thẻ (C5) ------------------------------
 
 function openPaste() {
+  setPasteMode(null);
   pasteInput.value = '';
   updatePaste();
   pasteDialog.showModal();
   pasteInput.focus();
+}
+
+/** Hộp thoại dùng cho ô dán (fileName = null) hay cho file nhập: đổi tiêu đề, ẩn / hiện ô dán. */
+function setPasteMode(fileName) {
+  $('#paste-title').textContent = fileName ? `Nhập file ${fileName}` : 'Dán nhiều thẻ';
+  $('#paste-field').hidden = Boolean(fileName);
+  $('#paste-file-hint').hidden = !fileName;
 }
 
 function updatePaste() {
@@ -504,6 +531,85 @@ function renderPaste() {
   pasteAdd.disabled = !picked;
 }
 
+// ------------------------------ Nhập file (C7) ------------------------------
+
+async function importFile(file) {
+  if (!file) return;
+  if (file.size > MAX_FILE_BYTES) {
+    toast('File lớn quá 2 MB. Hãy chia nhỏ rồi nhập từng phần.', true);
+    return;
+  }
+  let text;
+  try {
+    text = await file.text();
+  } catch {
+    toast('Không đọc được file này.', true);
+    return;
+  }
+  const terms = rows.filter(hasContent).map((row) => fieldsOf(row).term);
+  const result = readCardFile(file.name, text, terms);
+  if (result.error) {
+    toast(result.error, true);
+    return;
+  }
+  pasted = result.rows.map((item) => ({ ...item, selected: !item.error }));
+  importedDeck = willUseImportedDeck() ? result.deck : null;
+  setPasteMode(file.name);
+  $('#paste-file-hint').textContent = importedDeck?.name
+    ? `Bộ chưa có tên nên sẽ lấy tên “${importedDeck.name}”, mô tả, màu bìa và chiều học theo file. Bỏ chọn dòng không muốn thêm.`
+    : 'Kiểm tra lại trước khi thêm. Bỏ chọn dòng không muốn thêm.';
+  renderPaste();
+  pasteDialog.showModal();
+  pasteAdd.disabled ? $('#paste-cancel').focus() : pasteAdd.focus();
+}
+
+/** Thông tin bộ trong file chỉ dùng khi đang tạo bộ mới và chưa gõ tên. */
+function willUseImportedDeck() {
+  return !deck && !cleanText(nameInput.value);
+}
+
+function applyImportedDeck(info) {
+  if (info.name) nameInput.value = info.name;
+  if (info.description !== undefined) descInput.value = info.description;
+  if (info.newPerDay !== undefined) limitInput.value = info.newPerDay;
+  if (info.color) setSelectedColor(info.color);
+  if (info.direction && form.elements.direction) form.elements.direction.value = info.direction;
+  setError(nameInput, null);
+  setError(limitInput, null);
+  $('#page-title').textContent = info.name || 'Bộ thẻ mới';
+}
+
+// ------------------------------ Xuất file (C7) ------------------------------
+
+async function openExport() {
+  if (!deck) return;
+  exportCards = await getCards(deck.id);
+  $('#export-text').textContent = exportCards.length
+    ? `${exportCards.length} thẻ đã lưu của bộ “${deck.name}”. Chọn định dạng:`
+    : `Bộ “${deck.name}” chưa có thẻ nào đã lưu. File sẽ chỉ có thông tin bộ.`;
+  $('#export-unsaved').hidden = !isDirty();
+  exportDialog.showModal();
+  $('#export-csv').focus();
+}
+
+function exportAs(format) {
+  const text = format === 'csv' ? cardsToCsv(exportCards) : cardsToJson(deck, exportCards);
+  const type = format === 'csv' ? 'text/csv;charset=utf-8' : 'application/json';
+  const fileName = exportFileName(deck.name, format);
+  downloadText(fileName, text, type);
+  exportDialog.close();
+  toast(`Đã tải ${fileName}`);
+}
+
+function downloadText(fileName, text, type) {
+  const url = URL.createObjectURL(new Blob([text], { type }));
+  const link = h('a', { href: url, download: fileName, hidden: true });
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
 /** Điền các dòng đã chọn vào dòng thẻ trống (chưa lưu), hết dòng trống thì thêm dòng mới. */
 function addPasted() {
   const picked = pasted.filter((item) => item.selected).map((item) => item.card);
@@ -516,11 +622,14 @@ function addPasted() {
     return row;
   });
   if (hasContent(rows.at(-1))) cards.add();
+  const withDeck = Boolean(importedDeck && willUseImportedDeck());
+  if (withDeck) applyImportedDeck(importedDeck);
+  importedDeck = null;
   pasteDialog.close();
   activeRow = added[0];
   refresh();
   added[0].el.scrollIntoView({ block: 'center' });
-  toast(`Đã thêm ${added.length} thẻ. Bấm Lưu để lưu vào bộ.`);
+  toast(`Đã thêm ${added.length} thẻ${withDeck ? ' và thông tin bộ' : ''}. Bấm Lưu để lưu vào bộ.`);
 }
 
 // ------------------------------ Lưu ------------------------------

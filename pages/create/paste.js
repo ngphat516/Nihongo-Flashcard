@@ -3,6 +3,7 @@
  *
  * Mỗi dòng một thẻ, tối đa 4 cột theo thứ tự term | meaning | reading | example.
  * Dòng có Tab thì tách bằng Tab (dán từ Excel, Google Sheets, Quizlet), không có thì tách bằng "|".
+ * checkRows() kiểm tra lỗi / trùng / thiếu cách đọc; nhập file (C7, file-io.js) dùng lại hàm này.
  */
 import { cleanText, LIMITS } from '../../core/models.js';
 import { plainFurigana } from '../../core/furigana.js';
@@ -14,25 +15,40 @@ export const PASTE_FIELDS = Object.freeze(['term', 'meaning', 'reading', 'exampl
 export const termKey = (term) => plainFurigana(cleanText(term)).toLowerCase().replace(/\s+/g, ' ');
 
 /**
- * @param {string} text           văn bản người dùng dán
- * @param {string[]} existingTerms từ của các dòng thẻ đang có trên trang (để nhắc trùng)
- * @returns {{ line: number, card: object, error: string, duplicate: string, noReading: string[] }[]}
- *   line: số dòng trong ô dán (bắt đầu từ 1, bỏ qua dòng trống)
+ * @typedef {{ line: number, card: object, error: string, duplicate: string, noReading: string[] }} CheckedRow
+ *   line: số dòng trong ô dán / trong file (bắt đầu từ 1)
  *   error: lý do không thêm được; '' nếu hợp lệ
  *   duplicate: lời nhắc trùng (vẫn cho thêm); '' nếu không trùng
  *   noReading: các cụm kanji chưa có [cách đọc] (vẫn cho thêm), xem kanjiWithoutReading()
  */
+
+/**
+ * @param {string} text           văn bản người dùng dán
+ * @param {string[]} existingTerms từ của các dòng thẻ đang có trên trang (để nhắc trùng)
+ * @returns {CheckedRow[]}  bỏ qua dòng trống
+ */
 export function parsePaste(text, existingTerms = []) {
+  const rows = [];
+  String(text ?? '').split(/\r\n|\r|\n/).forEach((raw, i) => {
+    if (raw.trim()) rows.push({ line: i + 1, parts: raw.split(raw.includes('\t') ? '\t' : '|') });
+  });
+  return checkRows(rows, existingTerms);
+}
+
+/**
+ * Kiểm tra các dòng đã tách cột.
+ * @param {{ line: number, parts: string[] }[]} rows  parts theo thứ tự PASTE_FIELDS
+ * @param {string[]} existingTerms
+ * @returns {CheckedRow[]}
+ */
+export function checkRows(rows, existingTerms = []) {
   const existing = new Set(existingTerms.map(termKey).filter(Boolean));
   const seen = new Map();
-  const result = [];
 
-  String(text ?? '').split(/\r\n|\r|\n/).forEach((raw, i) => {
-    if (!raw.trim()) return;
-    const parts = raw.split(raw.includes('\t') ? '\t' : '|').map(cleanText);
+  return rows.map(({ line, parts: rawParts }) => {
+    const parts = rawParts.map(cleanText);
     while (parts.length > PASTE_FIELDS.length && !parts.at(-1)) parts.pop(); // Excel hay để thừa ô trống ở cuối
     const card = Object.fromEntries(PASTE_FIELDS.map((field, j) => [field, parts[j] ?? '']));
-    const line = i + 1;
 
     let error = '';
     if (parts.length > PASTE_FIELDS.length) error = `Có ${parts.length} cột, tối đa ${PASTE_FIELDS.length}`;
@@ -49,9 +65,8 @@ export function parsePaste(text, existingTerms = []) {
       else if (seen.has(key)) duplicate = `Trùng dòng ${seen.get(key)}`;
       if (!seen.has(key)) seen.set(key, line);
     }
-    result.push({ line, card, error, duplicate, noReading: error ? [] : kanjiWithoutReading(card) });
+    return { line, card, error, duplicate, noReading: error ? [] : kanjiWithoutReading(card) };
   });
-  return result;
 }
 
 /**

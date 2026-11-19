@@ -174,12 +174,14 @@ textarea.create-card-input {
 .create-add:hover {
   color: var(--text);
 }
-.create-paste-open {
-  flex: 1 1 160px;
+.create-paste-open,
+.create-import-open {
+  flex: 1 1 140px;
   white-space: nowrap; /* cột danh sách hẹp (1024–1200px) làm nút bị bẻ thành 2 dòng */
 }
 @media (min-width: 640px) {
-  .create-paste-open {
+  .create-paste-open,
+  .create-import-open {
     flex-grow: 0;
   }
 }
@@ -440,6 +442,39 @@ textarea.create-card-input {
 }
 .create-paste-note {
   color: var(--text-2);
+}
+
+/* ---------- Xuất file (C7) ---------- */
+.create-export-unsaved {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-sm);
+}
+.create-export-options {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+.create-export-option {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.create-export-option:hover {
+  background: var(--surface-2);
+}
+.create-export-name {
+  font-weight: 700;
+}
+.create-export-desc {
+  color: var(--text-2);
+  font-size: var(--text-sm);
 }
 
 /* ---------- Thanh Lưu ---------- */
