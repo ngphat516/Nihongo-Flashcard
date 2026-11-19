@@ -17,6 +17,7 @@
  *
  * Thẻ tiếng Nhật (C9): createCards / updateCard nhận { term, meaning, reading, example }.
  * Màu bìa (C8): chọn màu từ DECK_COLORS qua .color-picker; tạo bộ mới chọn sẵn màu kế tiếp.
+ * Kanji chưa có [cách đọc] (reading.js): nhắc dưới ô Từ / Ví dụ, nút "Thêm cách đọc" chèn [] để gõ.
  * So trùng thẻ dùng plainFurigana(term) (furigana.js) để 約束[やくそく] trùng với 約束.
  */
 import {
@@ -44,6 +45,7 @@ import {
 import { confirmDialog, setError, showFailure, toast } from './feedback.js';
 import { createPreview } from './preview.js';
 import { parsePaste } from './paste.js';
+import { addReadingBrackets } from './reading.js';
 
 const DEFAULT_NEW_PER_DAY = 20;
 const BLANK_ROWS_FOR_NEW_DECK = 3;
@@ -253,7 +255,10 @@ function bindEvents() {
   $('#cards').addEventListener('click', (event) => {
     const button = event.target.closest('.create-card-delete');
     if (button) deleteRow(cards.find(button));
+    const addReading = event.target.closest('.create-reading-add');
+    if (addReading) insertReadingBrackets($('textarea', addReading.closest('.field')));
   });
+  $('#cards').addEventListener('focusout', () => cards.refresh());
   $('#cards').addEventListener('focusin', (event) => {
     const row = cards.find(event.target);
     if (row && row !== activeRow) {
@@ -265,7 +270,8 @@ function bindEvents() {
   $('#preview-next').addEventListener('click', () => stepPreview(1));
   $('#open-review').addEventListener('click', openReview);
   $('#review-prev').addEventListener('click', () => showReview(reviewIndex - 1));
-  $('#review-next').addEventListener('click', () => showReview(reviewIndex + 1));
+  $('#review-next').addEventListener('click', () =>
+    showReview(reviewIndex === reviewRows.length - 1 ? 0 : reviewIndex + 1));
   $('#review-flip').addEventListener('click', () => review.flip());
   $('#review-edit').addEventListener('click', editReviewed);
   $('#review-close').addEventListener('click', () => reviewDialog.close());
@@ -305,6 +311,16 @@ function deleteRow(row) {
   const next = rows[i] ?? rows[i - 1];
   (next ? next.term : addButton).focus();
   refresh();
+}
+
+/** Nút "Thêm cách đọc": chèn [] sau cụm kanji thiếu đầu tiên, đặt con trỏ vào giữa để gõ luôn. */
+function insertReadingBrackets(input) {
+  const result = addReadingBrackets(input.value);
+  if (!result) return;
+  input.value = result.text;
+  input.focus();
+  input.setSelectionRange(result.cursor, result.cursor);
+  input.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
 function onInput(event) {
@@ -375,10 +391,14 @@ function showReview(index) {
   const row = reviewRows[index];
   review.show(fieldsOf(row), row, deck?.direction);
   const total = reviewRows.length;
-  $('#review-count').textContent = `Thẻ ${index + 1} / ${total}`;
   $('#review-bar').style.width = `${((index + 1) / total) * 100}%`;
+  // Thẻ cuối: báo hết bộ, nút Sau thành "Xem lại từ đầu" (mũi tên → vẫn dừng ở đây)
+  const last = index === total - 1;
+  $('#review-count').textContent = last && total > 1 ? `Thẻ ${total} / ${total} · Hết bộ` : `Thẻ ${index + 1} / ${total}`;
   $('#review-prev').disabled = index === 0;
-  $('#review-next').disabled = index === total - 1;
+  $('#review-next').disabled = total === 1;
+  $('#review-next').classList.toggle('is-end', last);
+  $('#review-next-label').textContent = last ? 'Xem lại từ đầu' : 'Sau';
 }
 
 function onReviewKeydown(event) {
@@ -442,7 +462,7 @@ function updatePaste() {
 
 function renderPaste() {
   $('#paste-rows').replaceChildren(...pasted.map((item) => {
-    const { card, error, duplicate } = item;
+    const { card, error, duplicate, noReading } = item;
     const message = error || duplicate;
     return h('tr', { class: error ? 'is-error' : item.selected ? '' : 'is-off' },
       h('td', {}, h('input', {
@@ -458,7 +478,9 @@ function renderPaste() {
       h('td', { class: 'create-paste-line' }, item.line),
       h('td', {},
         card.term ? renderFurigana(card.term) : null,
-        message && h('span', { class: error ? 'create-paste-error' : 'create-paste-note' }, message)),
+        message && h('span', { class: error ? 'create-paste-error' : 'create-paste-note' }, message),
+        noReading.length > 0 && h('span', { class: 'create-paste-note' },
+          'Chưa có cách đọc: ', h('span', { lang: 'ja' }, noReading.join('、')))),
       h('td', {}, card.meaning),
       h('td', { lang: 'ja' }, card.reading),
       h('td', {}, card.example ? renderFurigana(card.example) : null),
@@ -468,11 +490,13 @@ function renderPaste() {
   const picked = pasted.filter((item) => item.selected).length;
   const errors = pasted.filter((item) => item.error).length;
   const duplicates = pasted.filter((item) => item.duplicate).length;
+  const noReading = pasted.filter((item) => item.noReading.length).length;
   $('#paste-summary').textContent = pasted.length
     ? [
         `${pasted.length} dòng, sẽ thêm ${picked} thẻ`,
         errors && `${errors} dòng lỗi không thêm được`,
         duplicates && `${duplicates} dòng trùng từ`,
+        noReading && `${noReading} dòng có kanji chưa có cách đọc`,
       ].filter(Boolean).join(' · ')
     : '';
   $('#paste-preview').hidden = !pasted.length;

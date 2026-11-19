@@ -137,6 +137,29 @@ textarea.create-card-input {
 .create-warning svg {
   flex: none;
 }
+/* Nhắc kanji chưa có cách đọc (reading.js). Chỉ nhắc, không phải lỗi: chữ thường màu phụ. */
+.create-reading-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-2);
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+.create-reading-hint[hidden] {
+  display: none;
+}
+.create-reading-add {
+  padding: var(--space-1) 0;
+  border: 0;
+  background: none;
+  color: var(--primary-strong);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
 
 .create-card-actions {
   display: flex;
@@ -153,6 +176,7 @@ textarea.create-card-input {
 }
 .create-paste-open {
   flex: 1 1 160px;
+  white-space: nowrap; /* cột danh sách hẹp (1024–1200px) làm nút bị bẻ thành 2 dòng */
 }
 @media (min-width: 640px) {
   .create-paste-open {
@@ -334,6 +358,9 @@ textarea.create-card-input {
 }
 .create-review-nav .btn {
   gap: var(--space-1);
+}
+.create-review-nav .is-end .create-review-arrow {
+  display: none;
 }
 .create-review-actions {
   justify-content: space-between;

@@ -175,6 +175,10 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
             <span class="create-warning-text"></span>
           </span>
+          <span class="create-reading-hint" hidden>
+            <span class="create-reading-text"></span>
+            <button class="create-reading-add" type="button">Thêm cách đọc</button>
+          </span>
         </div>
         <div class="field create-card-meaning">
           <label class="field-label">Nghĩa</label>
@@ -190,6 +194,10 @@
           <label class="field-label">Ví dụ <span class="muted">(không bắt buộc)</span></label>
           <textarea class="input create-card-input" data-field="example" lang="ja" rows="1" maxlength="2000" placeholder="VD: 約束[やくそく]を守[まも]る。"></textarea>
           <span class="field-error" hidden></span>
+          <span class="create-reading-hint" hidden>
+            <span class="create-reading-text"></span>
+            <button class="create-reading-add" type="button">Thêm cách đọc</button>
+          </span>
         </div>
         <button class="btn btn-ghost create-card-delete" type="button">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
@@ -252,7 +260,7 @@
       <div class="create-review-nav">
         <button class="btn" id="review-prev" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg> Trước</button>
         <button class="btn" id="review-flip" type="button">Lật</button>
-        <button class="btn" id="review-next" type="button">Sau <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+        <button class="btn" id="review-next" type="button"><span id="review-next-label">Sau</span> <svg class="create-review-arrow"width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
       </div>
       <div class="dialog-actions create-review-actions">
         <button class="btn btn-ghost" id="review-edit" type="button">Sửa thẻ này</button>

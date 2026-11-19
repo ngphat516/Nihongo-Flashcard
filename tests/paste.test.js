@@ -39,4 +39,9 @@ describe('dán nhiều thẻ (C5)', () => {
     const rows = parsePaste('約束[やくそく]|lời hứa\nABC|x\nabc|y', ['約束']);
     assert.deepEqual(rows.map((r) => r.duplicate), ['Trùng thẻ đã có', '', 'Trùng dòng 2']);
   });
+
+  test('nhắc kanji chưa có cách đọc; từ đã có cột Cách đọc thì không nhắc ở từ', () => {
+    const rows = parsePaste('山|núi\n山|núi|やま|川を見る\n水[みず]|nước||水[みず]を飲[の]む\n|thiếu từ');
+    assert.deepEqual(rows.map((r) => r.noReading), [['山'], ['川', '見'], [], []]);
+  });
 });

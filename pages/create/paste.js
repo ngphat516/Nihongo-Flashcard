@@ -6,6 +6,7 @@
  */
 import { cleanText, LIMITS } from '../../core/models.js';
 import { plainFurigana } from '../../core/furigana.js';
+import { missingReadings } from './reading.js';
 
 export const PASTE_FIELDS = Object.freeze(['term', 'meaning', 'reading', 'example']);
 
@@ -15,10 +16,11 @@ export const termKey = (term) => plainFurigana(cleanText(term)).toLowerCase().re
 /**
  * @param {string} text           văn bản người dùng dán
  * @param {string[]} existingTerms từ của các dòng thẻ đang có trên trang (để nhắc trùng)
- * @returns {{ line: number, card: object, error: string, duplicate: string }[]}
+ * @returns {{ line: number, card: object, error: string, duplicate: string, noReading: string[] }[]}
  *   line: số dòng trong ô dán (bắt đầu từ 1, bỏ qua dòng trống)
  *   error: lý do không thêm được; '' nếu hợp lệ
  *   duplicate: lời nhắc trùng (vẫn cho thêm); '' nếu không trùng
+ *   noReading: các cụm kanji chưa có [cách đọc] (vẫn cho thêm), xem kanjiWithoutReading()
  */
 export function parsePaste(text, existingTerms = []) {
   const existing = new Set(existingTerms.map(termKey).filter(Boolean));
@@ -47,7 +49,19 @@ export function parsePaste(text, existingTerms = []) {
       else if (seen.has(key)) duplicate = `Trùng dòng ${seen.get(key)}`;
       if (!seen.has(key)) seen.set(key, line);
     }
-    result.push({ line, card, error, duplicate });
+    result.push({ line, card, error, duplicate, noReading: error ? [] : kanjiWithoutReading(card) });
   });
   return result;
+}
+
+/**
+ * Cụm kanji chưa có cách đọc trong từ và ví dụ, không lặp.
+ * Từ đã có cột Cách đọc thì không nhắc: người học có thể cố ý để mặt trước không có furigana.
+ */
+export function kanjiWithoutReading(card) {
+  const runs = [
+    ...(card.reading ? [] : missingReadings(card.term)),
+    ...missingReadings(card.example),
+  ].map((run) => run.text);
+  return [...new Set(runs)];
 }
