@@ -6,6 +6,7 @@ import { DECK_COLORS } from '../core/models.js';
 import { Rating } from '../core/scheduler.js';
 import { seedDemoData } from '../core/seed.js';
 import { migrateCards } from '../core/migrate.js';
+import { parseFurigana } from '../core/furigana.js';
 
 let storage;
 beforeEach(() => {
@@ -359,4 +360,14 @@ test('dữ liệu mẫu tạo được và hợp lệ', async () => {
   assert.equal(firstCard.term, '約束[やくそく]');
   assert.equal(firstCard.reading, 'やくそく');
   assert.equal(firstCard.example, '約束[やくそく]を守[まも]る。');
+});
+
+test('dữ liệu mẫu: chữ kanji nào trên thẻ cũng có furigana', async () => {
+  await seedDemoData();
+  const kanji = /[一-鿿々]/;
+  const missing = Object.values(raw('cards')).flatMap((card) =>
+    ['term', 'example'].filter((field) =>
+      parseFurigana(card[field]).some((segment) => 'text' in segment && kanji.test(segment.text)))
+      .map((field) => `${field}: ${card[field]}`));
+  assert.deepEqual(missing, [], 'thêm [cách đọc] ngay sau kanji trong core/seed.js');
 });
