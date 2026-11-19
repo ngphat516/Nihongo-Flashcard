@@ -35,6 +35,17 @@
 - **Đã làm:** nút đổi chiều theo bộ trong phiên học, lưu qua updateDeck; đổi ngay thẻ hiện tại; hiển thị nghĩa trước ở chiều Việt → Nhật. Điều chỉnh chiều cao thẻ trên điện thoại để nút chấm không bị thanh điều hướng che.
 - **Kiểm tra:** npm test 85/85; Chrome thử bộ mẫu, lưu chiều qua tải lại, Space, mũi tên, chấm 1–4 và Z; ảnh desktop và 375px trong pages/study/screenshots. Không có lỗi console.
 - **Còn cần review:** trường hợp ví dụ rất dài ở cả hai chiều và học hết một lượt.
+## 2026-11-18 — Chọn chiều học trong hộp sửa bộ (A10)
+
+- **Người làm:** Banana (`tanphat-trinh`).
+- **Đã xong:**
+  - Nhánh `feature/album-a10`, tách từ `main` tại `eb631a7`.
+  - Hộp sửa bộ thêm radio Nhật → Việt / Việt → Nhật ngay sau màu bìa, lấy giá trị từ `DECK_DIRECTIONS`, chọn sẵn `deck.direction`, lưu qua `updateDeck()`. Trang chi tiết ghi chiều hiện tại; Album vẫn hiện từ ở mặt trước.
+  - `npm test`: 85/85 đạt. Chromium: 42 kiểm tra A10 tại 1440px và 375px đạt (hai chiều, bàn phím, Esc hủy, lưu/mở lại/tải lại, không đổi thẻ/lịch sử ôn/các trường khác, không tràn ngang, hàng đợi Study nhận chiều đã lưu); 75 kiểm tra hồi quy Album đạt với `?seed`, `?reset`, sửa/xóa, tìm/lọc/sắp xếp, màu bìa, furigana và nội dung dài.
+  - Đã xem trực tiếp 4 ảnh PNG hộp sửa bộ và trang chi tiết tại 1440px/375px trong `pages/album/screenshots/album-a10-*.png`; ảnh chụp từ Chromium. Không sửa thiết kế thẻ, phần chung hoặc trang khác.
+- **Quyết định:** giữ A10 ở trạng thái Đang làm vì tiêu chí tích hợp với trang Học chưa đạt; không sửa phần S11 của At.
+- **Tiếp theo:** review phần Album; khi S11 có trên nhánh tích hợp, kiểm tra mặt trước ở cả hai chiều rồi mới đánh dấu A10 Xong.
+- **Vướng mắc:** `main` hiện chưa có S11: Study vẫn hiện từ ở mặt trước dù `getStudyQueue()` đã trả `deck.direction = 'vi-ja'`. Không có lỗi JavaScript trong kiểm thử; Google Fonts bị môi trường chặn (`ERR_TUNNEL_CONNECTION_FAILED`) và favicon trả 404, nên screenshot dùng font dự phòng và chưa xác minh font tải từ Google.
 
 ## 2026-11-18 — Sắp xếp lại bảng việc
 
