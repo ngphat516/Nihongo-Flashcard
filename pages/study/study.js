@@ -80,6 +80,8 @@ async function showDeckPicker() {
 async function startSession(deckId) {
   const session = $('#session');
   const done = $('#done-screen');
+  const empty = $('#empty-deck');
+  $('#empty-add').href = routes.create(deckId);
   const stage = $('#card-stage');
   const front = $('#card-front');
   const back = $('#card-back');
@@ -198,9 +200,16 @@ async function startSession(deckId) {
     try {
       const now = Date.now();
       const queue = await getStudyQueue(deckId, { now, lastCardId });
+      const cards = await getCards(deckId);
+      empty.hidden = cards.length > 0;
+      if (cards.length === 0) {
+        session.hidden = true;
+        done.hidden = true;
+        $('#empty-title').focus();
+        return;
+      }
       const card = preferredCard ?? queue.card;
       if (card) {
-        const cards = await getCards(deckId);
         cardsToBrowse = browsableCards(cards, queue.counts.new, now, lastCardId);
         cardIndex = cardsToBrowse.findIndex((item) => item.id === card.id);
         if (cardIndex === -1) {
@@ -215,6 +224,7 @@ async function startSession(deckId) {
       if (card) showFront(card);
       else showDone(queue.nextLearningAt);
     } catch (error) {
+      empty.hidden = true;
       session.hidden = true;
       done.hidden = true;
       if (!(error instanceof NotFoundError)) {
