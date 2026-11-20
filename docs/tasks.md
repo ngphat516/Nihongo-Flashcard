@@ -10,6 +10,13 @@ Trạng thái hiện tại: còn việc gì, ai làm. Đã làm gì, khi nào th
 | L3 | Review & merge | Leader | — | Bắt buộc | Làm liên tục |
 
 **Sẵn sàng nộp:** đợt 3 (S11, A10, C4, C5, C7, C10) và L13 đã xong; L5 đã kiểm thử và dọn code ngày 2026-11-20. C11 để sau (Leader chốt ngày 2026-11-20).
+| L5 | Kiểm thử cuối | Leader | — | Bắt buộc | Đang làm — đã kiểm thử, còn dọn code |
+| S12 | Học, rộng 320px: chữ "Đang học" trong ô đếm `#study-counts` tràn ra ngoài ô, đè lên số của ô "Đến hạn" | At | — | Nếu kịp | Chưa làm |
+| S13 | Học: mở bộ chưa có thẻ nào thì hiện "Xong rồi! 0 thẻ đã học", nên báo bộ chưa có thẻ và có nút thêm thẻ | At | — | Nếu kịp | Chưa làm |
+| C11 | Tách `create.js` | kakushi | — | Nếu kịp | Để sau |
+| L3 | Review & merge | Leader | — | Bắt buộc | Làm liên tục |
+
+**Đợt 3 xong:** S11, A10, C4, C5, C7, C10 (đã merge #22–#25). L13 xong (giữ nguyên bo góc, bóng, cỡ tiêu đề). L5 đã kiểm thử: luồng chính không có lỗi; S12, S13 là lỗi nhỏ, sửa nếu kịp. C11 để sau (Leader chốt ngày 2026-11-20).
 
 Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong PR đầu tiên; xong thì đổi thành **Xong** và chuyển dòng đó xuống phần [Đã xong](#đã-xong).
 
