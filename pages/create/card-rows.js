@@ -8,7 +8,8 @@
  */
 import { cleanText } from '../../core/models.js';
 import { plainFurigana } from '../../core/furigana.js';
-import { $, $$ } from '../../core/dom.js';
+import { $, $$, h } from '../../core/dom.js';
+import { missingReadings } from './reading.js';
 
 export const ROW_FIELDS = Object.freeze(['term', 'meaning', 'reading', 'example']);
 const FURIGANA_FIELDS = new Set(['term', 'example']);
@@ -64,8 +65,10 @@ export function createCardRows(list, template) {
       input.id = id;
       $('label', field).htmlFor = id;
       const describedBy = [];
-      for (const message of $$('.field-error, .create-warning', field)) {
-        message.id = `${id}-${message.classList.contains('field-error') ? 'error' : 'warning'}`;
+      for (const message of $$('.field-error, .create-warning, .create-reading-hint', field)) {
+        const kind = message.classList.contains('field-error') ? 'error'
+          : message.classList.contains('create-warning') ? 'warning' : 'reading';
+        message.id = `${id}-${kind}`;
         describedBy.push(message.id);
       }
       if (hasGlobalHint && FURIGANA_FIELDS.has(name)) describedBy.push('cards-hint');
@@ -100,13 +103,35 @@ export function createCardRows(list, template) {
   /** Dòng chứa phần tử `el` (ô nhập, nút xóa...). */
   const find = (el) => rows.find((row) => row.el === el.closest('.create-card'));
 
-  /** Đánh lại số thứ tự và nhắc thẻ trùng. Gọi sau mỗi lần thêm, xóa hay gõ. */
+  /** Đánh lại số thứ tự, nhắc thẻ trùng và kanji chưa có cách đọc. Gọi sau mỗi lần thêm, xóa, gõ hay rời ô. */
   function refresh() {
     rows.forEach((row, i) => {
       $('.create-card-num', row.el).textContent = i + 1;
       $('.create-card-delete', row.el).setAttribute('aria-label', `Xóa thẻ ${i + 1}`);
     });
     markDuplicates();
+    rows.forEach(markMissingReadings);
+  }
+
+  /**
+   * Cụm kanji không có [cách đọc] thì lúc học không có furigana: nhắc dưới ô Từ và ô Ví dụ, vẫn cho lưu.
+   * Ô Từ đã có Cách đọc thì không nhắc (người học có thể cố ý để mặt trước không có furigana).
+   * Đang gõ trong ô thì đợi rời ô mới hiện lời nhắc mới; lời nhắc đang hiện thì cập nhật ngay (sửa xong là tắt).
+   */
+  function markMissingReadings(row) {
+    for (const field of FURIGANA_FIELDS) {
+      const input = row[field];
+      const hint = $('.create-reading-hint', input.closest('.field'));
+      const skip = field === 'term' && cleanText(row.reading.value);
+      const runs = skip ? [] : [...new Set(missingReadings(input.value).map((run) => run.text))];
+      if (!runs.length) {
+        hint.hidden = true;
+        continue;
+      }
+      if (hint.hidden && document.activeElement === input) continue;
+      $('.create-reading-text', hint).replaceChildren('Chưa có cách đọc cho ', h('span', { lang: 'ja' }, runs.join('、')));
+      hint.hidden = false;
+    }
   }
 
   /** Từ trùng một thẻ phía trên (bỏ [..] furigana, không phân biệt hoa thường, khoảng trắng thừa) thì nhắc, vẫn cho lưu. */

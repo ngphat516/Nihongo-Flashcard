@@ -16,6 +16,30 @@
 
 ---
 
+## 2026-11-19 — Xuất / nhập file và chiều học khi tạo bộ (C7, C10)
+
+- **Người làm:** kakushi.
+- **Đã xong:** nhánh `feature/create-c4-c5`.
+  - C7 xuất: nút "Xuất file" ở đầu trang (bộ đã lưu) mở hộp thoại chọn **CSV** (cột `term,meaning,reading,example`, có BOM để Excel đọc đúng chữ Việt / Nhật) hoặc **JSON** (`{ app: 'nho-lau', version: 1, deck, cards }`, giữ tên, mô tả, màu, chiều học, số thẻ mới mỗi ngày). File lấy bản đã lưu; có thay đổi chưa lưu thì hộp thoại nhắc. Tên file theo tên bộ.
+  - C7 nhập: nút "Nhập file" cạnh "Dán nhiều thẻ" nhận `.csv`, `.tsv`, `.txt`, `.json` (tối đa 2 MB). Thẻ hiện trong bảng xem trước của hộp thoại Dán nhiều thẻ (ẩn ô dán): dòng lỗi, trùng, thiếu cách đọc báo như khi dán; thêm vào dòng thẻ, bấm Lưu mới ghi. CSV có dòng tiêu đề (`term` / `Từ` / `front`, `meaning` / `Nghĩa` / `back`...) thì lấy cột theo tên, không thì theo thứ tự; tự nhận dấu `,` hoặc `;` (Excel máy Việt). Bộ mới chưa gõ tên thì lấy tên, mô tả, màu, chiều học từ file JSON.
+  - C10: form bộ thẻ có "Chiều học" (Nhật → Việt / Việt → Nhật) dưới Màu bìa, mặc định Nhật → Việt, bộ cũ chọn sẵn `deck.direction`. Khung xem trước và Xem thử đổi chiều ngay khi chọn; đổi chiều tính là thay đổi chưa lưu.
+- **Kiểm tra:** `npm test` 107/107 (thêm `tests/file-io.test.js`, `checkRows()` tách khỏi `parsePaste()`). Chrome 1280px và 375px: xuất CSV / JSON (chặn tải thật, đọc lại Blob: có BOM, đúng 4 thẻ), nhập CSV tiêu đề tiếng Việt dấu `;` có 1 dòng lỗi và 1 dòng trùng, nhập JSON vào bộ mới điền đủ thông tin bộ, file `.xlsx` báo lỗi; đổi sang Việt → Nhật thì khung xem trước hiện nghĩa, Lưu rồi tải lại vẫn chọn đúng; không cuộn ngang.
+- **Quyết định:** nhập file dùng chung bảng xem trước với Dán nhiều thẻ thay vì lưu thẳng, để người dùng thấy lỗi và bỏ dòng trước khi thêm. Xuất chỉ lấy 4 trường của thẻ, không có tiến độ học. Thông tin bộ trong file chỉ dùng khi tạo bộ mới chưa có tên, không ghi đè bộ đang sửa.
+- **Tiếp theo:** review và gộp nhánh `feature/create-c4-c5` (C4, C5, C7, C10).
+- **Vướng mắc:** nhờ Leader cập nhật `architecture.md` (module mới trong `pages/create/`: `preview.js`, `paste.js`, `reading.js`, `file-io.js` và test của chúng) và dòng trạng thái C10 trong `product.md › Đổi chiều học`; PR trang không sửa các file này.
+
+## 2026-11-19 — Xem trước thẻ và dán nhiều thẻ (C4, C5)
+
+- **Người làm:** kakushi.
+- **Đã xong:** nhánh `feature/create-c4-c5`.
+  - C4: khung "Xem trước" hiện dòng thẻ đang focus hoặc đang gõ, giống thẻ trang Học, theo chiều học của bộ; bấm để lật; furigana theo nút bật/tắt (L7). Nút `‹ Thẻ 2 / 4 ›` chuyển giữa các thẻ đã gõ, dòng đang xem được tô viền. Chỉ hiện từ 1024px (cột phải dính khi cuộn).
+  - Nút "Xem thử" trên thanh Lưu mở hộp thoại lật lần lượt cả bộ (chưa cần lưu), bắt đầu từ thẻ đang sửa: Space lật, ← → chuyển thẻ, điện thoại vuốt ngang; "Sửa thẻ này" đóng hộp thoại và đưa con trỏ tới dòng đó. Ở thẻ cuối, bộ đếm ghi "Hết bộ" và nút Sau đổi thành "Xem lại từ đầu".
+  - Nhắc kanji chưa có cách đọc: rời ô Từ / Ví dụ mà còn cụm kanji không có `[cách đọc]` thì hiện "Chưa có cách đọc cho 山" và nút "Thêm cách đọc" (chèn `[]`, con trỏ vào giữa). Ô Từ đã điền Cách đọc thì không nhắc. Bảng Dán nhiều thẻ cũng nhắc từng dòng. Chỉ nhắc, vẫn cho lưu.
+  - C5: nút "Dán nhiều thẻ" cạnh "Thêm thẻ" mở hộp thoại; mỗi dòng một thẻ, cột `từ | nghĩa | cách đọc | ví dụ` cách bằng `|` hoặc Tab. Bảng xem trước: dòng lỗi (thiếu từ/nghĩa, quá 4 cột, quá dài) tô đỏ và không thêm, dòng trùng có nhắc, bỏ chọn được từng dòng. Thẻ điền vào dòng trống, chưa lưu cho tới khi bấm Lưu.
+- **Kiểm tra:** `npm test` 96/96 (thêm `tests/paste.test.js`, `tests/reading.test.js`). Chrome 1280px và 375px với `?seed` và `?reset`: khung theo đúng dòng, lật, tắt furigana ẩn chữ nhỏ, ‹ › đi qua 4 thẻ; Xem thử mở đúng thẻ đang sửa, Space / → / vuốt / Sửa thẻ này / Xem lại từ đầu chạy đúng; gõ 山 rồi rời ô thì có nhắc, bấm Thêm cách đọc gõ やま thì tắt; dán 5 dòng có 2 lỗi, bỏ chọn 1, thêm 2 rồi Lưu vào bộ; không cuộn ngang; console không lỗi.
+- **Quyết định:** bố cục chọn sau khi thử 3 phương án trên prototype (cột bên + hộp thoại). Xem nhiều thẻ: chọn mũi tên trên khung xem trước + hộp thoại Xem thử cả bộ. Màn hẹp ẩn khung xem trước vì nằm trên danh sách, gõ tới thẻ thứ 2 là trôi khỏi màn hình; thay bằng nút Xem thử trên thanh Lưu dính đáy.
+- **Tiếp theo:** C7 xuất / nhập file.
+
 ## 2026-11-19 — Furigana đủ trong dữ liệu mẫu
 
 - **Người làm:** kakushi.

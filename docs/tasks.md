@@ -10,10 +10,10 @@ Trạng thái hiện tại: còn việc gì, ai làm. Đã làm gì, khi nào th
 | A10 | Chiều học trong hộp sửa bộ | Daika | L8 ✅ | Nên có | Chưa làm |
 | S11 | Đổi chiều học | At | L8 ✅ | Nên có | Chưa làm |
 | A10 | Chiều học trong hộp sửa bộ | Daika | L8 ✅ | Nên có | Đang làm — Album xong, chờ S11 kiểm chứng trang Học |
-| C4 | Xem trước thẻ | kakushi | — | Nên có | Chưa làm |
-| C5 | Nhập nhiều thẻ | kakushi | C4 | Nên có | Chưa làm |
-| C7 | Xuất / nhập file | kakushi | C5 | Nếu kịp | Chưa làm |
-| C10 | Chiều học khi tạo bộ | kakushi | C7, L8 ✅ | Nếu kịp | Chưa làm |
+| C4 | Xem trước thẻ | kakushi | — | Nên có | Đang làm — xong, chờ review |
+| C5 | Nhập nhiều thẻ | kakushi | C4 | Nên có | Đang làm — xong, chờ review |
+| C7 | Xuất / nhập file | kakushi | C5 | Nếu kịp | Đang làm — xong, chờ review |
+| C10 | Chiều học khi tạo bộ | kakushi | C7, L8 ✅ | Nếu kịp | Đang làm — xong, chờ review |
 | L13 | Tinh chỉnh giao diện | Leader | — | Nếu kịp | Chưa làm |
 | L5 | Kiểm thử cuối | Leader | các việc trên | Bắt buộc | Chưa làm |
 | L3 | Review & merge | Leader | — | Bắt buộc | Làm liên tục |
