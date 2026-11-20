@@ -16,6 +16,19 @@
 
 ---
 
+## 2026-11-20 — Dọn code trước khi nộp (L5)
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `chore/don-code-nop-bai`.
+  - Xóa `pages/styleguide/` và dòng của nó trong `.vercelignore`; bỏ các chỗ nhắc styleguide trong `AGENTS.md`, `.github/pull_request_template.md`, chú thích đầu `styles/*.css`, `design.md`, `conventions.md`, `architecture.md`.
+  - Xóa class `.todo`, `.todo-label`, `.demo` trong `styles/base.css` (trang không còn khung `.todo` hay đoạn `DEMO` nào).
+  - `dev/dev.js`: sửa chú thích đầu file, ghi là giữ lại để demo; không đổi code.
+  - README thêm mục "Xem nhanh với dữ liệu mẫu"; `conventions.md` mục "Trước khi nộp / deploy" ghi theo quyết định mới; L5 chuyển xuống "Đã xong".
+  - Kiểm tra lại: `npm test` 108/108; chạy lại luồng chính, luồng chiều học, Console và Network với `?seed` và trên trình duyệt sạch.
+- **Quyết định:** giữ `dev/dev.js` (`?seed`, `?reset`) và dòng script trong 4 file HTML để thầy và nhóm demo. Lý do: app trống thì Trang chủ không có heatmap, biểu đồ, chuỗi ngày; `?reset` chỉ xóa dữ liệu trong trình duyệt của người mở link. Giữ lời nhắc `dev.reset()` trong `core/storage.js` vì lệnh vẫn dùng được.
+- **Tiếp theo:** sau khi merge, Leader chạy `vercel deploy --prod`, mở link kiểm tra `?seed` vẫn chạy, `pages/styleguide/` và ảnh trong `pages/*/screenshots/` ra 404.
+- **Vướng mắc:** còn 2 chú thích nhắc `pages/styleguide/` trong file của thành viên (`pages/album/album.css` dòng 4, `pages/album/ui.js` dòng 2), không sửa vì ngoài phạm vi; chỉ là chú thích, không ảnh hưởng chạy.
+
 ## 2026-11-20 — Tinh chỉnh giao diện (L13)
 
 - **Người làm:** Leader.

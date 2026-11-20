@@ -5,7 +5,6 @@
 .vscode/
 docs/
 tests/
-pages/styleguide/
 pages/*/screenshots/
 *.test.js
 *.md

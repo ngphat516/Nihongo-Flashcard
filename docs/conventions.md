@@ -6,7 +6,7 @@ Luật chung cho cả nhóm và cho agent. Kiến trúc xem [architecture.md](ar
 
 - **Mỗi người chỉ sửa trong folder `pages/<trang>/` của mình** (bảng phân việc ở [tasks.md](tasks.md#phân-việc)).
 - **Phần chung thuộc Leader:** `core/`, `styles/`, `dev/`, cột điều hướng trong 4 file HTML, và `docs/product.md`, `docs/design.md`, `docs/architecture.md`, `docs/conventions.md`. Cần đổi thì nhắn Leader hoặc mở PR riêng cho phần đó, không sửa lẫn trong PR của trang.
-- **Sửa cột điều hướng thì sửa cả 4 file HTML** (và trang styleguide) trong cùng một PR, vì cột được viết sẵn ở từng file.
+- **Sửa cột điều hướng thì sửa cả 4 file HTML** trong cùng một PR, vì cột được viết sẵn ở từng file.
 
 ## Code
 
@@ -27,7 +27,7 @@ Chỉ có CSS tự viết: không thư viện, không build, không dark mode. M
 - **Màu chính `--primary` chỉ dành cho hành động** (nút chính, link, mục đang chọn). Trạng thái thẻ và chấm điểm dùng `--state-*`, `--rate-*` ([design.md › Màu](design.md#màu-nào-dùng-ở-đâu)).
 - **Chữ tiếng Nhật gắn `lang="ja"`**, VD `h('span', { lang: 'ja' }, card.term)`.
 - **Icon là SVG của Lucide chép thẳng vào HTML**, có `aria-hidden="true"` và luôn có chữ đi kèm ([design.md › Icon](design.md#icon)).
-- **Dùng class chung trước khi tự viết.** Mở `pages/styleguide/` để xem mọi biến và class kèm mẫu HTML; phần cần JS (lật thẻ, dialog, toast) có mẫu code trong `pages/styleguide/styleguide.js`.
+- **Dùng class chung trước khi tự viết.** Xem [bảng class](#class-dùng-chung) bên dưới; phần cần JS (lật thẻ, dialog, toast) xem cách các trang đang làm, VD `pages/album/ui.js`, `pages/study/study.js`. Trang styleguide đã xóa khi dọn code trước khi nộp.
 - **Tên class kiểu Bootstrap**, gạch ngang đơn:
   - Class chung không có tiền tố: `btn btn-primary`, `field-label`, `badge-new`.
   - Class riêng của trang bắt đầu bằng tên trang và viết trong CSS của trang: `album-grid`, `study-bar`, `create-preview`.
@@ -56,7 +56,7 @@ Chỉ có CSS tự viết: không thư viện, không build, không dark mode. M
 | `rail` > `rail-brand`, `rail-nav` > `rail-link` > `rail-label`; `rail-link rail-furigana` > `rail-switch` | cột điều hướng, viết sẵn trong HTML; chỉ Leader sửa ([design.md](design.md#bố-cục-khung)) |
 | `container`, `container-narrow`, `page-head`, `page-title`, `section`, `section-title`, `back-link`, `row`, `muted`, `visually-hidden` | khung trang, tiện ích |
 
-Thêm hoặc đổi class chung thì sửa cả bảng này và trang styleguide.
+Thêm hoặc đổi class chung thì sửa cả bảng này.
 
 ## Nhánh, commit, PR
 
@@ -103,14 +103,14 @@ vercel link --yes --project nho-lau   # chỉ lần đầu trên một máy
 vercel deploy --prod
 ```
 
-- `.vercelignore` bỏ tài liệu, test, `pages/styleguide/`, ảnh chụp màn hình trong `pages/*/screenshots/` và `package.json`, để Vercel coi đây là web tĩnh và không chạy npm.
+- `.vercelignore` bỏ tài liệu, test, ảnh chụp màn hình trong `pages/*/screenshots/` và `package.json`, để Vercel coi đây là web tĩnh và không chạy npm.
 - Deploy xong, mở link, thử cả 4 trang và xem Console không có lỗi 404.
 
-**Dọn code trước khi nộp.** Bản đang chạy còn giữ `dev/dev.js` để demo bằng `?seed` (Leader chốt ngày 2026-11-11). Lúc nộp thì:
-- Xóa dòng `<script type="module" src="…dev/dev.js">` trong 4 file HTML. Nếu còn, ai mở link có `?reset` sẽ mất sạch dữ liệu, `?seed` sẽ thêm dữ liệu giả.
-- Xóa folder `pages/styleguide/`.
-- Xóa hết khung `.todo` và đoạn `DEMO` còn sót.
-- Sửa lời nhắc trong `core/storage.js` (đang bảo người dùng gõ `dev.reset()`, lệnh này không còn sau khi xóa `dev.js`).
+**Dọn code trước khi nộp:** đã làm xong ngày 2026-11-20 (L5).
+- **Giữ `dev/dev.js`** và dòng `<script type="module" src="…dev/dev.js">` trong 4 file HTML, để thầy và nhóm demo bằng `?seed` / `?reset` (Leader chốt ngày 2026-11-20). Lý do: app trống thì Trang chủ không có heatmap, biểu đồ, chuỗi ngày; `?reset` chỉ xóa dữ liệu trong trình duyệt của người mở link, không ảnh hưởng người khác.
+- Giữ lời nhắc gõ `dev.reset()` trong `core/storage.js`, vì lệnh này vẫn dùng được.
+- Đã xóa folder `pages/styleguide/`.
+- Đã xóa khung `.todo` và đoạn `DEMO` còn sót, cùng class `.todo`, `.demo` trong `styles/base.css` (không còn chỗ nào dùng).
 - `npm test` qua hết.
 
 **Kiểm tra cuối:** luồng tạo bộ → thêm thẻ → học → xem heatmap, trên máy tính và điện thoại.

@@ -15,7 +15,6 @@ App web học tiếng Nhật bằng flashcard, lịch ôn theo SM-2 kiểu Anki.
 - [`docs/design.md`](docs/design.md): màu nào dùng ở đâu, chữ, bố cục, bìa bộ thẻ, chip, icon. Đọc khi việc chạm tới giao diện.
 - [`docs/architecture.md`](docs/architecture.md): thư mục, 4 trang, luồng trang → `repo.js` → `storage.js`, API, dữ liệu, SM-2. Đọc trước khi sửa JS.
 - [`docs/conventions.md`](docs/conventions.md): luật code, CSS và bảng class dùng chung, nhánh/PR, định nghĩa xong, trước khi nộp. Đọc trước khi viết code hoặc commit.
-- Trang styleguide `pages/styleguide/`: xem tận mắt mọi biến màu và class kèm mẫu HTML, mẫu JS cho lật thẻ, chip, dialog, toast.
 
 ## Luật cứng
 

@@ -6,7 +6,7 @@
      components.css   nút, ô nhập, panel, ô thống kê, badge, thẻ lật, dialog, toast...
      (file này)       reset, khung trang (cột điều hướng, container), tiện ích
 
-   Xem mọi thứ trên trang pages/styleguide/ (chỉ dùng lúc dev).
+   Bảng class dùng chung: docs/conventions.md › Class dùng chung.
    ========================================================================== */
 
 /* Plus Jakarta Sans (Latin + tiếng Việt) và Noto Sans JP (kana/kanji). Google tự chia nhỏ font theo
@@ -353,34 +353,6 @@ body {
 }
 .back-link:hover {
   color: var(--text);
-}
-
-/* ---------- Khung "chưa làm" của codebase — xóa khỏi HTML khi làm xong phần đó ---------- */
-.todo {
-  border: 1.5px dashed var(--border);
-  border-radius: var(--radius);
-  padding: var(--space-4);
-  color: var(--muted);
-}
-.todo-label {
-  margin: 0 0 var(--space-2);
-}
-.todo-label b {
-  display: inline-block;
-  margin-right: var(--space-2);
-  padding: 0 6px;
-  border-radius: calc(var(--radius-sm) / 2);
-  background: var(--surface-2);
-  color: var(--text-2);
-  font-size: var(--text-sm);
-}
-.demo {
-  margin: 0;
-  color: var(--text-2);
-  font-size: var(--text-sm);
-}
-.demo li + li {
-  margin-top: 2px;
 }
 
 /* ---------- Tiện ích ---------- */

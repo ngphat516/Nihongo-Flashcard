@@ -6,8 +6,8 @@
      .album-grid              class riêng của trang: bắt đầu bằng tên trang, viết trong pages/<trang>/<trang>.css
      .is-flipped              trạng thái do JS bật/tắt: bắt đầu bằng "is-"
 
-   Chỉ có CSS. Thành phần nào cần hành vi (lật thẻ, dialog, toast) thì trang tự viết vài dòng JS —
-   mẫu code có ở pages/styleguide/.
+   Chỉ có CSS. Thành phần nào cần hành vi (lật thẻ, dialog, toast) thì trang tự viết vài dòng JS
+   (VD pages/album/ui.js, pages/study/study.js).
    ========================================================================== */
 
 /* ---------- Nút ---------- */

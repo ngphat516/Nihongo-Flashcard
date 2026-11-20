@@ -3,7 +3,7 @@
 
    Trang chỉ DÙNG các biến này (var(--primary), var(--space-4)...), không viết mã màu cứng.
    Cần màu / cỡ mới → nhắn Leader thêm vào đây, đừng tự khai báo trong CSS của trang.
-   Xem tất cả trên trang pages/styleguide/.
+   Dùng màu nào ở đâu: docs/design.md.
    ========================================================================== */
 
 :root {
