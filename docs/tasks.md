@@ -6,44 +6,16 @@ Trạng thái hiện tại: còn việc gì, ai làm. Đã làm gì, khi nào th
 
 | Mã | Việc | Ai | Cần trước | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
-| S12 | Ô đếm tràn chữ ở 320px | At | — | Nếu kịp | Chưa làm |
-| S13 | Bộ chưa có thẻ ở trang Học | At | — | Nếu kịp | Chưa làm |
 | C11 | Tách `create.js` | kakushi | — | Nếu kịp | Để sau |
 | L3 | Review & merge | Leader | — | Bắt buộc | Làm liên tục |
 
-**Sẵn sàng nộp:** đợt 3 (S11, A10, C4, C5, C7, C10) và L13 đã xong; L5 đã kiểm thử và dọn code ngày 2026-11-20. Kiểm thử tìm ra 2 lỗi nhỏ ở trang Học (S12, S13, At sửa nếu kịp), không ảnh hưởng luồng chính. C11 để sau (Leader chốt ngày 2026-11-20).
+**Sẵn sàng nộp:** đợt 3 (S11, A10, C4, C5, C7, C10) và L13 đã xong; L5 đã kiểm thử và dọn code ngày 2026-11-20. Hai lỗi nhỏ ở trang Học S12, S13 đã sửa và kiểm tra. C11 để sau (Leader chốt ngày 2026-11-20).
 
 Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong PR đầu tiên; xong thì đổi thành **Xong** và chuyển dòng đó xuống phần [Đã xong](#đã-xong).
 
 ---
 
 ## Chi tiết việc đang mở
-
-### S12 · Ô đếm tràn chữ ở 320px · At · `pages/study/`
-
-Lỗi tìm được khi kiểm thử cuối (L5).
-
-- **Lỗi:** màn hình rộng 320px, trong phiên học, ô "Cần học trong bộ" (`#study-counts`) chia 3 ô Mới / Đang học / Đến hạn. Chữ "Đang học" rộng khoảng 63px nhưng ô chỉ 55px, nên tràn ra ngoài và đè lên số của ô "Đến hạn". Ở 375px trở lên không bị.
-- **Tái hiện:** `?seed`, DevTools › Toggle device toolbar, rộng 320px, mở Học, chọn bộ "JLPT N5 – Từ vựng". Trong Console:
-  ```js
-  [...document.querySelectorAll('#study-counts .count')].map(c => c.scrollWidth > c.clientWidth)
-  ```
-  Hiện tại ra `[false, true, false]`.
-- **Chỗ liên quan:** rule `.study-queue-counts` và `.study-queue-counts .count` trong khối màn hình hẹp của `pages/study/study.css` (khoảng dòng 418–439): `white-space: nowrap` cùng số và chữ nằm một hàng. Gợi ý: cho số và chữ xếp dọc ở màn hẹp, hoặc cho tiêu đề "Cần học trong bộ" xuống hàng riêng để 3 ô rộng hơn.
-- **Xong khi:** lệnh trên ra toàn `false` ở 320px và 375px; chữ không đè nhau; 4 nút chấm điểm vẫn ở chỗ cũ; không cuộn ngang.
-
-### S13 · Bộ chưa có thẻ ở trang Học · At · `pages/study/`
-
-Lỗi tìm được khi kiểm thử cuối (L5).
-
-- **Lỗi:** mở trang Học với một bộ chưa có thẻ nào thì hiện màn hoàn thành "Xong rồi! 0 thẻ đã học · 0 giây", như thể vừa học xong. Người dùng không biết là bộ còn trống.
-- **Tái hiện:** trong Console ở trang bất kỳ:
-  ```js
-  const m = await import('/core/repo.js'); const d = await m.createDeck({ name: 'Bộ trống' }); location.href = '/pages/study/?deck=' + d.id;
-  ```
-- **Làm gì:** khi bộ chưa có thẻ nào (`getCards(deckId)` rỗng) thì hiện trạng thái rỗng thay cho màn "Xong rồi!": tiêu đề kiểu "Bộ này chưa có thẻ nào" và nút "+ Thêm thẻ" tới `routes.create(deckId)`, giống Album (A8). Bộ có thẻ nhưng hết thẻ cần học thì vẫn giữ màn "Xong rồi!" như cũ. Dùng class `empty`, `empty-title`, `empty-text` có sẵn.
-- **Hàm core:** `getCards()`, `routes`.
-- **Xong khi:** bộ trống hiện lời nhắc và nút thêm thẻ; bộ đã học hết vẫn hiện "Xong rồi!"; Console không lỗi.
 
 ### C11 · Tách create.js · kakushi · `pages/create/`
 
@@ -78,6 +50,42 @@ Lỗi tìm được khi kiểm thử cuối (L5).
 ---
 
 ## Đã xong
+
+### S12, S13 — At — Xong
+
+- **S12:** số và nhãn bộ đếm xếp dọc, không tràn ở 320px và 375px; bốn nút chấm vẫn ở dưới thẻ.
+- **S13:** bộ không có thẻ hiện lời nhắc và liên kết thêm thẻ đúng bộ; bộ có thẻ nhưng hết lượt vẫn hiện hoàn thành.
+
+<details>
+<summary>Yêu cầu S12, S13 đã hoàn thành</summary>
+
+### S12 · Ô đếm tràn chữ ở 320px · At · `pages/study/`
+
+Lỗi tìm được khi kiểm thử cuối (L5).
+
+- **Lỗi:** màn hình rộng 320px, trong phiên học, ô "Cần học trong bộ" (`#study-counts`) chia 3 ô Mới / Đang học / Đến hạn. Chữ "Đang học" rộng khoảng 63px nhưng ô chỉ 55px, nên tràn ra ngoài và đè lên số của ô "Đến hạn". Ở 375px trở lên không bị.
+- **Tái hiện:** `?seed`, DevTools › Toggle device toolbar, rộng 320px, mở Học, chọn bộ "JLPT N5 – Từ vựng". Trong Console:
+  ```js
+  [...document.querySelectorAll('#study-counts .count')].map(c => c.scrollWidth > c.clientWidth)
+  ```
+  Hiện tại ra `[false, true, false]`.
+- **Chỗ liên quan:** rule `.study-queue-counts` và `.study-queue-counts .count` trong khối màn hình hẹp của `pages/study/study.css` (khoảng dòng 418–439): `white-space: nowrap` cùng số và chữ nằm một hàng. Gợi ý: cho số và chữ xếp dọc ở màn hẹp, hoặc cho tiêu đề "Cần học trong bộ" xuống hàng riêng để 3 ô rộng hơn.
+- **Xong khi:** lệnh trên ra toàn `false` ở 320px và 375px; chữ không đè nhau; 4 nút chấm điểm vẫn ở chỗ cũ; không cuộn ngang.
+
+### S13 · Bộ chưa có thẻ ở trang Học · At · `pages/study/`
+
+Lỗi tìm được khi kiểm thử cuối (L5).
+
+- **Lỗi:** mở trang Học với một bộ chưa có thẻ nào thì hiện màn hoàn thành "Xong rồi! 0 thẻ đã học · 0 giây", như thể vừa học xong. Người dùng không biết là bộ còn trống.
+- **Tái hiện:** trong Console ở trang bất kỳ:
+  ```js
+  const m = await import('/core/repo.js'); const d = await m.createDeck({ name: 'Bộ trống' }); location.href = '/pages/study/?deck=' + d.id;
+  ```
+- **Làm gì:** khi bộ chưa có thẻ nào (`getCards(deckId)` rỗng) thì hiện trạng thái rỗng thay cho màn "Xong rồi!": tiêu đề kiểu "Bộ này chưa có thẻ nào" và nút "+ Thêm thẻ" tới `routes.create(deckId)`, giống Album (A8). Bộ có thẻ nhưng hết thẻ cần học thì vẫn giữ màn "Xong rồi!" như cũ. Dùng class `empty`, `empty-title`, `empty-text` có sẵn.
+- **Hàm core:** `getCards()`, `routes`.
+- **Xong khi:** bộ trống hiện lời nhắc và nút thêm thẻ; bộ đã học hết vẫn hiện "Xong rồi!"; Console không lỗi.
+
+</details>
 
 Bấm để mở. Mô tả giữ nguyên lúc giao việc, dùng để tra lại tính năng đã làm.
 

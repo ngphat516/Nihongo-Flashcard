@@ -427,12 +427,14 @@
   }
 
   .study-queue-counts .count {
-    display: flex;
-    justify-content: center;
-    align-items: baseline;
+    display: grid;
+    align-content: start;
+    justify-items: center;
     gap: var(--space-1);
     padding: var(--space-1);
-    white-space: nowrap;
+    min-width: 0;
+    white-space: normal;
+    text-align: center;
     font-size: var(--text-xs);
   }
 

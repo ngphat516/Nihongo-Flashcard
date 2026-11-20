@@ -16,6 +16,13 @@
 
 ---
 
+## 2026-11-20 — Sửa bộ đếm và bộ trống trang Học (S12, S13)
+
+- **Người làm:** At, cùng Codex.
+- **Đã xong:** bộ đếm mobile xếp số và chữ dọc, bỏ nowrap; loadQueue đọc getCards cho cả hàng đợi rỗng và hiện khối empty với routes.create(deckId) nếu bộ không có thẻ. Bộ có thẻ hết lượt vẫn dùng showDone. Chỉ sửa pages/study/ và tài liệu tiến độ.
+- **Kiểm tra:** npm test 108/108; Chrome 320px và 375px: cả ba ô scrollWidth <= clientWidth, không cuộn ngang, bốn nút chấm nằm trên nav. Tạo bộ trống qua form, kiểm tra link thêm thẻ đúng bộ, thêm một thẻ rồi chấm Dễ: hiện Xong rồi; tải lại bộ hết lượt vẫn hiện Xong rồi. ID constructor vẫn xử lý lỗi. Console không lỗi. Ảnh s12-320.jpg, s12-375.jpg, s13-empty-375.jpg, s13-done-375.jpg.
+- **Tiếp theo:** Leader review.
+
 ## 2026-11-20 — Ghi lỗi S12, S13 cho At
 
 - **Người làm:** Leader.
