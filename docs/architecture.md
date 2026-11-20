@@ -94,6 +94,12 @@ Trang được import những module nào: xem [conventions.md › Code](convent
 - `fieldsOf(row)` → `{ term, meaning, reading, example }` đã `cleanText()`.
 - `snapshot(card)`, `hasContent(row)`, `isRowChanged(row)`, `autosizeRow(row)`.
 
+Các module khác trong `pages/create/` (hàm thuần có test ở `tests/<tên>.test.js`):
+- `preview.js` (`C4`): thẻ xem trước giống trang Học, bấm để lật; dùng cho khung xem trước và hộp thoại "Xem thử cả bộ".
+- `paste.js` (`C5`): tách văn bản dán vào thành thẻ, mỗi dòng một thẻ, cột `term | meaning | reading | example` tách bằng Tab hoặc `|`; `checkRows()` kiểm tra lỗi / trùng / thiếu cách đọc. Test: `tests/paste.test.js`.
+- `file-io.js` (`C7`): xuất / nhập file bộ thẻ. Xuất `.csv` (cột `term,meaning,reading,example`, có BOM) hoặc `.json` (`{ app: 'nho-lau', version: 1, deck, cards }`); nhập `.json`, `.csv`, `.tsv`, `.txt`, đi qua `checkRows()` để dùng chung bảng xem trước với dán nhiều thẻ. Test: `tests/file-io.test.js`.
+- `reading.js`: tìm cụm kanji chưa có `[cách đọc]` để nhắc người nhập. Test: `tests/reading.test.js`.
+
 ## Dữ liệu
 
 Ba "bảng" trong localStorage, key có tiền tố `nholau:`: `decks`, `cards`, `reviewLogs`. Mỗi bảng lưu thành một object JSON `{ [id]: bản ghi }`.
