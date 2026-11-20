@@ -472,6 +472,10 @@
 }
 
 #empty-title {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  color: var(--text);
   font-weight: 700;
 }
 
