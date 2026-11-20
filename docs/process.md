@@ -16,6 +16,12 @@
 
 ---
 
+## 2026-11-20 — Ghi lỗi S12, S13 cho At
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `docs/ghi-loi-s12-s13`. Lúc gộp #28 và #29, bảng "Việc đang mở" trong `tasks.md` bị ghép đôi (C11 lặp, còn dòng L5 "Đang làm", hai câu tóm tắt): gộp lại thành một bảng. Thêm mục chi tiết cho S12 (ô đếm tràn chữ ở 320px) và S13 (bộ chưa có thẻ ở trang Học hiện "Xong rồi!"), gồm cách tái hiện, gợi ý chỗ sửa, tiêu chí xong.
+- **Tiếp theo:** At sửa S12, S13 nếu kịp trước khi nộp.
+
 ## 2026-11-20 — Dọn code trước khi nộp (L5)
 
 - **Người làm:** Leader.
