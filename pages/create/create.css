@@ -332,8 +332,12 @@ textarea.create-card-input {
 /* Dòng thẻ đang hiện trong khung xem trước (chỉ tô khi có từ 2 thẻ trở lên và khung đang hiện) */
 @media (min-width: 1024px) {
   .create-card.is-previewing {
-    border-color: var(--text-2);
-    box-shadow: inset 3px 0 0 var(--text-2);
+    border-color: var(--primary);
+    box-shadow: inset 4px 0 0 var(--primary);
+    background: var(--primary-soft);
+  }
+  .create-card.is-previewing .create-card-num {
+    color: var(--primary-strong);
   }
 }
 
