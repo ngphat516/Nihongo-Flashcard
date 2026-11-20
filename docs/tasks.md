@@ -6,19 +6,12 @@ Trạng thái hiện tại: còn việc gì, ai làm. Đã làm gì, khi nào th
 
 | Mã | Việc | Ai | Cần trước | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
-| S11 | Đổi chiều học | At | L8 ✅ | Nên có | Đang làm — đã triển khai, chờ review |
-| A10 | Chiều học trong hộp sửa bộ | Daika | L8 ✅ | Nên có | Chưa làm |
-| S11 | Đổi chiều học | At | L8 ✅ | Nên có | Chưa làm |
-| A10 | Chiều học trong hộp sửa bộ | Daika | L8 ✅ | Nên có | Đang làm — Album xong, chờ S11 kiểm chứng trang Học |
-| C4 | Xem trước thẻ | kakushi | — | Nên có | Đang làm — xong, chờ review |
-| C5 | Nhập nhiều thẻ | kakushi | C4 | Nên có | Đang làm — xong, chờ review |
-| C7 | Xuất / nhập file | kakushi | C5 | Nếu kịp | Đang làm — xong, chờ review |
-| C10 | Chiều học khi tạo bộ | kakushi | C7, L8 ✅ | Nếu kịp | Đang làm — xong, chờ review |
+| L5 | Kiểm thử cuối | Leader | — | Bắt buộc | Chưa làm |
+| C11 | Tách `create.js` | kakushi | — | Nếu kịp | Để sau |
 | L13 | Tinh chỉnh giao diện | Leader | — | Nếu kịp | Chưa làm |
-| L5 | Kiểm thử cuối | Leader | các việc trên | Bắt buộc | Chưa làm |
 | L3 | Review & merge | Leader | — | Bắt buộc | Làm liên tục |
 
-**Làm song song ngay:** S11 (At), A10 (Daika), C4 (kakushi). Ba việc sửa 3 trang khác nhau, chỉ dùng hàm có sẵn trong `core/`, không ai chờ ai. kakushi làm lần lượt C4 → C5 → C7 → C10 vì cùng sửa `pages/create/`.
+**Đợt 3 xong:** S11, A10, C4, C5, C7, C10 (đã merge #22–#25). Còn lại L5 trước khi nộp, L13 nếu còn thời gian. C11 để sau (Leader chốt ngày 2026-11-20).
 
 Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong PR đầu tiên; xong thì đổi thành **Xong** và chuyển dòng đó xuống phần [Đã xong](#đã-xong).
 
@@ -26,45 +19,10 @@ Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong 
 
 ## Chi tiết việc đang mở
 
-### S11 · Đổi chiều học · At · `pages/study/`
+### C11 · Tách create.js · kakushi · `pages/create/`
 
-- **Làm gì:** đảo mặt thẻ theo `deck.direction` ([product.md › Đổi chiều học](product.md#đổi-chiều-học)).
-  - `'ja-vi'` (Nhật → Việt, mặc định): mặt trước là từ có furigana; mặt sau là nghĩa, kèm cách đọc và ví dụ.
-  - `'vi-ja'` (Việt → Nhật): mặt trước là nghĩa; mặt sau là từ có furigana, kèm cách đọc và ví dụ.
-- **Nút đổi chiều** trên trang Học (màn chọn bộ hoặc thanh trên phiên học). Bấm thì lưu bằng `updateDeck(id, { direction })` và đổi ngay thẻ đang hiện.
-- **Lịch ôn dùng chung:** chấm điểm vẫn gọi `reviewCard()` như cũ.
-- **Hàm core:** `getDeck()`, `updateDeck()`, `renderFurigana()`.
-- **Xong khi:** với `?seed`, bộ 挨拶 (`'vi-ja'`) hiện nghĩa ở mặt trước; đổi chiều xong tải lại vẫn giữ; Space, 1–4, ← →, Z và hoàn tác đúng ở cả 2 chiều; ví dụ dài ở 375px không đẩy 4 nút chấm ra khỏi màn hình.
-
-### A10 · Chiều học trong hộp sửa bộ · Daika · `pages/album/`
-
-- **Làm gì:** trong `#deck-dialog`, cạnh ô chọn màu bìa (A5), thêm lựa chọn Nhật → Việt / Việt → Nhật. Dùng radio, chọn được bằng bàn phím, chọn sẵn `deck.direction`.
-- Lưu bằng `updateDeck(id, { direction })`. Trang chi tiết bộ ghi chiều đang dùng.
-- Thẻ trong lưới Album **không đảo**: mặt trước vẫn là từ (Album là nơi xem thẻ).
-- **Hàm core:** `updateDeck()`, `DECK_DIRECTIONS`.
-- **Xong khi:** đổi chiều ở Album thì trang Học dùng chiều mới; mở lại hộp sửa bộ thấy đúng chiều đã lưu; Esc hủy không đổi gì.
-
-### C4 · Xem trước thẻ · kakushi · `pages/create/`
-
-- **Làm gì:** khung thẻ cập nhật theo lúc gõ, lấy dữ liệu dòng đang focus bằng `fieldsOf(row)` ở `card-rows.js`. Bấm để lật, nhìn giống thẻ ở trang Học.
-- **Hàm core:** `renderFurigana()`.
-- **Xong khi:** gõ ở dòng nào thì khung hiện dòng đó; furigana hiện đúng và theo nút bật/tắt furigana (L7); ở 375px không cuộn ngang.
-
-### C5 · Nhập nhiều thẻ · kakushi · `pages/create/`
-
-- **Làm gì:** ô dán văn bản, mỗi dòng một thẻ, các trường cách nhau bằng `|` hoặc Tab, tối đa 4 cột: `term`, `meaning`, `reading`, `example` (dán thẳng từ Excel / Quizlet).
-- Có bảng xem trước, dòng lỗi tô đỏ, bỏ chọn được từng dòng, rồi thêm thành các dòng thẻ của C2 (`cards.add({ term, meaning, reading, example })`).
-- **Hàm core:** `plainFurigana()` (so trùng).
-
-### C7 · Xuất / nhập file · kakushi · `pages/create/`
-
-- **Làm gì:** xuất một bộ ra file `.json` hoặc `.csv` (`term`, `meaning`, `reading`, `example`), và nhập lại vào bộ.
-- **Hàm core:** `getCards()`, `createCards()`.
-
-### C10 · Chiều học khi tạo bộ · kakushi · `pages/create/`
-
-- **Làm gì:** trong form bộ thẻ, cạnh ô chọn màu (C8), cho chọn chiều học, mặc định Nhật → Việt. Mở bộ cũ thì chọn sẵn `deck.direction`, lưu khi đổi.
-- **Hàm core:** `createDeck()`, `updateDeck()`, `DECK_DIRECTIONS`.
+- **Làm gì:** `create.js` dài khoảng 750 dòng, quy ước ([conventions.md](conventions.md#code) mục Chia file) là quá khoảng 300 dòng thì tách module trong cùng folder. Tách theo phần (VD form bộ thẻ, xuất/nhập, dán nhiều thẻ) sao cho `create.js` chỉ còn là điểm vào.
+- **Xong khi:** không đổi hành vi; `npm test` xanh; chạy thử lại C1–C10 ở 1440px và 375px, Console không lỗi.
 
 ### L13 · Tinh chỉnh giao diện · Leader · `styles/`
 
@@ -73,6 +31,7 @@ Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong 
 ### L5 · Kiểm thử cuối · Leader
 
 - **Làm gì:** `npm test` qua hết; thử luồng tạo bộ → thêm thẻ → học → xem heatmap; thử trên điện thoại; làm hết mục [Trước khi nộp](conventions.md#trước-khi-nộp--deploy).
+- Chạy thử luồng chiều học qua 3 trang: tạo bộ Việt → Nhật ở Tạo thẻ → Album chi tiết bộ ghi đúng chiều → Học hiện nghĩa ở mặt trước → đổi chiều ở Album thì Học đổi theo, và ngược lại; xuất bộ ra JSON rồi nhập vào bộ mới giữ đủ thẻ và furigana.
 
 ### L3 · Review & merge · Leader
 
@@ -144,7 +103,7 @@ Bấm để mở. Mô tả giữ nguyên lúc giao việc, dùng để tra lại
 </details>
 
 <details>
-<summary><b>Album: `pages/album/` (Daika)</b> — A1, A2, A3, A4, A5, A6, A7, A8, A9</summary>
+<summary><b>Album: `pages/album/` (Daika)</b> — A1, A2, A3, A4, A5, A6, A7, A8, A9, A10</summary>
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Hàm core | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
@@ -157,25 +116,30 @@ Bấm để mở. Mô tả giữ nguyên lúc giao việc, dùng để tra lại
 | A7 | Học lại từ đầu | Nút đưa một thẻ về trạng thái Mới | `resetCard()` | Nếu kịp | Xong |
 | A8 | Trường hợp đặc biệt | Chưa có bộ nào: lời nhắc + nút tạo bộ. `?deck=` sai id: thông báo + link về lưới. Bộ chưa có thẻ: nút "Thêm thẻ đầu tiên" | `getDeck()` trả `null` | Bắt buộc | Xong |
 | A9 | Thẻ tiếng Nhật | Cần L6. **Mặt trước:** từ chữ to, có furigana (`renderFurigana(card.term)`). **Mặt sau:** nghĩa, kèm cách đọc và câu ví dụ có furigana nếu có. Trường trống thì không hiện. **Tìm kiếm** trên từ và ví dụ đã bỏ furigana (`plainFurigana()`), nghĩa, cách đọc; vẫn không phân biệt hoa thường và dấu. **Câu xác nhận xóa** dùng `plainFurigana(card.term)`. **Hộp thoại sửa thẻ** (`#card-dialog`) có 4 ô: Từ, Nghĩa, Cách đọc, Ví dụ; dưới ô Từ có gợi ý "Ghi cách đọc trong ngoặc vuông sau kanji, VD 約束[やくそく]"; lưu bằng `updateCard(id, { term, meaning, reading, example })`. **Màu bìa:** bỏ hằng `COVER_COLORS` trong `album.js`, bìa dùng `deck.color`. **Xong khi:** furigana hiện đúng; gõ từ hoặc nghĩa đều tìm ra thẻ; sửa thẻ không đổi trạng thái và hạn ôn | `renderFurigana()`, `plainFurigana()`, `updateCard()` | Bắt buộc | Xong |
+| A10 | Chiều học trong hộp sửa bộ | Trong `#deck-dialog`, cạnh ô chọn màu bìa (A5), thêm lựa chọn Nhật → Việt / Việt → Nhật: radio, chọn được bằng bàn phím, chọn sẵn `deck.direction`. Lưu bằng `updateDeck(id, { direction })`. Trang chi tiết bộ ghi chiều đang dùng. Thẻ trong lưới Album **không đảo**: mặt trước vẫn là từ (Album là nơi xem thẻ). **Xong khi:** đổi chiều ở Album thì trang Học dùng chiều mới; mở lại hộp sửa bộ thấy đúng chiều đã lưu; Esc hủy không đổi gì | `updateDeck()`, `DECK_DIRECTIONS` | Nên có | Xong |
 
 </details>
 
 <details>
-<summary><b>Tạo thẻ: `pages/create/` (kakushi)</b> — C1, C2, C3, C6, C8, C9</summary>
+<summary><b>Tạo thẻ: `pages/create/` (kakushi)</b> — C1, C2, C3, C4, C5, C6, C7, C8, C9, C10</summary>
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Hàm core | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
 | C1 | Chọn / tạo bộ | Dropdown "Bộ thẻ" gồm "+ Bộ mới" và các bộ có sẵn (ẩn khi chưa có bộ nào), chọn sẵn theo `?deck=`. Đổi bộ thì cập nhật `?deck=`, còn thay đổi chưa lưu thì hỏi trước. Ô tên (bắt buộc), mô tả, số thẻ mới/ngày (mặc định 20). `?deck=` sai id thì báo rồi chuyển sang tạo bộ mới. Lưu bộ mới xong thì trang chuyển sang sửa bộ đó, có link "Xem trong album" và "Học ngay" | `getDecks()`, `createDeck()`, `updateDeck()` | Bắt buộc | Xong |
 | C2 | Soạn thẻ | Mỗi dòng một thẻ: từ, nghĩa (ô tự cao theo nội dung), nút xóa. Bộ mới có sẵn 3 dòng trống; nút "Thêm thẻ"; Tab ở ô nghĩa của dòng cuối thì thêm dòng. Lưu một lần bằng nút trên thanh dính ở đáy hoặc **Ctrl+Enter**, báo bằng toast. Sửa thẻ giữ nguyên tiến độ học. Xóa thẻ đã lưu (thùng rác hoặc xóa trắng cả từ và nghĩa) thì hỏi xác nhận lúc lưu. Rời trang khi chưa lưu thì trình duyệt hỏi | `getCards()`, `createCards()`, `updateCard()`, `deleteCard()` | Bắt buộc | Xong |
 | C3 | Kiểm tra dữ liệu | Thiếu tên bộ, số thẻ mới/ngày sai, dòng thiếu từ hoặc nghĩa: báo ngay dưới ô, không lưu gì, đưa con trỏ tới ô sai đầu tiên. Từ trùng một thẻ phía trên (không phân biệt hoa thường): nhắc dưới ô, vẫn cho lưu. Lỗi từ repo hiện `err.message` bằng toast | — | Bắt buộc | Xong |
+| C4 | Xem trước thẻ | Khung thẻ cập nhật theo lúc gõ, lấy dữ liệu dòng đang focus bằng `fieldsOf(row)` ở `card-rows.js`. Bấm để lật, nhìn giống thẻ ở trang Học. **Xong khi:** gõ ở dòng nào thì khung hiện dòng đó; furigana hiện đúng và theo nút bật/tắt furigana (L7); ở 375px không cuộn ngang | `renderFurigana()` | Nên có | Xong |
+| C5 | Nhập nhiều thẻ | Ô dán văn bản, mỗi dòng một thẻ, các trường cách nhau bằng `\|` hoặc Tab, tối đa 4 cột: `term`, `meaning`, `reading`, `example` (dán thẳng từ Excel / Quizlet). Có bảng xem trước, dòng lỗi tô đỏ, bỏ chọn được từng dòng, rồi thêm thành các dòng thẻ của C2 (`cards.add({ term, meaning, reading, example })`) | `plainFurigana()` (so trùng) | Nên có | Xong |
 | C6 | Thẻ vừa thêm | Bỏ: danh sách thẻ của C2 hiện mọi thẻ trong bộ, xóa được từng thẻ, có link "Xem trong album" | — | Nên có | Bỏ |
+| C7 | Xuất / nhập file | Xuất một bộ ra file `.json` hoặc `.csv` (`term`, `meaning`, `reading`, `example`), và nhập lại vào bộ | `getCards()`, `createCards()` | Nếu kịp | Xong |
 | C8 | Chọn màu bìa | Trong form tạo bộ: 6 ô màu (radio, có tên màu cho trình đọc màn hình), chọn sẵn màu kế tiếp: màu sau màu của bộ cuối trong `getDecks()`, theo thứ tự `DECK_COLORS` ([design.md](design.md#màu-bìa-bộ-thẻ)). Dùng `color-picker`. Cần L6, L14 | `createDeck({ color })` | Nên có | Xong |
 | C9 | Ô nhập thẻ tiếng Nhật | Cần L6. Mỗi dòng thẻ có 4 ô: Từ, Nghĩa, Cách đọc, Ví dụ, và nút xóa. Ô Từ và ô Ví dụ gắn `lang="ja"`, có gợi ý cú pháp `約束[やくそく]`, `日本語[にほんご]勉強[べんきょう]` (mỗi từ kanji một cặp ngoặc). Lưu bằng `createCards()` / `updateCard()` với `{ term, meaning, reading, example }`; kiểm tra "đã sửa chưa" so cả 4 ô. Báo lỗi "Nhập từ." / "Nhập nghĩa.". So trùng bằng `plainFurigana(term)`, không phân biệt hoa thường. Tab ở ô Ví dụ của dòng cuối thì thêm dòng mới. **Xong khi:** lưu được thẻ đủ 4 ô, thẻ chỉ có từ + nghĩa, thẻ chỉ có kana; sửa thẻ cũ không mất tiến độ | `createCards()`, `updateCard()`, `plainFurigana()` | Bắt buộc | Xong |
+| C10 | Chiều học khi tạo bộ | Trong form bộ thẻ, cạnh ô chọn màu (C8), cho chọn chiều học, mặc định Nhật → Việt. Mở bộ cũ thì chọn sẵn `deck.direction`, lưu khi đổi | `createDeck()`, `updateDeck()`, `DECK_DIRECTIONS` | Nếu kịp | Xong |
 
 </details>
 
 <details>
-<summary><b>Học: `pages/study/` (At)</b> — S1, S2, S3, S4, S5, S6, S7, S8, S9, S10</summary>
+<summary><b>Học: `pages/study/` (At)</b> — S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11</summary>
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Hàm core | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
@@ -189,6 +153,7 @@ Bấm để mở. Mô tả giữ nguyên lúc giao việc, dùng để tra lại
 | S8 | Hiệu ứng lật | Lật 3D bằng CSS, tắt khi người dùng bật giảm chuyển động. Nút to, dễ bấm trên điện thoại | — | Nên có | Xong |
 | S9 | Phát âm | Nút đọc mặt trước bằng `speechSynthesis` | — | — | Bỏ: app không có âm thanh ([product.md](product.md#không-làm)) |
 | S10 | Thẻ tiếng Nhật khi học | Cần L6. **Mặt trước:** từ có furigana. **Mặt sau:** nghĩa, kèm cách đọc và câu ví dụ có furigana nếu có. Trường trống thì không hiện. Câu ví dụ dài thì xuống dòng trong thẻ, không đẩy 4 nút chấm điểm ra khỏi màn hình ở bề rộng 375px. **Hoàn tác** dùng thẳng thẻ do `await undo()` trả về, bỏ biến `restoredCard` (B3 đã sửa). **Bìa** dùng `deck.color` thay cho hằng `COVER_COLORS`. **Xong khi:** học hết một lượt với `?seed`; phím Space, 1–4, ← →, Z vẫn chạy như cũ | `renderFurigana()`, `reviewCard()`, `undo()` | Bắt buộc | Xong |
+| S11 | Đổi chiều học | Đảo mặt thẻ theo `deck.direction` ([product.md › Đổi chiều học](product.md#đổi-chiều-học)): `'ja-vi'` (Nhật → Việt, mặc định) mặt trước là từ có furigana, mặt sau là nghĩa kèm cách đọc và ví dụ; `'vi-ja'` (Việt → Nhật) mặt trước là nghĩa, mặt sau là từ có furigana kèm cách đọc và ví dụ. **Nút đổi chiều** trên trang Học (màn chọn bộ hoặc thanh trên phiên học): bấm thì lưu bằng `updateDeck(id, { direction })` và đổi ngay thẻ đang hiện. **Lịch ôn dùng chung:** chấm điểm vẫn gọi `reviewCard()` như cũ. **Xong khi:** với `?seed`, bộ 挨拶 (`'vi-ja'`) hiện nghĩa ở mặt trước; đổi chiều xong tải lại vẫn giữ; Space, 1–4, ← →, Z và hoàn tác đúng ở cả 2 chiều; ví dụ dài ở 375px không đẩy 4 nút chấm ra khỏi màn hình | `getDeck()`, `updateDeck()`, `renderFurigana()` | Nên có | Xong |
 
 </details>
 

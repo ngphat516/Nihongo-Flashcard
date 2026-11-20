@@ -103,7 +103,7 @@ vercel link --yes --project nho-lau   # chỉ lần đầu trên một máy
 vercel deploy --prod
 ```
 
-- `.vercelignore` bỏ tài liệu, test, `pages/styleguide/` và `package.json`, để Vercel coi đây là web tĩnh và không chạy npm.
+- `.vercelignore` bỏ tài liệu, test, `pages/styleguide/`, ảnh chụp màn hình trong `pages/*/screenshots/` và `package.json`, để Vercel coi đây là web tĩnh và không chạy npm.
 - Deploy xong, mở link, thử cả 4 trang và xem Console không có lỗi 404.
 
 **Dọn code trước khi nộp.** Bản đang chạy còn giữ `dev/dev.js` để demo bằng `?seed` (Leader chốt ngày 2026-11-11). Lúc nộp thì:

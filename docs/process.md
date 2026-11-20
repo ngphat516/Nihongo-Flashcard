@@ -16,6 +16,17 @@
 
 ---
 
+## 2026-11-20 — Cập nhật tài liệu sau đợt 3
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `docs/sau-dot-3`, sau khi merge #22 (A10), #23 (S11), #24 (furigana dữ liệu mẫu), #25 (C4, C5, C7, C10).
+  - `tasks.md`: sửa bảng "Việc đang mở" bị lặp do gộp conflict, chỉ còn L5, C11, L13, L3; xóa chi tiết S11, A10, C4, C5, C7, C10 và chuyển các việc này vào "Đã xong"; thêm C11; L5 thêm bước chạy thử luồng chiều học qua 3 trang và xuất / nhập JSON.
+  - `product.md`: "Đổi chiều học" ghi xong cả `core/`, Học, Album, Tạo thẻ.
+  - `architecture.md`: thêm `preview.js`, `paste.js`, `file-io.js`, `reading.js` của `pages/create/` và test của chúng.
+  - `.vercelignore` thêm `pages/*/screenshots/`; `conventions.md` mục "Trước khi nộp / deploy" ghi theo.
+- **Quyết định:** ghi C11 (tách `create.js`, đang khoảng 750 dòng, vượt quy ước 300 dòng) nhưng để sau, Leader chốt chưa làm. Không đưa ảnh chụp kiểm tra của PR lên Vercel.
+- **Tiếp theo:** L5, rồi L13 nếu kịp.
+
 ## 2026-11-19 — Xuất / nhập file và chiều học khi tạo bộ (C7, C10)
 
 - **Người làm:** kakushi.
