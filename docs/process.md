@@ -16,6 +16,28 @@
 
 ---
 
+## 2026-11-20 — Kiểm thử cuối (L5)
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `chore/kiem-thu-cuoi`, kiểm thử trên `main` sau #27. Chạy bằng Chrome headless điều khiển qua DevTools Protocol (gõ phím, bấm nút, đọc localStorage), bắt đầu từ `?reset`; mục 7–9 dùng `?seed`. Không sửa code.
+
+  | Mục | Kết quả | Ghi chú |
+  |---|---|---|
+  | 1. `npm test` | Đạt | 108/108 |
+  | 2. Luồng chính | Đạt | Tạo bộ 3 thẻ (đủ 4 ô có furigana, chỉ từ + nghĩa, chỉ kana), Ctrl+Enter lưu; Album tìm không dấu ("truong hoc"), tìm theo ví dụ, sửa thẻ giữ trạng thái; Học: Space, ← →, 1–4, Z hoàn tác đúng thẻ, màn "Xong rồi!"; Trang chủ: lượt ôn hôm nay, tổng thẻ, ô heatmap hôm nay, biểu đồ cập nhật |
+  | 3. Chiều học | Đạt | Tạo bộ Việt → Nhật (xem trước hiện nghĩa) → Album ghi đúng chiều → Học hiện nghĩa trước; đổi ở Album thì Học đổi theo; đổi ở Học thì Album đúng; tải lại vẫn giữ |
+  | 4. Xuất / nhập | Đạt | JSON đủ 3 thẻ, furigana, màu, chiều; CSV có BOM UTF-8, đúng chữ Nhật/Việt khi đọc bằng UTF-8; nhập JSON vào bộ mới giữ đủ thẻ, màu, chiều. Chưa mở bằng Excel/Google Sheets (máy kiểm thử không chạy được), mới kiểm tra BOM |
+  | 5. Furigana bật/tắt | Đạt | Tắt ở Album, `<rt>` ẩn; sang 3 trang còn lại và tải lại vẫn tắt |
+  | 6. Dữ liệu cũ | Đạt | Thẻ `front`/`back` ghi tay được đổi sang `term`/`meaning` khi mở app; bộ không có `color`/`direction` hiện màu theo thứ tự, chiều Nhật → Việt, học và sửa được |
+  | 7. Kích thước | Lỗi nhỏ | 6 màn hình × 1440/1024/768/375/320px: không cuộn ngang. Lỗi **S12**: ở 320px chữ "Đang học" tràn khỏi ô đếm trên trang Học |
+  | 8. Bàn phím | Đạt | Tab đi hết phần tử bấm được ở 5 màn hình, đều có viền focus; Esc đóng 6 hộp thoại, Esc ở hộp sửa bộ không lưu; mũi tên đổi màu bìa và chiều học ở Tạo thẻ và Album |
+  | 9. Trường hợp đặc biệt | Lỗi nhỏ | `?deck=` sai id (kể cả `constructor`) ở 3 trang báo "Không tìm thấy"; chưa có bộ: cả 4 trang có lời nhắc, nút tạo bộ; bộ chưa có thẻ ở Album có "Thêm thẻ đầu tiên". Lỗi **S13**: bộ chưa có thẻ ở trang Học hiện "Xong rồi! 0 thẻ đã học". Bộ hết thẻ ở màn chọn bộ chỉ nhạt chữ, khá khó nhận ra |
+  | 10. Console, Network | Đạt | Không lỗi Console, không file 404 ở mọi bước (hộp hỏi khi rời trang lúc chưa lưu là hành vi đúng của C2) |
+  | 11. Bản deploy | Chưa kiểm | Máy kiểm thử không mở được `nho-lau-gamma.vercel.app` (lỗi chứng chỉ HTTPS của mạng, không phải lỗi app). Cần mở tay: `?seed`, chạy nhanh mục 2, ảnh `pages/*/screenshots/` phải 404 |
+
+- **Quyết định:** không có lỗi làm hỏng luồng chính hay mất dữ liệu, nên làm tiếp phần dọn code của L5. S12, S13 là lỗi nhỏ của trang Học (At), sửa nếu kịp.
+- **Tiếp theo:** dọn code trước khi nộp (L5, nhánh `chore/don-code-nop-bai`); Leader mở bản deploy kiểm mục 11.
+
 ## 2026-11-20 — Tinh chỉnh giao diện (L13)
 
 - **Người làm:** Leader.
