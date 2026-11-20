@@ -470,3 +470,15 @@
   .study-ratings { gap: var(--space-2); }
   .study-ratings .btn { min-height: 48px; }
 }
+
+#empty-title {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  color: var(--text);
+  font-weight: 700;
+}
+
+#empty-title:focus-visible {
+  outline: none;
+}
