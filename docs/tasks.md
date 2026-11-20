@@ -8,10 +8,9 @@ Trạng thái hiện tại: còn việc gì, ai làm. Đã làm gì, khi nào th
 |---|---|---|---|---|---|
 | L5 | Kiểm thử cuối | Leader | — | Bắt buộc | Chưa làm |
 | C11 | Tách `create.js` | kakushi | — | Nếu kịp | Để sau |
-| L13 | Tinh chỉnh giao diện | Leader | — | Nếu kịp | Chưa làm |
 | L3 | Review & merge | Leader | — | Bắt buộc | Làm liên tục |
 
-**Đợt 3 xong:** S11, A10, C4, C5, C7, C10 (đã merge #22–#25). Còn lại L5 trước khi nộp, L13 nếu còn thời gian. C11 để sau (Leader chốt ngày 2026-11-20).
+**Đợt 3 xong:** S11, A10, C4, C5, C7, C10 (đã merge #22–#25). L13 xong (giữ nguyên bo góc, bóng, cỡ tiêu đề). Còn lại L5 trước khi nộp. C11 để sau (Leader chốt ngày 2026-11-20).
 
 Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong PR đầu tiên; xong thì đổi thành **Xong** và chuyển dòng đó xuống phần [Đã xong](#đã-xong).
 
@@ -23,10 +22,6 @@ Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong 
 
 - **Làm gì:** `create.js` dài khoảng 750 dòng, quy ước ([conventions.md](conventions.md#code) mục Chia file) là quá khoảng 300 dòng thì tách module trong cùng folder. Tách theo phần (VD form bộ thẻ, xuất/nhập, dán nhiều thẻ) sao cho `create.js` chỉ còn là điểm vào.
 - **Xong khi:** không đổi hành vi; `npm test` xanh; chạy thử lại C1–C10 ở 1440px và 375px, Console không lỗi.
-
-### L13 · Tinh chỉnh giao diện · Leader · `styles/`
-
-- **Làm gì:** thử trên bìa thật rồi chốt bo góc, bóng, cỡ tiêu đề lớn ([design.md](design.md#chốt-khi-làm-prototype)); sửa `tokens.css`.
 
 ### L5 · Kiểm thử cuối · Leader
 
@@ -65,7 +60,7 @@ Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong 
 Bấm để mở. Mô tả giữ nguyên lúc giao việc, dùng để tra lại tính năng đã làm.
 
 <details>
-<summary><b>Leader: nền chung</b> — L1, L2, L4, L6, L6b, L15, L7, L8, L9, L10, L11, L12, L14</summary>
+<summary><b>Leader: nền chung</b> — L1, L2, L4, L6, L6b, L15, L7, L8, L9, L10, L11, L12, L13, L14</summary>
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Ưu tiên | Trạng thái |
 |---|---|---|---|---|
@@ -81,6 +76,7 @@ Bấm để mở. Mô tả giữ nguyên lúc giao việc, dùng để tra lại
 | L10 | Bộ tài liệu | `docs/` (product, architecture, conventions, tasks, process), `AGENTS.md` + `CLAUDE.md`, rút gọn README | Nên có | Xong |
 | L11 | Màu và chữ mới | Màu chính matcha, nền xám ánh lục, heatmap xanh, 6 màu bìa pastel, font Plus Jakarta Sans + Noto Sans JP, class `chip` và `cover`, cập nhật styleguide, viết [design.md](design.md) | Nên có | Xong |
 | L12 | Cột điều hướng | Thay header ngang bằng cột icon bên trái, dưới 768px thành thanh tab ở đáy; nút furigana (chưa có tác dụng) ở cuối cột; sửa cả 4 file HTML, `base.css`, styleguide ([design.md › Bố cục khung](design.md#bố-cục-khung)). Kèm khung 2 cột của Trang chủ | Nên có | Xong |
+| L13 | Tinh chỉnh giao diện | Thử trên bìa thật rồi chốt bo góc, bóng, cỡ tiêu đề lớn ở Trang chủ ([design.md › Hình khối](design.md#hình-khối)); sửa `tokens.css` | Nếu kịp | Xong |
 | L14 | Thành phần chọn màu và furigana | Trong `styles/components.css`: class `color-picker` (6 chấm tròn 32px theo thứ tự `DECK_COLORS`, vùng bấm 44px, màu lấy từ `cover-<màu>`, ô đang chọn có viền `--cover-ink` và dấu ✓, radio vẫn dùng được bằng bàn phím và trình đọc màn hình) và kiểu chữ furigana (`rt` cỡ 0.5em, màu `--text-2`, giãn dòng để không đè dòng trên). Có mẫu trong styleguide, ghi ở [bảng class](conventions.md#class-dùng-chung) và [design.md › Thành phần](design.md#thành-phần) | Bắt buộc | Xong |
 
 </details>

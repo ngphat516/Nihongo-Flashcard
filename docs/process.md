@@ -16,6 +16,14 @@
 
 ---
 
+## 2026-11-20 — Tinh chỉnh giao diện (L13)
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `styles/tinh-chinh-giao-dien`. So 3 phương án chỉ đổi biến trong `tokens.css`, chụp với `?seed` ở Trang chủ, Album (lưới, chi tiết), Tạo thẻ, Học, mỗi trang 1440px và 375px: A giữ nguyên; B bo 20px, bóng mềm hơn, tiêu đề Trang chủ 32→40px; C bo 24px, bóng rõ hơn, tiêu đề 36→48px. `base.css`: nhãn `.todo-label b` bỏ `4px` viết cứng, dùng `--radius-sm`. `design.md` thêm mục "Hình khối", ghi cỡ tiêu đề lớn ở mục "Chữ", xóa mục "Chốt khi làm prototype" và link tới mục đó trong `AGENTS.md`.
+- **Quyết định:** Leader chọn **A**, giữ nguyên `--radius` 14px, `--radius-sm` 8px, `--shadow`, `--shadow-lg`; tiêu đề lớn ở Trang chủ dùng `--text-2xl` (28px), không thêm biến. Lý do: Leader chọn sau khi xem ảnh so sánh 3 phương án; giữ nguyên thì không phải chạy thử lại các trang lúc gần nộp.
+- **Tiếp theo:** L5.
+- **Vướng mắc:** chỗ viết cứng trong CSS của trang (không sửa trong L13, Leader quyết sau): `pages/study/study.css` khoảng 14 cỡ chữ `clamp(...rem...)` / `em` (dòng 357–398, 462–463).
+
 ## 2026-11-20 — Cập nhật tài liệu sau đợt 3
 
 - **Người làm:** Leader.

@@ -86,7 +86,7 @@
   --text-base: 1rem; /* 16px — chữ thường */
   --text-lg: 1.125rem; /* 18px — tiêu đề mục */
   --text-xl: 1.5rem; /* 24px — số trong ô thống kê */
-  --text-2xl: 1.75rem; /* 28px — tiêu đề trang */
+  --text-2xl: 1.75rem; /* 28px — tiêu đề trang, kể cả tiêu đề lớn ở Trang chủ (chốt ở L13) */
   --text-card: 1.75rem; /* chữ trên mặt thẻ flashcard */
 
   /* ---------- Khoảng cách ---------- */
@@ -97,7 +97,7 @@
   --space-5: 24px;
   --space-6: 40px;
 
-  /* ---------- Hình khối ---------- */
+  /* ---------- Hình khối (bo góc, bóng chốt ở L13: giữ nguyên, xem docs/design.md › Hình khối) ---------- */
   --radius: 14px;
   --radius-sm: 8px;
   --radius-full: 999px;

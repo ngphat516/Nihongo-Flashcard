@@ -24,7 +24,7 @@ App web học tiếng Nhật bằng flashcard, lịch ôn theo SM-2 kiểu Anki.
 - **XSS:** đưa dữ liệu người dùng vào trang bằng `h()` hoặc `textContent`.
 - **Đường dẫn:** luôn tương đối; link giữa trang dùng `routes`.
 - **Giao diện:** dùng biến trong `styles/tokens.css` và class chung; màu chính `--primary` chỉ cho hành động; chữ tiếng Nhật gắn `lang="ja"`.
-- **Chưa chốt:** gặp mục trong [product.md › Chưa chốt](docs/product.md#chưa-chốt) hoặc [design.md › Chốt khi làm prototype](docs/design.md#chốt-khi-làm-prototype) thì hỏi người dùng, không tự quyết.
+- **Chưa chốt:** gặp mục trong [product.md › Chưa chốt](docs/product.md#chưa-chốt) thì hỏi người dùng, không tự quyết.
 
 ## Chạy
 

@@ -92,7 +92,14 @@ Có 6 màu. Tên màu (cột "Giá trị") vừa là giá trị lưu trong `deck
 - **Font:** Plus Jakarta Sans cho chữ Latin và tiếng Việt, Noto Sans JP cho kana và kanji. Cả hai tải từ Google Fonts trong `styles/base.css`. Trình duyệt vẽ mỗi ký tự bằng font đầu tiên trong danh sách có ký tự đó, nên câu trộn Việt và Nhật tự hiển thị đúng.
 - **Chữ tiếng Nhật gắn `lang="ja"`.** Áp dụng cho trường `term`, `reading`, `example` và mọi chỗ hiện chữ Nhật. Khi đó cả câu dùng Noto Sans JP, dấu câu Nhật đúng kiểu, và trình đọc màn hình đọc bằng giọng tiếng Nhật.
 - **Độ đậm:** 400 cho chữ thường; 500 cho nhãn và chip; 600 cho nút và nhãn ô nhập; 700 cho tiêu đề và số liệu.
-- **Cỡ chữ:** dùng các biến `--text-xs` … `--text-2xl`, `--text-card`. Cỡ của tiêu đề lớn ở Trang chủ chốt khi làm prototype ([cuối trang](#chốt-khi-làm-prototype)).
+- **Cỡ chữ:** dùng các biến `--text-xs` … `--text-2xl`, `--text-card`. Tiêu đề lớn ở Trang chủ ("Hôm nay ôn gì?") dùng `.page-title` như các trang khác, cỡ `--text-2xl` (28px), không có biến riêng (chốt ở L13).
+
+## Hình khối
+
+Chốt ở L13 sau khi so 3 phương án trên trang thật: giữ nguyên giá trị đang có trong `styles/tokens.css`.
+
+- **Bo góc:** `--radius` 14px cho khối, bìa, thẻ, dialog, cột điều hướng; `--radius-sm` 8px cho nút, ô nhập, khối nhỏ bên trong; `--radius-full` cho chip, badge, nút tròn. Chi tiết nhỏ hơn (VD ô heatmap, nhãn) tính theo `--radius-sm`, không viết số cứng.
+- **Bóng:** `--shadow` (`0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.05)`) cho khối `panel`, mặt thẻ lật và bìa khi rê chuột, nhẹ để nền và viền vẫn là thứ tách khối; `--shadow-lg` (`0 8px 32px rgb(0 0 0 / 0.16)`) cho dialog và toast.
 
 ## Bố cục khung
 
@@ -166,13 +173,3 @@ Mẫu HTML của từng thành phần có trong styleguide. Phần dưới đây
 - Kích thước 20px, cả trên cột điều hướng và trong nút. Giữ `stroke="currentColor"` để icon lấy màu chữ.
 - Icon chỉ để trang trí: gắn `aria-hidden="true"` và luôn có chữ đi kèm: nhãn bên cạnh, chữ hiện thành tooltip như ở cột điều hướng, hoặc `aria-label` nếu nút chỉ có icon.
 - Icon trên cột điều hướng: Trang chủ `house`, Album `library-big`, Tạo thẻ `square-plus`, Học `graduation-cap`, Furigana `languages` (chép từ lucide-static 0.468.0).
-
-## Chốt khi làm prototype
-
-Task L13. Phải nhìn trên trang thật mới chốt được, nên chốt khi Trang chủ (H3) hoặc Album (A1) đã có bìa thật. Muốn thử nhiều phương án thì làm trên nhánh `prototype/giao-dien-moi`:
-
-- Bo góc: mẫu bo tròn hơn `--radius` hiện tại (14px).
-- Bóng đổ của khối và bìa.
-- Cỡ tiêu đề lớn ở Trang chủ.
-
-Chốt xong thì sửa `tokens.css` và xóa mục tương ứng ở đây.
