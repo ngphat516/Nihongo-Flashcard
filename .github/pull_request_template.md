@@ -8,7 +8,7 @@
 
 ## Tự kiểm tra
 - [ ] Chỉ sửa trong folder `pages/<trang>/` của mình (hoặc đã báo leader nếu đụng `core/`, `styles/`)
-- [ ] Dùng class chung trong `pages/styleguide/` trước khi tự viết; class riêng bắt đầu bằng tên trang
+- [ ] Dùng class chung ([bảng class](../docs/conventions.md#class-dùng-chung)) trước khi tự viết; class riêng bắt đầu bằng tên trang
 - [ ] Không dùng `innerHTML` với dữ liệu người dùng
 - [ ] Đã thử với dữ liệu mẫu (`?seed`) và khi chưa có dữ liệu (`?reset`)
 - [ ] `npm test` vẫn xanh (nếu có sửa `core/`)

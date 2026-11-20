@@ -1,6 +1,7 @@
 /**
  * Công cụ cho lúc phát triển.
- * TRƯỚC KHI NỘP: xóa thẻ <script src="…dev/dev.js"> trong 4 file HTML.
+ * Giữ lại trên bản nộp để demo bằng ?seed / ?reset (Leader chốt ngày 2026-11-20).
+ * ?reset chỉ xóa dữ liệu trong trình duyệt của người mở link.
  *
  *   Thêm ?seed vào URL   → tạo dữ liệu mẫu (3 bộ thẻ + ~4 tháng lịch sử ôn)
  *   Thêm ?reset vào URL  → xóa sạch dữ liệu

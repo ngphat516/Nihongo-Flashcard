@@ -24,7 +24,6 @@ pages/
   album/                index.html, album.js (+ detail.js, ui.js), album.css
   create/               index.html, create.js (+ card-rows.js, feedback.js), create.css
   study/                index.html, study.js, study.css
-  styleguide/           xem mọi biến và class giao diện (công cụ dev, xóa trước khi nộp)
 core/                   phần lõi dùng chung
   repo.js               ★ API dữ liệu cho các trang
   scheduler.js          thuật toán SM-2 (hàm thuần)
@@ -39,7 +38,7 @@ core/                   phần lõi dùng chung
   routes.js             link giữa các trang
   seed.js               dữ liệu mẫu (test cũng dùng)
 dev/
-  dev.js                ?seed / ?reset lúc phát triển (xóa trước khi nộp)
+  dev.js                ?seed / ?reset tạo và xóa dữ liệu mẫu (giữ lại trên bản nộp để demo)
 styles/
   base.css              file CSS duy nhất các trang nạp: @import 2 file dưới + reset, cột điều hướng, khung trang
   tokens.css            biến: màu, font, cỡ chữ, khoảng cách, bo góc, chuyển động, z-index

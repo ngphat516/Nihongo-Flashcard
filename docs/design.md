@@ -3,7 +3,7 @@
 Tài liệu này mô tả giao diện Nhớ Lâu trông thế nào và lý do chọn như vậy: màu, chữ, bố cục, thành phần, icon.
 
 - Luật viết CSS, tên class và bảng class dùng chung: xem [conventions.md › Giao diện](conventions.md#giao-diện-css).
-- Mọi biến và class kèm mẫu HTML: mở trang styleguide `pages/styleguide/` (http://localhost:5500/pages/styleguide/).
+- Mọi biến: `styles/tokens.css`. Trang styleguide `pages/styleguide/` đã xóa khi dọn code trước khi nộp (L5, 2026-11-20); muốn xem lại thì mở bản trong lịch sử git.
 
 ## Hướng giao diện
 
@@ -146,7 +146,7 @@ HTML của trang viết theo đúng thứ tự một cột ở trên (`#overview
 
 ## Thành phần
 
-Mẫu HTML của từng thành phần có trong styleguide. Phần dưới đây chỉ ghi cách dùng.
+Mẫu HTML của từng thành phần: xem cách 4 trang đang dùng. Phần dưới đây chỉ ghi cách dùng.
 
 - **Bìa bộ thẻ (`cover`)** dùng ở Trang chủ (H3) và Album (A1).
   - Nội dung bìa:

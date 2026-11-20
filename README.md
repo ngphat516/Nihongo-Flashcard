@@ -7,6 +7,13 @@ HTML / CSS / JavaScript thuần (không framework, không build), dữ liệu l�
 
 Đồ án nhóm 4 người, đang làm giai đoạn 1 (flashcard). Tiến độ: [docs/process.md](docs/process.md).
 
+## Xem nhanh với dữ liệu mẫu
+
+App mới mở thì trống. Để xem đủ tính năng (heatmap, biểu đồ, chuỗi ngày học):
+
+- Thêm `?seed` vào link, VD https://nho-lau-gamma.vercel.app/?seed: tạo 3 bộ thẻ tiếng Nhật kèm khoảng 4 tháng lịch sử ôn. Đây là **dữ liệu mẫu**, không phải tiến độ học thật.
+- Thêm `?reset` để xóa sạch dữ liệu. Lệnh chỉ xóa dữ liệu trong trình duyệt của người mở link, không ảnh hưởng ai khác.
+
 ## Chạy thử
 
 ES modules **không chạy** khi mở file trực tiếp (`file://...`), nên phải mở qua server cục bộ:
@@ -20,8 +27,7 @@ ES modules **không chạy** khi mở file trực tiếp (`file://...`), nên ph
 
   (Mac/Linux dùng `python3`), rồi mở http://localhost:5500
 
-**Dữ liệu mẫu:** thêm `?seed` vào URL (VD http://localhost:5500/?seed) để tạo 3 bộ thẻ + khoảng 4 tháng lịch sử ôn.
-Thêm `?reset` để xóa sạch. Hoặc gõ trong Console: `dev.seed()` / `dev.reset()`.
+**Dữ liệu mẫu:** http://localhost:5500/?seed và `?reset` như [ở trên](#xem-nhanh-với-dữ-liệu-mẫu). Hoặc gõ trong Console: `dev.seed()` / `dev.reset()`.
 
 ## Chạy test
 

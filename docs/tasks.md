@@ -6,6 +6,10 @@ Trạng thái hiện tại: còn việc gì, ai làm. Đã làm gì, khi nào th
 
 | Mã | Việc | Ai | Cần trước | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
+| C11 | Tách `create.js` | kakushi | — | Nếu kịp | Để sau |
+| L3 | Review & merge | Leader | — | Bắt buộc | Làm liên tục |
+
+**Sẵn sàng nộp:** đợt 3 (S11, A10, C4, C5, C7, C10) và L13 đã xong; L5 đã kiểm thử và dọn code ngày 2026-11-20. C11 để sau (Leader chốt ngày 2026-11-20).
 | L5 | Kiểm thử cuối | Leader | — | Bắt buộc | Đang làm — đã kiểm thử, còn dọn code |
 | S12 | Học, rộng 320px: chữ "Đang học" trong ô đếm `#study-counts` tràn ra ngoài ô, đè lên số của ô "Đến hạn" | At | — | Nếu kịp | Chưa làm |
 | S13 | Học: mở bộ chưa có thẻ nào thì hiện "Xong rồi! 0 thẻ đã học", nên báo bộ chưa có thẻ và có nút thêm thẻ | At | — | Nếu kịp | Chưa làm |
@@ -24,11 +28,6 @@ Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong 
 
 - **Làm gì:** `create.js` dài khoảng 750 dòng, quy ước ([conventions.md](conventions.md#code) mục Chia file) là quá khoảng 300 dòng thì tách module trong cùng folder. Tách theo phần (VD form bộ thẻ, xuất/nhập, dán nhiều thẻ) sao cho `create.js` chỉ còn là điểm vào.
 - **Xong khi:** không đổi hành vi; `npm test` xanh; chạy thử lại C1–C10 ở 1440px và 375px, Console không lỗi.
-
-### L5 · Kiểm thử cuối · Leader
-
-- **Làm gì:** `npm test` qua hết; thử luồng tạo bộ → thêm thẻ → học → xem heatmap; thử trên điện thoại; làm hết mục [Trước khi nộp](conventions.md#trước-khi-nộp--deploy).
-- Chạy thử luồng chiều học qua 3 trang: tạo bộ Việt → Nhật ở Tạo thẻ → Album chi tiết bộ ghi đúng chiều → Học hiện nghĩa ở mặt trước → đổi chiều ở Album thì Học đổi theo, và ngược lại; xuất bộ ra JSON rồi nhập vào bộ mới giữ đủ thẻ và furigana.
 
 ### L3 · Review & merge · Leader
 
@@ -62,13 +61,14 @@ Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong 
 Bấm để mở. Mô tả giữ nguyên lúc giao việc, dùng để tra lại tính năng đã làm.
 
 <details>
-<summary><b>Leader: nền chung</b> — L1, L2, L4, L6, L6b, L15, L7, L8, L9, L10, L11, L12, L13, L14</summary>
+<summary><b>Leader: nền chung</b> — L1, L2, L4, L5, L6, L6b, L15, L7, L8, L9, L10, L11, L12, L13, L14</summary>
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Ưu tiên | Trạng thái |
 |---|---|---|---|---|
 | L1 | Codebase nền | Cấu trúc thư mục, CSS chung, lớp lưu localStorage, thuật toán SM-2 + 37 test, dữ liệu mẫu, khung 4 trang | Bắt buộc | Xong |
 | L2 | Repo GitHub | Tạo repo, push codebase, bật bảo vệ nhánh `main` (bắt buộc qua PR), mời 3 thành viên, điền username thật vào `.github/CODEOWNERS` | Bắt buộc | Xong |
 | L4 | Hệ thống giao diện | `styles/tokens.css` + `styles/components.css` (nút, ô nhập, thống kê, bộ đếm, badge, thẻ lật, dialog, toast, trạng thái rỗng), font Noto Sans JP, trang `pages/styleguide/`. Chỉ CSS, không có JS cho component | Nên có | Xong |
+| L5 | Kiểm thử cuối | `npm test` qua hết; thử luồng tạo bộ → thêm thẻ → học → xem heatmap; thử trên điện thoại; luồng chiều học qua 3 trang (tạo bộ Việt → Nhật ở Tạo thẻ → Album ghi đúng chiều → Học hiện nghĩa ở mặt trước → đổi chiều ở Album thì Học đổi theo, và ngược lại); xuất bộ ra JSON rồi nhập vào bộ mới giữ đủ thẻ và furigana; làm hết mục [Trước khi nộp](conventions.md#trước-khi-nộp--deploy) | Bắt buộc | Xong |
 | L6 | Thẻ tiếng Nhật + màu bìa | Đổi `Card` từ `front`/`back` sang `term`, `meaning`, `reading`, `example`, `jlpt` + cú pháp furigana `漢字[かんじ]` (chi tiết: [product.md](product.md#thẻ-tiếng-nhật)). Thêm `Deck.color` ([product.md](product.md#màu-bìa-bộ-thẻ)): `DECK_COLORS` trong `models.js` theo thứ tự ở [design.md](design.md#màu-bìa-bộ-thẻ), `createDeck` không truyền màu thì lấy màu kế tiếp, `updateDeck` đổi được màu, màu lạ báo `ValidationError`, bộ cũ chưa có màu thì đọc ra theo thứ tự. Sửa `models.js`, `repo.js`, `seed.js`, test, chú thích đầu file các trang. Album, Tạo thẻ, Học đều đang dùng thẻ 2 mặt: phần đổi ở mỗi trang là A9, C9, S10 bên dưới | Bắt buộc | Xong |
 | L6b | Bỏ lớp tương thích `front`/`back` | Cần A9, C9, S10 đã merge vào `main`, làm sau L15. Không cần chờ A5, C8. Xóa `core/card-compat.js` và các chỗ gọi `readCard` / `writeCard` trong `core/repo.js`, bỏ nhóm test "lớp tương thích" trong `tests/repo.test.js`. Thẻ cũ còn `front`/`back` trong localStorage phải được xử lý: chuyển đổi một lần khi mở app, hoặc chấp nhận bỏ; chọn cách nào thì ghi vào [process.md](process.md). Xong khi `grep -rnE '\.(front\|back)([^-[:alnum:]_]\|$)\|\b(front\|back):' pages core` không còn dòng nào khớp (lệnh này bỏ qua class `.back-link`) và `npm test` xanh | Bắt buộc | Xong |
 | L15 | Chạy thử luồng sau đợt 2 | Trên `main` sau khi merge A9, C9, S10, bắt đầu từ `?reset`: tạo bộ ở Tạo thẻ với thẻ có furigana, `reading`, `example` và chọn màu bìa → Album hiển thị đúng, tìm và sửa được → Học hiển thị đúng furigana, chấm, hoàn tác → màu bìa khớp ở Trang chủ, Album, Học. Thử ở 1440px và 375px; Console không lỗi. Làm trước L6b | Bắt buộc | Xong |
