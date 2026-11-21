@@ -107,7 +107,7 @@ Các quyết định này đã chốt nhưng code chưa có. Ai làm thì cập 
 Hỏi Leader trước khi làm các phần này.
 
 - **Giai đoạn 2:** dạng bài tập nào (trắc nghiệm, gõ cách đọc, nối cặp, điền chỗ trống), kết quả có tính vào lịch ôn SM-2 không; "ghi chú" gồm những gì.
-- **Backend:** có làm không, làm ở giai đoạn nào. Kế hoạch kỹ thuật nếu làm: [architecture.md › Thêm backend](architecture.md#thêm-backend-sau-này).
+- **Backend:** Đã chốt làm: Node.js, PostgreSQL trên Prisma Postgres; thiết kế ở [backend.md](backend.md). Còn chưa chốt: xem [backend.md › Chưa chốt](backend.md#chưa-chốt).
 
 ## Không làm
 

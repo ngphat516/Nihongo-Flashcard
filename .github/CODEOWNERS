@@ -10,3 +10,8 @@
 
 /core/   @ngphat516
 /styles/ @ngphat516
+
+# Backend (chưa có, dòng sẵn cho sau này)
+/api/        @ngphat516
+/db/         @ngphat516
+/vercel.json @ngphat516

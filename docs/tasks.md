@@ -8,10 +8,26 @@ Trạng thái hiện tại: còn việc gì, ai làm. Đã làm gì, khi nào th
 |---|---|---|---|---|---|
 | C11 | Tách `create.js` | kakushi | — | Nếu kịp | Để sau |
 | L3 | Review & merge | Leader | — | Bắt buộc | Làm liên tục |
+| L16 | Bỏ trường `jlpt` | Leader | — | Bắt buộc trước backend | Chưa làm |
 
 **Sẵn sàng nộp:** đợt 3 (S11, A10, C4, C5, C7, C10) và L13 đã xong; L5 đã kiểm thử và dọn code ngày 2026-11-20. Hai lỗi nhỏ ở trang Học S12, S13 đã sửa và kiểm tra. C11 để sau (Leader chốt ngày 2026-11-20).
 
 Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong PR đầu tiên; xong thì đổi thành **Xong** và chuyển dòng đó xuống phần [Đã xong](#đã-xong).
+
+## Backend (kế hoạch, chưa giao)
+
+Thiết kế ở [backend.md](backend.md). Chỉ giao việc khi đã chốt các mục [backend.md › Chưa chốt](backend.md#chưa-chốt). Dùng mã `BE…` vì `B1–B5` đã là mã lỗi.
+
+| Mã | Việc | Ai | Cần trước | Trạng thái |
+|---|---|---|---|---|
+| BE1 | Khung server + DB: thư mục `api/`, `db/migrations/001_init.sql`, Prisma Postgres qua Vercel Marketplace, `.gitignore` + `.env.example`, bật Secret scanning + Push protection, `vercel.json` có header bảo mật, `vercel dev`, README | Leader | L16 | Chưa làm |
+| BE2 | Đăng nhập Google + JWT cookie, `/api/auth/*`, `/api/me`, giới hạn số lần gọi đăng nhập | Leader | BE1 | Chưa làm |
+| BE3 | CRUD theo collection, kiểm tra chủ sở hữu, idempotent, `409` khi sửa chồng; test 2 user | Leader | BE2 | Chưa làm |
+| BE4 | Route transaction: chấm điểm, hoàn tác, xóa bộ, tạo nhiều thẻ | Leader | BE3 | Chưa làm |
+| BE5 | `core/storage.js` 2 bản (localStorage / API) chọn theo đăng nhập; `?seed`/`?reset` chỉ chạy ở chế độ khách | Leader | BE3 | Chưa làm |
+| BE6 | Nút đăng nhập/đăng xuất ở cột điều hướng (4 file HTML + `styles/`) | Leader | BE2 | Chưa làm |
+| BE7 | Đưa dữ liệu khách lên tài khoản | Leader + kakushi (dùng lại C7) | BE5 | Chưa làm |
+| BE8 | Trạng thái đang tải / lỗi mạng ở từng trang | Daika (Album), kakushi (Tạo thẻ), At (Học), Leader (Trang chủ) | BE5 | Chưa làm |
 
 ---
 
@@ -25,6 +41,17 @@ Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong 
 ### L3 · Review & merge · Leader
 
 - Review mọi PR. Thay đổi trong phần chung (`core/`, `styles/`) phải qua Leader. `main` đã bật bảo vệ: PR cần 1 lượt duyệt, người sở hữu folder trong `.github/CODEOWNERS` được gắn reviewer tự động.
+
+### L16 · Bỏ trường jlpt · Leader · `core/`
+
+- **Lý do:** giao diện không dùng `jlpt`, database của backend ([backend.md › Database](backend.md#database)) không có cột này.
+- **Làm gì:**
+  - `core/models.js`: bỏ `JLPT_LEVELS`, `jlpt` trong typedef `Card`, `CARD_FIELDS`, `makeCard`, `validateCard`.
+  - `core/migrate.js`: xóa `jlpt` của thẻ cũ thay vì điền `''`.
+  - Sửa chú thích JSDoc trong `core/repo.js` và `pages/album/album.js`.
+  - `tests/`: bỏ test `jlpt`; thêm test gửi `jlpt` lên thì bị bỏ qua.
+  - Tài liệu: `product.md`, `architecture.md`.
+- **Xong khi:** `grep -rn jlpt core pages tests` chỉ còn test "bị bỏ qua" và chỗ `migrate.js` xóa trường; `npm test` xanh; thẻ cũ có `jlpt` mở lên không lỗi.
 
 ---
 

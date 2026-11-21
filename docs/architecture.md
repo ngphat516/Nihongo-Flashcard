@@ -197,4 +197,4 @@ Giao diện các trang chưa có test tự động.
 
 ## Thêm backend (sau này)
 
-Viết lại `core/storage.js` bằng `fetch()` với cùng tên hàm (`list`, `get`, `put`, `putMany`, `remove`, `removeMany`, `clearAll`). Ba bảng `decks`, `cards`, `reviewLogs` chuyển thẳng thành 3 bảng trong database, cột lấy từ chú thích trong `models.js`. Các trang không phải sửa, vì mọi hàm `repo.js` đã là `async`.
+Server Node.js, database PostgreSQL trên Prisma Postgres. `core/storage.js` được viết lại bằng `fetch()` với cùng 7 hàm, nên các trang không phải sửa; SM-2 và chọn thẻ vẫn chạy ở trình duyệt. Database, API, đăng nhập và luật bảo mật: xem [backend.md](backend.md).

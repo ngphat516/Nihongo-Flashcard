@@ -74,6 +74,18 @@ Thêm hoặc đổi class chung thì sửa cả bảng này.
 - Console không có lỗi.
 - Đã xóa khung `.todo` và đoạn `DEMO` của phần đó.
 - `npm test` vẫn xanh (bắt buộc nếu có sửa `core/`).
+- Task backend: có test 2 user cho route mới; không có bí mật trong diff.
+
+## Bảo mật
+
+Tóm tắt. Đủ luật xem [backend.md › Bảo mật](backend.md#bảo-mật).
+
+- Không commit bí mật (mật khẩu DB, `JWT_SECRET`, token); `.env` phải có trong `.gitignore`.
+- `user_id` chỉ lấy từ JWT; mọi query lọc theo người dùng.
+- Chỉ dùng SQL có tham số (`$1, $2`), không ghép chuỗi.
+- Không dùng `innerHTML` với dữ liệu người dùng.
+- Mỗi route có test 2 user: user B không đụng được dữ liệu của user A.
+- Lỡ lộ bí mật thì đổi ngay; xóa commit không đủ.
 
 ## Tài liệu
 
@@ -84,6 +96,7 @@ Mỗi thông tin chỉ ghi ở **một** file; file khác thì trỏ link sang.
 | App làm gì, từ ngữ, phạm vi, quyết định sản phẩm | [product.md](product.md) |
 | Giao diện: màu, chữ, bố cục, thành phần, icon | [design.md](design.md) |
 | Cấu trúc code, API, dữ liệu, SM-2 | [architecture.md](architecture.md) |
+| Thiết kế backend: database, API, bảo mật | [backend.md](backend.md) |
 | Luật code, CSS, git, định nghĩa xong, trước khi nộp | file này |
 | Việc cần làm và trạng thái | [tasks.md](tasks.md) |
 | Đã làm gì, khi nào, quyết định gì | [process.md](process.md) |
