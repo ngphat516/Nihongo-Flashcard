@@ -16,6 +16,13 @@
 
 ---
 
+## 2026-11-21 — Thiết kế backend
+
+- **Người làm:** Leader, cùng Claude Code.
+- **Đã xong:** nhánh `docs/thiet-ke-backend`, chỉ tài liệu. Viết [backend.md](backend.md): mục tiêu, tech stack, khối SQL 4 bảng, API, idempotency, luật bảo mật, chưa chốt. `architecture.md` mục "Thêm backend" thu gọn, trỏ sang backend.md; `product.md` dòng Backend; `conventions.md` thêm mục Bảo mật, dòng bảng Tài liệu, dòng định nghĩa xong; `AGENTS.md`; `.github/CODEOWNERS` (`/api/`, `/db/`, `/vercel.json`); mẫu PR thêm mục không có bí mật. `tasks.md` thêm L16 và bảng BE1–BE8.
+- **Quyết định:** đã chốt Node.js và PostgreSQL trên Prisma Postgres (không dùng Neon); 4 bảng `users`, `decks`, `cards`, `review_logs`; bỏ `jlpt` (L16); SM-2 và chọn thẻ giữ ở trình duyệt; id do trình duyệt tạo để idempotent; luật bảo mật ở [backend.md › Bảo mật](backend.md#bảo-mật). Phần còn lại của tech stack (`pg`, Vercel Functions, Google OAuth, JWT cookie, migration SQL, `vercel dev`) là **đề xuất**.
+- **Tiếp theo:** chốt các mục [backend.md › Chưa chốt](backend.md#chưa-chốt) (chế độ khách, hạn nộp, yêu cầu đề bài); làm L16; rồi giao BE1.
+
 ## 2026-11-20 — Sửa bộ đếm và bộ trống trang Học (S12, S13)
 
 - **Người làm:** At, cùng Codex.

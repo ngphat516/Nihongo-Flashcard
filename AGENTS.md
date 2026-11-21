@@ -14,6 +14,7 @@ App web học tiếng Nhật bằng flashcard, lịch ôn theo SM-2 kiểu Anki.
 - [`docs/product.md`](docs/product.md): app làm gì, từ ngữ của dự án, quyết định đã chốt và **chưa chốt**. Đọc khi việc chạm tới tính năng hay chữ trên giao diện.
 - [`docs/design.md`](docs/design.md): màu nào dùng ở đâu, chữ, bố cục, bìa bộ thẻ, chip, icon. Đọc khi việc chạm tới giao diện.
 - [`docs/architecture.md`](docs/architecture.md): thư mục, 4 trang, luồng trang → `repo.js` → `storage.js`, API, dữ liệu, SM-2. Đọc trước khi sửa JS.
+- [`docs/backend.md`](docs/backend.md): thiết kế backend (database, API, bảo mật). Đọc mục Bảo mật trước khi sửa `api/`, `db/`, `core/storage.js`.
 - [`docs/conventions.md`](docs/conventions.md): luật code, CSS và bảng class dùng chung, nhánh/PR, định nghĩa xong, trước khi nộp. Đọc trước khi viết code hoặc commit.
 
 ## Luật cứng
