@@ -102,12 +102,20 @@ Các quyết định này đã chốt nhưng code chưa có. Ai làm thì cập 
 - `deck.direction` lưu `'ja-vi'` (Nhật → Việt) hoặc `'vi-ja'` (Việt → Nhật). Bộ tạo trước khi có trường này đọc ra Nhật → Việt.
 - **Trạng thái:** xong cả `core/` (`L8`), Học (`S11`), Album (`A10`), Tạo thẻ (`C10`). `DECK_DIRECTIONS` trong `core/models.js`; `createDeck` không truyền chiều thì `'ja-vi'`; `updateDeck` đổi được chiều; giá trị lạ báo `ValidationError`. Bộ cũ chưa có chiều chỉ được ghi khi bộ được lưu lại.
 
+### Tạo thẻ từ PDF bằng AI
+
+- Người học chọn một file PDF tài liệu tiếng Nhật, chọn khoảng trang; AI đề xuất thẻ (từ có furigana, nghĩa tiếng Việt, cách đọc, câu ví dụ).
+- Cần đăng nhập; có hạn mức mỗi ngày.
+- **Luôn có bước xem trước:** người học sửa, bỏ chọn, xem thẻ trùng rồi mới bấm thêm vào bộ. Kết quả AI không bao giờ được lưu thẳng.
+- Chữ trong PDF được gửi tới Google Gemini để tạo thẻ; giao diện ghi rõ điều này.
+- **Vị trí trên giao diện:** chưa chốt ([Chưa chốt](#chưa-chốt)). Luồng, prompt và luật bảo mật: [backend.md › AI tạo thẻ từ PDF](backend.md#ai-tạo-thẻ-từ-pdf).
+
 ## Chưa chốt
 
 Hỏi Leader trước khi làm các phần này.
 
 - **Giai đoạn 2:** dạng bài tập nào (trắc nghiệm, gõ cách đọc, nối cặp, điền chỗ trống), kết quả có tính vào lịch ôn SM-2 không; "ghi chú" gồm những gì.
-- **Backend:** Đã chốt làm: Node.js, PostgreSQL trên Prisma Postgres; thiết kế ở [backend.md](backend.md). Còn chưa chốt: xem [backend.md › Chưa chốt](backend.md#chưa-chốt).
+- **Backend:** Đã chốt: Node.js, PostgreSQL 16 chạy bằng Docker trên máy của kakushi, ra mạng qua Cloudflare Tunnel; AI tạo thẻ gọi Gemini. Thiết kế ở [backend.md](backend.md). Còn chưa chốt (chế độ khách, hạn nộp, vị trí giao diện AI): xem [backend.md › Chưa chốt](backend.md#chưa-chốt).
 
 ## Không làm
 

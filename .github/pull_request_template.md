@@ -11,6 +11,8 @@
 - [ ] Dùng class chung ([bảng class](../docs/conventions.md#class-dùng-chung)) trước khi tự viết; class riêng bắt đầu bằng tên trang
 - [ ] Không dùng `innerHTML` với dữ liệu người dùng
 - [ ] Không có bí mật (mật khẩu, token, `.env`) trong diff
+- [ ] Route mới có test 2 user (user B không đụng được dữ liệu của user A)
+- [ ] Không bật auth giả (`X-Dev-User`) ngoài dev
 - [ ] Đã thử với dữ liệu mẫu (`?seed`) và khi chưa có dữ liệu (`?reset`)
 - [ ] `npm test` vẫn xanh (nếu có sửa `core/`)
 - [ ] Đã sửa trạng thái trong `docs/tasks.md` và thêm một mục vào `docs/process.md`

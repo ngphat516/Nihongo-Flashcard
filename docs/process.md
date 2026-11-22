@@ -16,6 +16,19 @@
 
 ---
 
+## 2026-11-22 — Chốt hạ tầng backend, AI và chia việc
+
+- **Người làm:** Leader, cùng Claude Code.
+- **Đã xong:** nhánh `docs/chia-viec-backend`, chỉ tài liệu và `.github/`. Gộp `docs/backend-docker.md` vào [backend.md](backend.md) (mục Hạ tầng) rồi xóa file đó. `backend.md`: sửa Tech stack, thêm mục Hạ tầng, Hợp đồng chung (GĐ0), AI tạo thẻ từ PDF, nhóm bảo mật "i. AI", sửa Chưa chốt. `tasks.md`: thay phần kế hoạch backend bằng [Backend và AI](tasks.md#backend-và-ai) (thứ tự GĐ0–GĐ4, bảng BE1–BE11, AI1–AI4, chi tiết từng việc, luật chung). `product.md` thêm tính năng "Tạo thẻ từ PDF bằng AI"; `conventions.md` thêm luật auth giả và API key AI, dòng định nghĩa xong cho task AI; `architecture.md` sửa câu Prisma Postgres; `.github/CODEOWNERS` đổi `/api/`, `/vercel.json` sang `/server/`, `/server/ai/`, `/docker-compose.yml`, `/Dockerfile`; mẫu PR thêm 2 mục; README thêm dòng backend và giới hạn 18 tuổi.
+- **Quyết định:**
+  - **Hosting:** tự host bằng Docker trên máy của kakushi, ra ngoài qua Cloudflare Tunnel. Lý do: không vướng giới hạn gói Free, cả nhóm chạy giống bản thật, server chạy liên tục nên pool kết nối và rate limit trong bộ nhớ có tác dụng, không bị giới hạn thời gian chạy (cần cho AI), không khóa vào hạ tầng. Không dùng Vercel Functions và Prisma Postgres cho backend (bản frontend hiện tại vẫn ở Vercel).
+  - **Database:** PostgreSQL 16 (`postgres:16-alpine` trong Docker Compose), giữ nguyên 4 bảng.
+  - **AI tạo thẻ từ PDF:** server Node gọi thẳng model Gemini (key từ Google AI Studio). Không chạy Hermes Agent trong app: API server của agent cho dùng mọi công cụ kể cả lệnh terminal, mà input là chữ PDF người dùng tải lên, nên prompt injection có thể chạy lệnh trên máy host.
+  - **Chia việc:** Leader (đăng nhập, nối frontend), kakushi (hạ tầng), Daika (API dữ liệu), At (AI). Chi tiết ở [tasks.md › Backend và AI](tasks.md#backend-và-ai).
+  - **Vị trí giao diện AI:** chốt sau khi phần AI phía server (AI3, AI4) xong.
+- **Tiếp theo:** buổi GĐ0 chốt [backend.md › Hợp đồng chung](backend.md#hợp-đồng-chung-gđ0); sau đó GĐ1 (BE1, L16, AI1, kế hoạch test 2 user).
+- **Vướng mắc:** `AGENTS.md` còn ghi thư mục `api/` (cũ), cần đổi thành `server/` ở PR sau.
+
 ## 2026-11-21 — Thiết kế backend
 
 - **Người làm:** Leader, cùng Claude Code.

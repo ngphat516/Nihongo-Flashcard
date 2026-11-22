@@ -197,4 +197,4 @@ Giao diện các trang chưa có test tự động.
 
 ## Thêm backend (sau này)
 
-Server Node.js, database PostgreSQL trên Prisma Postgres. `core/storage.js` được viết lại bằng `fetch()` với cùng 7 hàm, nên các trang không phải sửa; SM-2 và chọn thẻ vẫn chạy ở trình duyệt. Database, API, đăng nhập và luật bảo mật: xem [backend.md](backend.md).
+Server Node.js, database PostgreSQL 16, chạy bằng Docker Compose. `core/storage.js` được viết lại bằng `fetch()` với cùng 7 hàm, nên các trang không phải sửa; SM-2 và chọn thẻ vẫn chạy ở trình duyệt. Database, API, đăng nhập và luật bảo mật: xem [backend.md](backend.md).

@@ -11,7 +11,9 @@
 /core/   @ngphat516
 /styles/ @ngphat516
 
-# Backend (chưa có, dòng sẵn cho sau này)
-/api/        @ngphat516
-/db/         @ngphat516
-/vercel.json @ngphat516
+# Backend (xem docs/backend.md)
+/server/            @ngphat516
+/db/                @ngphat516
+/docker-compose.yml @phattnt @ngphat516
+/Dockerfile         @phattnt @ngphat516
+/server/ai/         @Peter-Kohi @ngphat516
