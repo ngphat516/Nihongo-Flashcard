@@ -7,6 +7,8 @@ HTML / CSS / JavaScript thuần (không framework, không build), dữ liệu l�
 
 Đồ án nhóm 4 người, đang làm giai đoạn 1 (flashcard). Tiến độ: [docs/process.md](docs/process.md).
 
+Backend đang làm, xem [docs/backend.md](docs/backend.md). Tính năng tạo thẻ bằng AI dùng Gemini API, nên app không hướng tới người dùng dưới 18 tuổi (điều khoản của Gemini API).
+
 ## Xem nhanh với dữ liệu mẫu
 
 App mới mở thì trống. Để xem đủ tính năng (heatmap, biểu đồ, chuỗi ngày học):

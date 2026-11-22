@@ -10,24 +10,150 @@ Trạng thái hiện tại: còn việc gì, ai làm. Đã làm gì, khi nào th
 | L3 | Review & merge | Leader | — | Bắt buộc | Làm liên tục |
 | L16 | Bỏ trường `jlpt` | Leader | — | Bắt buộc trước backend | Chưa làm |
 
-**Sẵn sàng nộp:** đợt 3 (S11, A10, C4, C5, C7, C10) và L13 đã xong; L5 đã kiểm thử và dọn code ngày 2026-11-20. Hai lỗi nhỏ ở trang Học S12, S13 đã sửa và kiểm tra. C11 để sau (Leader chốt ngày 2026-11-20).
+**Sẵn sàng nộp:** đợt 3 (S11, A10, C4, C5, C7, C10) và L13 đã xong; L5 đã kiểm thử và dọn code ngày 2026-11-20. Hai lỗi nhỏ ở trang Học S12, S13 đã sửa và kiểm tra. C11 để sau (Leader chốt ngày 2026-11-20). **Đợt tiếp theo:** backend và AI tạo thẻ từ PDF, bắt đầu từ buổi GĐ0 ([Backend và AI](#backend-và-ai)).
 
 Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong PR đầu tiên; xong thì đổi thành **Xong** và chuyển dòng đó xuống phần [Đã xong](#đã-xong).
 
-## Backend (kế hoạch, chưa giao)
+## Backend và AI
 
-Thiết kế ở [backend.md](backend.md). Chỉ giao việc khi đã chốt các mục [backend.md › Chưa chốt](backend.md#chưa-chốt). Dùng mã `BE…` vì `B1–B5` đã là mã lỗi.
+Thiết kế ở [backend.md](backend.md); hợp đồng chung mọi người làm theo ở [backend.md › Hợp đồng chung](backend.md#hợp-đồng-chung-gđ0). Dùng mã `BE…` vì `B1–B5` đã là mã lỗi.
 
-| Mã | Việc | Ai | Cần trước | Trạng thái |
-|---|---|---|---|---|
-| BE1 | Khung server + DB: thư mục `api/`, `db/migrations/001_init.sql`, Prisma Postgres qua Vercel Marketplace, `.gitignore` + `.env.example`, bật Secret scanning + Push protection, `vercel.json` có header bảo mật, `vercel dev`, README | Leader | L16 | Chưa làm |
-| BE2 | Đăng nhập Google + JWT cookie, `/api/auth/*`, `/api/me`, giới hạn số lần gọi đăng nhập | Leader | BE1 | Chưa làm |
-| BE3 | CRUD theo collection, kiểm tra chủ sở hữu, idempotent, `409` khi sửa chồng; test 2 user | Leader | BE2 | Chưa làm |
-| BE4 | Route transaction: chấm điểm, hoàn tác, xóa bộ, tạo nhiều thẻ | Leader | BE3 | Chưa làm |
-| BE5 | `core/storage.js` 2 bản (localStorage / API) chọn theo đăng nhập; `?seed`/`?reset` chỉ chạy ở chế độ khách | Leader | BE3 | Chưa làm |
-| BE6 | Nút đăng nhập/đăng xuất ở cột điều hướng (4 file HTML + `styles/`) | Leader | BE2 | Chưa làm |
-| BE7 | Đưa dữ liệu khách lên tài khoản | Leader + kakushi (dùng lại C7) | BE5 | Chưa làm |
-| BE8 | Trạng thái đang tải / lỗi mạng ở từng trang | Daika (Album), kakushi (Tạo thẻ), At (Học), Leader (Trang chủ) | BE5 | Chưa làm |
+**Thứ tự:**
+
+```
+GĐ0  Cả nhóm ── chốt hợp đồng chung (1 buổi)
+GĐ1  kakushi BE1 │ Leader L16 │ At AI1 │ Daika kế hoạch test 2 user
+GĐ2  Leader BE2 │ Daika BE3 → BE4 (auth giả) │ At AI3 │ kakushi BE9
+GĐ3  Leader BE5 → BE6 │ At AI4 │ Daika BE10 │ kakushi review + bản thật
+GĐ4  Leader + kakushi BE7 │ mọi người BE8 │ At AI2 │ Leader BE11
+```
+
+| Mã | Việc | Ai | Cần trước | Ưu tiên | Trạng thái |
+|---|---|---|---|---|---|
+| GĐ0 | Chốt hợp đồng chung ([backend.md › Hợp đồng chung](backend.md#hợp-đồng-chung-gđ0)) | Cả nhóm | — | Bắt buộc | Chưa làm |
+| BE1 | Khung Docker + DB | kakushi | GĐ0 | Bắt buộc | Chưa làm |
+| BE2 | Đăng nhập Google + JWT, thay auth giả | Leader | BE1 | Bắt buộc | Chưa làm |
+| BE3 | CRUD theo collection | Daika | BE1 | Bắt buộc | Chưa làm |
+| BE4 | Route transaction | Daika | BE3 | Bắt buộc | Chưa làm |
+| BE5 | `core/storage.js` 2 bản | Leader | BE3, BE2 | Bắt buộc | Chưa làm |
+| BE6 | Nút đăng nhập/đăng xuất | Leader | BE2 | Bắt buộc | Chưa làm |
+| BE7 | Đưa dữ liệu khách lên tài khoản | Leader + kakushi | BE5 | Nên có | Chưa làm |
+| BE8 | Trạng thái tải / lỗi mạng ở từng trang | Daika (Album), kakushi (Tạo thẻ), At (Học), Leader (Trang chủ) | BE5 | Bắt buộc | Chưa làm |
+| BE9 | Cloudflare Tunnel, backup, deploy | kakushi | BE1 | Bắt buộc | Chưa làm |
+| BE10 | Lọc `?deckId=`, `?from=&to=` | Daika | BE3 | Nên có | Chưa làm |
+| BE11 | Kiểm thử cuối backend | Leader | BE1–BE10 | Bắt buộc | Chưa làm |
+| AI1 | Tách chữ PDF bằng pdf.js | At | — | Nên có | Chưa làm |
+| AI3 | Route `/api/ai/cards`, `provider.js`, mock | At | BE1 | Nên có | Chưa làm |
+| AI4 | Đăng nhập, hạn mức, giới hạn, lỗi `429` | At | AI3, BE2 | Nên có | Chưa làm |
+| AI2 | Giao diện xem trước + thêm vào bộ (vị trí chốt sau) | At | AI4 | Nên có | Chưa làm |
+
+Mã `AI2` đứng sau `AI4` là có chủ ý: giao diện làm cuối, khi phần server đã xong và đã chốt vị trí.
+
+**Luật chung đợt backend:**
+
+- Mỗi task một nhánh, một PR.
+- PR đụng `server/`, `db/`, `core/` phải được Leader duyệt.
+- Mỗi route mới có test 2 user.
+- Không có bí mật trong diff.
+- Cấu trúc bảng chỉ đổi qua migration đánh số trong `db/migrations/`.
+- Ai chưa có việc thì review PR của người khác.
+
+### GĐ0 · Chốt hợp đồng chung · Cả nhóm
+
+- **Làm gì:** một buổi cả nhóm đọc và chốt [backend.md › Hợp đồng chung](backend.md#hợp-đồng-chung-gđ0) (thư mục, `req.user.id`, dạng lỗi, biến môi trường, auth giả, migration) và chọn framework (đề xuất Express).
+- **Xong khi:** mục Hợp đồng chung được sửa theo kết quả buổi họp, ghi "đã chốt" và ngày; Daika có kế hoạch test 2 user.
+
+### BE1 · Khung Docker + DB · kakushi
+
+- **Làm gì:**
+  - `docker-compose.yml` (`app` + `db`), `Dockerfile`.
+  - Khung Express có `GET /api/health`.
+  - `db/migrations/001_init.sql` (4 bảng như [backend.md › Database](backend.md#database), không có `jlpt`) và lệnh chạy migration.
+  - Serve file tĩnh theo danh sách cho phép ([backend.md › Hạ tầng](backend.md#hạ-tầng)); header bảo mật; giới hạn body 2 MB; chỉ nhận JSON.
+  - `.env.example`; `.gitignore` có `.env`; bật Secret scanning + Push protection; README ghi cách chạy.
+- **Xong khi:** `docker compose up` là có web + API + DB; mở `/.env`, `/server/`, `/db/` đều `404`.
+
+### BE9 · Cloudflare Tunnel, backup, deploy · kakushi
+
+- **Làm gì:** service `tunnel` ở profile `prod`; rule bỏ cache `/api/*`; lấy IP từ `CF-Connecting-IP`; cron `pg_dump` hằng ngày; `restart: unless-stopped`; ghi cách deploy lại.
+- **Xong khi:** mở tên miền thật thấy app; xóa thử DB rồi khôi phục được từ backup.
+
+### BE2 · Đăng nhập Google + JWT · Leader
+
+- **Làm gì:**
+  - Google Identity Services ở trình duyệt; `POST /api/auth/google` xác minh `aud`, issuer, hạn, `email_verified`.
+  - Tạo/cập nhật user bằng `ON CONFLICT`.
+  - JWT `HS256` trong cookie `httpOnly; Secure; SameSite=Lax`, 7 ngày; kiểm tra `token_version`.
+  - `POST /api/auth/logout`, `GET /api/me`; giới hạn số lần gọi đăng nhập theo IP.
+  - Thay auth giả trong `server/auth/middleware.js` bằng auth thật.
+- **Xong khi:** token sai `aud`, hết hạn, `alg: none` đều bị từ chối; đăng xuất rồi không gọi được API.
+
+### BE3 · CRUD theo collection · Daika
+
+- **Làm gì:**
+  - CRUD `decks`, `cards`, `reviewLogs` theo bảng map ở [backend.md › API](backend.md#api).
+  - Mọi query có `AND user_id = $me`; dữ liệu người khác → `404`.
+  - Tạo dùng `ON CONFLICT DO NOTHING`; `PUT` kèm `updatedAt` cũ → `409`.
+  - Kiểm tra bằng `validateDeck` / `validateCard`; SQL có tham số; tên collection lấy từ danh sách cố định.
+  - Dùng auth giả (`X-Dev-User`) trong lúc BE2 chưa xong.
+- **Xong khi:** test 2 user cho từng route đều qua.
+
+### BE4 · Route transaction · Daika
+
+- **Làm gì:** `POST /api/reviews` (kiểm tra id lượt ôn trước, gửi lại không chấm 2 lần), `POST /api/reviews/:id/undo`, xóa bộ, tạo nhiều thẻ; mỗi route chạy trong 1 transaction.
+- **Xong khi:** gửi cùng request 2 lần ra kết quả như 1 lần; lỗi giữa chừng không ghi gì; có test 2 user.
+
+### BE10 · Lọc theo bộ và thời gian · Daika
+
+- **Làm gì:** `GET /api/cards?deckId=` lọc thẻ theo bộ; `GET /api/reviewLogs?from=&to=` lọc lượt ôn theo khoảng thời gian.
+- **Xong khi:** Trang Học, Trang chủ không phải tải toàn bộ dữ liệu.
+
+### BE5 · core/storage.js 2 bản · Leader · `core/`
+
+- **Làm gì:** `core/storage.js` có 2 bản (localStorage / API), chọn theo trạng thái đăng nhập, giữ nguyên 7 hàm; `?seed` / `?reset` chỉ chạy ở chế độ khách.
+- **Xong khi:** 4 trang chạy được ở cả 2 chế độ mà trang không phải sửa code; `dev.js` chỉ chạy ở chế độ khách.
+
+### BE6 · Nút đăng nhập/đăng xuất · Leader
+
+- **Làm gì:** nút đăng nhập/đăng xuất ở cột điều hướng (4 file HTML + `styles/`).
+- **Xong khi:** đăng nhập và đăng xuất được ở 1440px và 375px.
+
+### BE7 · Đưa dữ liệu khách lên tài khoản · Leader + kakushi
+
+- **Làm gì:** đăng nhập lần đầu mà máy có dữ liệu khách thì hỏi "Đưa dữ liệu trên máy lên tài khoản?"; dùng lại logic nhập JSON của C7.
+- **Xong khi:** bấm 2 lần không nhân đôi thẻ.
+
+### BE8 · Trạng thái tải / lỗi mạng ở từng trang · mỗi người trang của mình
+
+- **Làm gì:** mỗi trang có trạng thái đang tải, báo lỗi mạng, khóa nút Lưu khi đang gửi. Daika (Album), kakushi (Tạo thẻ), At (Học), Leader (Trang chủ).
+- **Xong khi:** tắt mạng thì trang báo lỗi rõ; nút Lưu khóa khi đang gửi.
+
+### BE11 · Kiểm thử cuối backend · Leader
+
+- **Làm gì:** chạy hết checklist [backend.md › Bảo mật](backend.md#bảo-mật) trên bản thật.
+- **Xong khi:** mọi mục đều qua và có báo cáo kết quả trong `process.md`.
+
+### AI1 · Tách chữ PDF bằng pdf.js · At
+
+- **Làm gì:** dùng pdf.js tách chữ ngay trên trình duyệt; chọn khoảng trang; giới hạn kích thước file; báo khi PDF chỉ có ảnh (bản scan).
+- **Xong khi:** tách đúng chữ Nhật từ 2–3 PDF mẫu.
+
+### AI3 · Route /api/ai/cards · At · `server/ai/`
+
+- **Làm gì:**
+  - `server/ai/provider.js`: hàm `generateCards(text)` gọi Gemini với JSON schema; `AI_MOCK=1` trả kết quả mẫu.
+  - Route `POST /api/ai/cards`; kiểm tra kết quả như [backend.md › AI tạo thẻ từ PDF](backend.md#ai-tạo-thẻ-từ-pdf); chữ PDF đặt trong khối phân cách.
+- **Xong khi:** có test bằng kết quả mẫu đúng và sai định dạng; `npm test` không gọi Gemini thật.
+
+### AI4 · Đăng nhập, hạn mức, giới hạn · At · `server/ai/`
+
+- **Làm gì:** bắt đăng nhập (middleware của BE2); bảng `ai_usage` (migration riêng, Leader duyệt); hạn mức mỗi user mỗi ngày; tối đa 20k ký tự; xử lý `429`; không log chữ PDF.
+- **Xong khi:** vượt hạn mức có thông báo rõ; Gemini lỗi hay mất mạng thì báo lỗi, không treo.
+
+### AI2 · Giao diện xem trước + thêm vào bộ · At
+
+- **Làm gì:** bảng xem trước (sửa, bỏ chọn, đánh dấu thẻ trùng bằng `plainFurigana`), nút thêm vào bộ bằng `createCards()`; có dòng "Chữ trong PDF được gửi tới Google Gemini để tạo thẻ". Vị trí trên giao diện chốt sau AI4 ([backend.md › Chưa chốt](backend.md#chưa-chốt)).
+- **Xong khi:** thêm được thẻ từ PDF mẫu vào một bộ, chỉ thẻ đã chọn được lưu; chạy được ở 1440px và 375px.
 
 ---
 

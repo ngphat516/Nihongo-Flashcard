@@ -1,6 +1,6 @@
 # Thiết kế backend
 
-Tài liệu này nói backend sẽ làm thế nào: tech stack, database, API, bảo mật. Code hiện tại (chưa có backend) xem [architecture.md](architecture.md); việc cần làm xem [tasks.md › Backend](tasks.md#backend-kế-hoạch-chưa-giao).
+Tài liệu này nói backend sẽ làm thế nào: tech stack, hạ tầng, database, API, AI, bảo mật. Code hiện tại (chưa có backend) xem [architecture.md](architecture.md); việc cần làm xem [tasks.md › Backend và AI](tasks.md#backend-và-ai).
 
 Chưa có code backend. Phần nào **Đã chốt**, phần nào **Đề xuất** ghi ở [Tech stack](#tech-stack); phần còn hỏi xem [Chưa chốt](#chưa-chốt).
 
@@ -16,19 +16,64 @@ Chưa có code backend. Phần nào **Đã chốt**, phần nào **Đề xuất*
 | Thành phần | Chọn | Trạng thái |
 |---|---|---|
 | Ngôn ngữ server | Node.js | **Đã chốt** (Leader, 2026-11-21) |
-| Database | PostgreSQL trên **Prisma Postgres** (gói Free, cài qua Vercel Marketplace) | **Đã chốt** (Leader, 2026-11-21) |
-| Thư viện kết nối DB | `pg` (node-postgres), viết SQL có tham số; không dùng Prisma ORM | Đề xuất |
-| Chạy server | Vercel Functions trong thư mục `api/`, cùng domain với web | Đề xuất |
-| Đăng nhập | Google OAuth (Google Identity Services) → server xác minh ID token bằng `google-auth-library` | Đề xuất |
-| Phiên đăng nhập | JWT của app trong cookie `httpOnly; Secure; SameSite=Lax`, hết hạn 7 ngày, không có refresh token | Đề xuất |
+| Framework | Express | Đề xuất — chốt ở buổi GĐ0 |
+| Chạy server | Docker Compose trên máy của kakushi | **Đã chốt** (Leader, 2026-11-22) |
+| Database | PostgreSQL 16 (container `postgres:16-alpine`) | **Đã chốt** (Leader, 2026-11-22) |
+| Ra mạng | Cloudflare Tunnel, tên miền riêng, cùng domain cho web và `/api` | **Đã chốt** (Leader, 2026-11-22) |
+| Thư viện DB | `pg` (node-postgres), SQL có tham số; không dùng ORM | Đề xuất |
+| Đăng nhập | Google OAuth (Google Identity Services, server xác minh ID token bằng `google-auth-library`) + JWT của app trong cookie `httpOnly; Secure; SameSite=Lax`, 7 ngày, không có refresh token | Đề xuất |
 | Migration | File SQL đánh số trong `db/migrations/` (VD `001_init.sql`) | Đề xuất |
-| Chạy local | `vercel dev` thay cho `python -m http.server` | Đề xuất |
+| AI | Gemini API (key lấy từ Google AI Studio), model loại Flash | **Đã chốt** (Leader, 2026-11-22) |
+| Chạy local | `docker compose up` | **Đã chốt** |
 
-- Prisma Postgres là Postgres thật, nên dùng `pg` và SQL thuần, không cần Prisma ORM.
-- Gói Free không hết hạn và không tự tạm dừng khi không dùng (khác Supabase tạm dừng sau 1 tuần, Render hết hạn sau 30 ngày).
-- Gói Free giới hạn khoảng 10 kết nối, 1 GB, 200 nghìn thao tác/tháng. Đủ cho đồ án; xem lại trang giá trước khi tạo.
-- Web và API cùng domain nên cookie tự gửi, không cần CORS.
-- **Đã cân nhắc, không chọn:** Neon (Leader không chọn), Aiven (20 kết nối, không pooling), Supabase, Turso (SQLite, phải sửa thiết kế bảng).
+**Vì sao chạy bằng Docker trên máy riêng:**
+
+1. **Không vướng giới hạn gói Free** của DB trên mạng (số kết nối, dung lượng, số thao tác mỗi tháng), trong khi `core/storage.js` hiện đọc cả bảng `cards` và `reviewLogs`.
+2. **Cả nhóm chạy giống bản thật:** chỉ cần `docker compose up` là có web, API và Postgres; không ai đụng chung một DB trên mạng.
+3. **Server chạy liên tục:** giữ được một pool kết nối, không cold start, và rate limit lưu trong bộ nhớ (VD cho `/api/auth/google`) có tác dụng thật; serverless thì mỗi lần gọi có thể rơi vào instance khác.
+4. **Không bị giới hạn thời gian chạy** mỗi request, cần cho lời gọi AI (có thể mất vài chục giây).
+5. **Cùng một tên miền:** web và `/api/*` chung domain qua Cloudflare Tunnel nên cookie tự gửi, không cần CORS, không mở port router, có sẵn HTTPS.
+6. **Không khóa vào hạ tầng:** server chỉ đọc `DATABASE_URL` từ `.env`; chuyển sang VPS hay DB khác thì đổi biến môi trường.
+
+**Đã cân nhắc, không chọn:** Prisma Postgres và Vercel Functions (phương án ngày 2026-11-21), Neon, Aiven (20 kết nối, không pooling), Supabase (tạm dừng sau 1 tuần không dùng), Turso (SQLite, phải sửa thiết kế bảng).
+
+## Hạ tầng
+
+```text
+Trình duyệt (HTTPS)
+   │  https://<tên-miền>
+   ▼
+Cloudflare Edge (HTTPS, ẩn IP máy)
+   │  Cloudflare Tunnel
+   ▼
+Docker Compose (mạng nội bộ):
+   ├── tunnel (cloudflared)     → trỏ vào http://app:3000 (chỉ bật ở profile prod)
+   ├── app (Node.js)            → serve web tĩnh (danh sách cho phép) + /api/*
+   └── db (postgres:16-alpine)  → volume pgdata, không mở port ra ngoài
+```
+
+- **Chạy local:** `docker compose up` (chỉ bật `app` và `db`; `tunnel` nằm ở profile `prod` nên không chạy).
+- **Chạy thật (máy kakushi):** `docker compose --profile prod up -d --build`, các service đặt `restart: unless-stopped`.
+- **Serve file tĩnh theo danh sách cho phép:** chỉ `index.html`, `/pages`, `/core`, `/styles`, `/dev`. Không serve cả thư mục gốc repo (lộ `.env`, `db/`, `server/`).
+- **Cloudflare:** rule *Bypass cache* cho `/api/*`. IP thật của người dùng lấy từ header `CF-Connecting-IP` (dùng cho rate limit); không thì mọi request trùng IP của `cloudflared`.
+- **TLS nối DB (`PGSSLMODE`):** trong mạng nội bộ Docker để `disable`; nối DB ở máy khác thì `require`. Đặt qua `.env` theo môi trường.
+- **Google OAuth:** thêm tên miền thật và `http://localhost:<port>` vào *Authorized JavaScript origins* trên Google Cloud Console.
+- **Backup:** cron `pg_dump` mỗi ngày ra máy host; thử khôi phục ít nhất một lần.
+- **Ổn định:** máy phải bật, có mạng ổn định suốt đợt nộp và chấm bài.
+
+## Hợp đồng chung (GĐ0)
+
+Chốt ở buổi GĐ0, ai cũng làm theo. Đổi điều nào thì báo cả nhóm và sửa mục này trong cùng PR.
+
+- **Thư mục:**
+  - `server/index.js` (điểm vào), `server/routes/`, `server/db/pool.js` (một `Pool` dùng chung), `server/auth/middleware.js`, `server/ai/`.
+  - `db/migrations/`: file đánh số `001_init.sql`, `002_…`.
+  - `docker-compose.yml`, `Dockerfile`, `.env.example` ở gốc repo.
+- **Người đang đăng nhập:** middleware gắn `req.user.id`; mọi route chỉ dùng giá trị này, không đọc `userId` từ body hay query.
+- **Lỗi trả về:** `{ error: { code, message } }`. JSON dùng `camelCase`, DB dùng `snake_case`.
+- **Biến môi trường:** `DATABASE_URL`, `JWT_SECRET`, `GOOGLE_CLIENT_ID`, `GEMINI_API_KEY`, `NODE_ENV`, `DEV_AUTH`, `AI_MOCK`. Tên biến ghi trong `.env.example`, không có giá trị.
+- **Auth giả cho dev:** header `X-Dev-User` được dùng làm `req.user.id`, **chỉ** khi `NODE_ENV=development` **và** `DEV_AUTH=1`. Phải có test chứng minh ở production header này bị bỏ qua. BE2 thay bằng auth thật. PR có phần này Leader review kỹ.
+- **Migration:** hai người cùng cần sửa bảng thì báo nhau trước để không trùng số `00x`.
 
 ## Database
 
@@ -147,6 +192,8 @@ Prefix `/api`. `:c` là collection, chỉ nhận đúng 3 giá trị `decks` | `
 
 **Đăng nhập:** `POST /api/auth/google`, `POST /api/auth/logout`, `GET /api/me`.
 
+**AI:** `POST /api/ai/cards` (xem [AI tạo thẻ từ PDF](#ai-tạo-thẻ-từ-pdf)).
+
 JSON dùng `camelCase` như `core/models.js`; server đổi sang `snake_case` khi ghi DB.
 
 ## Idempotency
@@ -166,31 +213,58 @@ Mạng chập chờn thì trình duyệt có thể gửi lại một request. G�
 
 Chưa cần bảng `idempotency_keys`, vì mọi thao tác đã có id do trình duyệt tạo.
 
+## AI tạo thẻ từ PDF
+
+**Luồng:**
+
+1. Người dùng chọn file PDF. **pdf.js tách chữ ngay trên trình duyệt**; file PDF không gửi đi đâu.
+2. Chọn khoảng trang cần lấy.
+3. `POST /api/ai/cards { text, deckId }` (cần đăng nhập).
+4. Server gọi Gemini, ép trả JSON theo schema `[{ term, meaning, reading, example }]`.
+5. Server kiểm tra: parse JSON, `validateCard` từng thẻ, cú pháp furigana bằng `parseFurigana`, tối đa 50 thẻ.
+6. Trình duyệt hiện bảng xem trước: sửa, bỏ chọn, đánh dấu thẻ trùng với thẻ đã có (so bằng `plainFurigana`).
+7. Người dùng bấm thêm → `createCards()`.
+
+**Không bao giờ lưu thẳng kết quả AI**; luôn qua bước xem trước.
+
+**Prompt:**
+- Furigana viết `漢字[かんじ]` cho từng từ có kanji.
+- Nghĩa bằng tiếng Việt.
+- Câu ví dụ lấy từ PDF nếu có.
+- Không tạo thẻ trùng.
+- Chỉ trả JSON.
+
+**Đổi model dễ:** mọi lời gọi AI chỉ nằm trong `server/ai/provider.js`, hàm `generateCards(text)`. `AI_MOCK=1` thì hàm trả kết quả mẫu, không gọi Gemini.
+
+**PDF chỉ có ảnh (bản scan):** bản đầu báo "chưa hỗ trợ".
+
+**Vì sao không dùng Hermes Agent:** API server của Hermes Agent cho quyền dùng toàn bộ công cụ của agent, kể cả chạy lệnh terminal. Input lại là chữ trong PDF do người dùng tải lên, nên một PDF có prompt injection có thể khiến agent chạy lệnh trên máy host. Muốn thử model Hermes thì gọi **model** qua API (OpenRouter, Nous Portal) bên trong `provider.js`, không chạy agent.
+
 ## Bảo mật
 
 **Repo đang public:** ai cũng xem được code và lịch sử commit. Cấu trúc bảng lộ ra không sao (bảo mật không dựa vào giấu tên bảng). Thứ không bao giờ được lộ là bí mật để vào DB và dữ liệu người dùng.
 
 ### a. Bí mật (secrets)
 
-- Bí mật gồm `DATABASE_URL`, `JWT_SECRET`, `GOOGLE_CLIENT_ID` (client ID không bí mật nhưng để chung chỗ cho dễ quản lý). Chỉ để trong Vercel Environment Variables và file `.env` ở máy.
+- Bí mật gồm `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY`, `GOOGLE_CLIENT_ID` (client ID không bí mật nhưng để chung chỗ cho dễ quản lý). Chỉ để trong file `.env` ở máy chạy server và máy dev.
 - Thêm `.env`, `.env.*` (trừ `.env.example`) vào `.gitignore` **trước khi** tạo file `.env`. Có `.env.example` liệt kê tên biến, không có giá trị.
 - Bật GitHub **Secret scanning** và **Push protection** (Settings › Code security) để GitHub chặn push có token, mật khẩu.
-- Lỡ commit bí mật: **đổi ngay** (mật khẩu DB, `JWT_SECRET`). Xóa commit không đủ, vì lịch sử git và bản fork vẫn còn.
-- `JWT_SECRET` dài ít nhất 32 byte ngẫu nhiên (`openssl rand -base64 48`), khác nhau giữa local và bản deploy.
+- Lỡ commit bí mật: **đổi ngay** (mật khẩu DB, `JWT_SECRET`, `GEMINI_API_KEY`). Xóa commit không đủ, vì lịch sử git và bản fork vẫn còn.
+- `JWT_SECRET` dài ít nhất 32 byte ngẫu nhiên (`openssl rand -base64 48`), khác nhau giữa local và bản chạy thật.
 - Không in bí mật, JWT, cookie ra log hay thông báo lỗi.
 
 ### b. Database
 
-- Trình duyệt không kết nối thẳng DB; chỉ server có `DATABASE_URL`.
-- Kết nối DB bắt buộc TLS (`sslmode=require`).
+- Trình duyệt không kết nối thẳng DB; chỉ server có `DATABASE_URL`. Container `db` không mở port ra ngoài.
+- TLS khi nối DB theo `PGSSLMODE` ([Hạ tầng](#hạ-tầng)): bắt buộc `require` nếu DB không nằm cùng mạng nội bộ Docker.
 - Coi ràng buộc trong bảng là lớp chặn cuối: FK `(deck_id, user_id)`, `CHECK` giá trị và độ dài, kiểu `UUID`, `token_version`.
-- Role của app chỉ có `SELECT/INSERT/UPDATE/DELETE` trên 4 bảng. Role chạy migration (tạo, sửa bảng) tách riêng, không nằm trong biến môi trường của app.
+- Role của app chỉ có `SELECT/INSERT/UPDATE/DELETE` trên các bảng. Role chạy migration (tạo, sửa bảng) tách riêng, không nằm trong biến môi trường của app.
 - Chỉ dùng query có tham số (`$1, $2`). Không ghép chuỗi SQL từ dữ liệu người dùng, kể cả tên cột hay tên bảng (tên bảng lấy từ danh sách cố định).
-- Không sửa tay cấu trúc bảng trên Prisma Postgres; mọi thay đổi qua file trong `db/migrations/`.
+- Không sửa tay cấu trúc bảng; mọi thay đổi qua file trong `db/migrations/`.
 
 ### c. Phân quyền dữ liệu (chống IDOR)
 
-- Lấy `user_id` chỉ từ JWT; bỏ qua mọi `userId`, `user_id` trong body hay query.
+- Lấy `user_id` chỉ từ JWT (`req.user.id`); bỏ qua mọi `userId`, `user_id` trong body hay query.
 - Mọi `SELECT/UPDATE/DELETE` có `AND user_id = $me`. Không tìm thấy (kể cả vì là dữ liệu người khác) → trả `404`; không phân biệt "không có" với "của người khác".
 - Ghi thẻ: kiểm tra `deckId` thuộc người đang đăng nhập (FK trong DB cũng chặn).
 - Mỗi route có test với **2 user**: user B không đọc, sửa, xóa được dữ liệu của user A.
@@ -201,7 +275,8 @@ Chưa cần bảng `idempotency_keys`, vì mọi thao tác đã có id do trình
 - Ký JWT bằng `HS256`; khi xác minh chỉ chấp nhận đúng thuật toán này (chặn `alg: none`). Kiểm tra `exp` và `token_version` khớp với DB.
 - Cookie: `httpOnly; Secure; SameSite=Lax; Path=/`, hết hạn 7 ngày. Không để JWT trong localStorage hay trong URL.
 - Đăng xuất: xóa cookie. "Đăng xuất mọi thiết bị" hoặc nghi lộ token: tăng `token_version`.
-- Giới hạn số lần gọi `/api/auth/google` theo IP (chống dò).
+- Giới hạn số lần gọi `/api/auth/google` theo IP (lấy từ `CF-Connecting-IP`), chống dò.
+- Auth giả `X-Dev-User` chỉ chạy khi `NODE_ENV=development` và `DEV_AUTH=1` ([Hợp đồng chung](#hợp-đồng-chung-gđ0)).
 
 ### e. Request và response
 
@@ -210,7 +285,7 @@ Chưa cần bảng `idempotency_keys`, vì mọi thao tác đã có id do trình
 - Kiểm tra dữ liệu ở server bằng `validateDeck` / `validateCard`; bỏ các trường lạ, không ghi thẳng object từ body vào DB.
 - Không bật CORS cho domain khác (web và API cùng domain). Không trả `Access-Control-Allow-Origin: *`.
 - Thông báo lỗi trả về không chứa stack trace, câu SQL hay tên bảng; chi tiết chỉ ghi vào log server.
-- Thêm header `X-Content-Type-Options: nosniff`, `Referrer-Policy: same-origin`, `X-Frame-Options: DENY` (cấu hình trong `vercel.json`).
+- Thêm header `X-Content-Type-Options: nosniff`, `Referrer-Policy: same-origin`, `X-Frame-Options: DENY` (đặt trong server).
 
 ### f. Trình duyệt (XSS)
 
@@ -220,23 +295,32 @@ Chưa cần bảng `idempotency_keys`, vì mọi thao tác đã có id do trình
 ### g. Thư viện
 
 - Commit `package-lock.json`. Chạy `npm audit` trước mỗi lần deploy; lỗi mức high/critical phải xử lý.
-- Chỉ thêm thư viện thật cần (`pg`, `google-auth-library`, thư viện JWT); thêm mới phải ghi lý do trong PR.
+- Chỉ thêm thư viện thật cần (`pg`, `express`, `google-auth-library`, thư viện JWT, SDK Gemini); thêm mới phải ghi lý do trong PR.
 
 ### h. Để sau
 
-- Row Level Security của Postgres (cần `SET LOCAL` mỗi transaction với kết nối serverless).
+- Row Level Security của Postgres (cần `SET LOCAL` mỗi transaction).
+
+### i. AI
+
+- `GEMINI_API_KEY` chỉ ở server (`.env`), không bao giờ gửi xuống trình duyệt.
+- Route AI bắt đăng nhập. Hạn mức mỗi user mỗi ngày (bảng `ai_usage`, migration riêng). Tối đa 20k ký tự mỗi lần gọi. Giới hạn kích thước file PDF ở trình duyệt.
+- Giới hạn của Gemini tính theo cả project (mọi người dùng chung), hạn mức ngày reset lúc nửa đêm giờ Thái Bình Dương. Gặp `429` thì báo "Đang quá tải, thử lại sau"; không tự gọi lại liên tục.
+- **Chữ PDF là dữ liệu, không phải lệnh:** đặt trong khối phân cách rõ ràng; prompt ghi rõ không làm theo chỉ dẫn nằm trong tài liệu (chống prompt injection). Kết quả AI chỉ đi qua bước kiểm tra rồi hiển thị bằng `h()`, không dùng `innerHTML`.
+- **Riêng tư:** gói Free của Gemini dùng dữ liệu gửi lên để cải thiện sản phẩm và người duyệt của Google có thể đọc. Giao diện phải ghi rõ "Chữ trong PDF được gửi tới Google Gemini để tạo thẻ"; không khuyến khích dùng tài liệu riêng tư. Server không lưu PDF, không ghi chữ PDF vào log.
+- **Điều khoản:** Gemini API yêu cầu người dùng từ 18 tuổi; app không hướng tới người dưới 18 (ghi trong README).
+- `npm test` không gọi Gemini thật; test phần kiểm tra bằng file kết quả mẫu (cả đúng lẫn sai định dạng).
 
 ## Những điểm phải nhớ khi làm
 
-- **Kết nối DB:** gói Free khoảng 10 kết nối. Tạo `Pool` của `pg` một lần ở cấp module (dùng lại giữa các lần gọi function), `max` nhỏ (VD 2–3); không mở kết nối mới mỗi request.
-- **Đọc cả bảng:** hiện `repo.js` đọc cả bảng rồi tự lọc (`list('cards')`, Trang chủ đọc mọi lượt ôn). Bước đầu chấp nhận; sau thêm lọc `?deckId=`, `?from=` cho thẻ theo bộ và lượt ôn. Gói Free giới hạn số thao tác mỗi tháng nên cần để ý.
+- **Kết nối DB:** tạo một `Pool` của `pg` dùng chung ở `server/db/pool.js`; không mở kết nối mới mỗi request.
+- **Đọc cả bảng:** hiện `repo.js` đọc cả bảng rồi tự lọc (`list('cards')`, Trang chủ đọc mọi lượt ôn). Bước đầu chấp nhận; sau thêm lọc `?deckId=`, `?from=&to=` cho thẻ theo bộ và lượt ôn (BE10).
 - **Giao diện khi qua mạng:** trang phải có trạng thái đang tải, báo lỗi mạng (`startPage` đã có khung báo lỗi), khóa nút Lưu khi đang gửi.
-- **Google Cloud Console:** thêm cả `http://localhost:<port>` và domain Vercel vào Authorized JavaScript origins.
 
 ## Chưa chốt
 
 Hỏi Leader trước khi làm các phần này.
 
-- **Chế độ khách:** giữ localStorage cho người chưa đăng nhập, hay bắt đăng nhập mới dùng được. Đề xuất: giữ; đăng nhập lần đầu thì hỏi "Đưa dữ liệu trên máy lên tài khoản?", dùng lại logic nhập JSON của C7.
+- **Chế độ khách:** giữ localStorage cho người chưa đăng nhập, hay bắt đăng nhập mới dùng được. Đề xuất: giữ (kế hoạch BE5, BE7 đang theo hướng này); đăng nhập lần đầu thì hỏi "Đưa dữ liệu trên máy lên tài khoản?", dùng lại logic nhập JSON của C7.
 - **Hạn nộp** của phần backend.
-- Đề bài có yêu cầu công nghệ cụ thể nào khác không.
+- **Vị trí giao diện AI** (nút tạo thẻ từ PDF đặt ở trang nào): chốt sau khi xong AI3, AI4.

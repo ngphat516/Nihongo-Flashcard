@@ -75,6 +75,7 @@ Thêm hoặc đổi class chung thì sửa cả bảng này.
 - Đã xóa khung `.todo` và đoạn `DEMO` của phần đó.
 - `npm test` vẫn xanh (bắt buộc nếu có sửa `core/`).
 - Task backend: có test 2 user cho route mới; không có bí mật trong diff.
+- Task AI: `npm test` không gọi AI thật (dùng kết quả mẫu).
 
 ## Bảo mật
 
@@ -85,6 +86,8 @@ Tóm tắt. Đủ luật xem [backend.md › Bảo mật](backend.md#bảo-mật
 - Chỉ dùng SQL có tham số (`$1, $2`), không ghép chuỗi.
 - Không dùng `innerHTML` với dữ liệu người dùng.
 - Mỗi route có test 2 user: user B không đụng được dữ liệu của user A.
+- Auth giả (`X-Dev-User`) chỉ chạy ở dev (`NODE_ENV=development` và `DEV_AUTH=1`), không bao giờ ở bản thật.
+- API key AI (`GEMINI_API_KEY`) chỉ ở server, không gửi xuống trình duyệt.
 - Lỡ lộ bí mật thì đổi ngay; xóa commit không đủ.
 
 ## Tài liệu
