@@ -18,7 +18,7 @@
 
 ## 2026-11-22 — Chốt hạ tầng backend, AI và chia việc
 
-- **Người làm:** Leader, cùng Claude Code.
+- **Người làm:** Leader.
 - **Đã xong:** nhánh `docs/chia-viec-backend`, chỉ tài liệu và `.github/`. Gộp `docs/backend-docker.md` vào [backend.md](backend.md) (mục Hạ tầng) rồi xóa file đó. `backend.md`: sửa Tech stack, thêm mục Hạ tầng, Hợp đồng chung (GĐ0), AI tạo thẻ từ PDF, nhóm bảo mật "i. AI", sửa Chưa chốt. `tasks.md`: thay phần kế hoạch backend bằng [Backend và AI](tasks.md#backend-và-ai) (thứ tự GĐ0–GĐ4, bảng BE1–BE11, AI1–AI4, chi tiết từng việc, luật chung). `product.md` thêm tính năng "Tạo thẻ từ PDF bằng AI"; `conventions.md` thêm luật auth giả và API key AI, dòng định nghĩa xong cho task AI; `architecture.md` sửa câu Prisma Postgres; `.github/CODEOWNERS` đổi `/api/`, `/vercel.json` sang `/server/`, `/server/ai/`, `/docker-compose.yml`, `/Dockerfile`; mẫu PR thêm 2 mục; README thêm dòng backend và giới hạn 18 tuổi.
 - **Quyết định:**
   - **Hosting:** tự host bằng Docker trên máy của kakushi, ra ngoài qua Cloudflare Tunnel. Lý do: không vướng giới hạn gói Free, cả nhóm chạy giống bản thật, server chạy liên tục nên pool kết nối và rate limit trong bộ nhớ có tác dụng, không bị giới hạn thời gian chạy (cần cho AI), không khóa vào hạ tầng. Không dùng Vercel Functions và Prisma Postgres cho backend (bản frontend hiện tại vẫn ở Vercel).
@@ -31,14 +31,14 @@
 
 ## 2026-11-21 — Thiết kế backend
 
-- **Người làm:** Leader, cùng Claude Code.
+- **Người làm:** Leader.
 - **Đã xong:** nhánh `docs/thiet-ke-backend`, chỉ tài liệu. Viết [backend.md](backend.md): mục tiêu, tech stack, khối SQL 4 bảng, API, idempotency, luật bảo mật, chưa chốt. `architecture.md` mục "Thêm backend" thu gọn, trỏ sang backend.md; `product.md` dòng Backend; `conventions.md` thêm mục Bảo mật, dòng bảng Tài liệu, dòng định nghĩa xong; `AGENTS.md`; `.github/CODEOWNERS` (`/api/`, `/db/`, `/vercel.json`); mẫu PR thêm mục không có bí mật. `tasks.md` thêm L16 và bảng BE1–BE8.
 - **Quyết định:** đã chốt Node.js và PostgreSQL trên Prisma Postgres (không dùng Neon); 4 bảng `users`, `decks`, `cards`, `review_logs`; bỏ `jlpt` (L16); SM-2 và chọn thẻ giữ ở trình duyệt; id do trình duyệt tạo để idempotent; luật bảo mật ở [backend.md › Bảo mật](backend.md#bảo-mật). Phần còn lại của tech stack (`pg`, Vercel Functions, Google OAuth, JWT cookie, migration SQL, `vercel dev`) là **đề xuất**.
 - **Tiếp theo:** chốt các mục [backend.md › Chưa chốt](backend.md#chưa-chốt) (chế độ khách, hạn nộp, yêu cầu đề bài); làm L16; rồi giao BE1.
 
 ## 2026-11-20 — Sửa bộ đếm và bộ trống trang Học (S12, S13)
 
-- **Người làm:** At, cùng Codex.
+- **Người làm:** At.
 - **Đã xong:** bộ đếm mobile xếp số và chữ dọc, bỏ nowrap; loadQueue đọc getCards cho cả hàng đợi rỗng và hiện khối empty với routes.create(deckId) nếu bộ không có thẻ. Bộ có thẻ hết lượt vẫn dùng showDone. Chỉ sửa pages/study/ và tài liệu tiến độ.
 - **Kiểm tra:** npm test 108/108; Chrome 320px và 375px: cả ba ô scrollWidth <= clientWidth, không cuộn ngang, bốn nút chấm nằm trên nav. Tạo bộ trống qua form, kiểm tra link thêm thẻ đúng bộ, thêm một thẻ rồi chấm Dễ: hiện Xong rồi; tải lại bộ hết lượt vẫn hiện Xong rồi. ID constructor vẫn xử lý lỗi. Console không lỗi. Ảnh s12-320.jpg, s12-375.jpg, s13-empty-375.jpg, s13-done-375.jpg.
 - **Tiếp theo:** Leader review.
@@ -134,20 +134,20 @@
 
 ## 2026-11-18 — Sửa bố cục mobile trang Học
 
-- **Người làm:** At, cùng Codex.
+- **Người làm:** At.
 - **Đã làm:** media query max-width 767px đặt thẻ phẳng, hai mặt đổi bằng aria-hidden, bỏ chuyển động 3D trên mobile; chiều cao 40vh, chữ lớn hơn; bộ đếm gọn một hàng; ẩn Phím tắt, thêm khoảng đệm đáy theo tabbar và safe-area. Thanh nav chung đã có nền đặc và viền trên. Nút chấm tối thiểu 48px.
 - **Kiểm tra:** Chrome tại 360/375/390/430 × 800: không cuộn ngang, thẻ cao 320px, nút khoảng 55px, đáy nút 639px trước nav ở 736px. Đổi thẻ bằng phím mũi tên reset về mặt trước và transform none. Console không lỗi. Ảnh study-mobile-*.jpg, cập nhật s11-mobile.jpg.
 - **Quyết định:** chỉ sửa CSS trong media query mobile, desktop dùng các quy tắc hiện có.
 
 ## 2026-11-18 — Mở rộng trang Học trên desktop lớn
 
-- **Người làm:** At, cùng Codex.
+- **Người làm:** At.
 - **Đã làm:** media query từ 1920px trong study.css: khung 80vw tối đa 1600px, thẻ cao tối thiểu 55vh, tăng chữ và nút bằng clamp, cột phụ chiếm khoảng 24%. Quy tắc mới chỉ áp dụng từ 1920px theo yêu cầu.
 - **Kiểm tra:** Chrome ở bề rộng CSS 1366×768, 1920×1080, 2560×1440; khung lần lượt 1040/1536/1600px, không cuộn ngang, bốn nút chấm trong màn hình. Mặt sau ở 1920px và console qua. Ảnh study-wide-*.jpg trong pages/study/screenshots.
 
 ## 2026-11-18 — Đổi chiều học (S11)
 
-- **Người làm:** At, cùng Codex.
+- **Người làm:** At.
 - **Đã làm:** nút đổi chiều theo bộ trong phiên học, lưu qua updateDeck; đổi ngay thẻ hiện tại; hiển thị nghĩa trước ở chiều Việt → Nhật. Điều chỉnh chiều cao thẻ trên điện thoại để nút chấm không bị thanh điều hướng che.
 - **Kiểm tra:** npm test 85/85; Chrome thử bộ mẫu, lưu chiều qua tải lại, Space, mũi tên, chấm 1–4 và Z; ảnh desktop và 375px trong pages/study/screenshots. Không có lỗi console.
 - **Còn cần review:** trường hợp ví dụ rất dài ở cả hai chiều và học hết một lượt.
@@ -165,7 +165,7 @@
 
 ## 2026-11-18 — Sắp xếp lại bảng việc
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:**
   - `docs/tasks.md` sắp lại thành 4 phần: **Việc đang mở** (bảng ngắn Mã · Việc · Ai · Cần trước · Ưu tiên · Trạng thái, kèm việc làm song song ngay) lên đầu; **Chi tiết việc đang mở** theo từng việc (Làm gì / Hàm core / Xong khi); **Phân việc** và **Quy ước**; **Đã xong** gói trong `<details>` theo từng nhóm, giữ nguyên chữ các bảng cũ, bảng lỗi B1–B5 dưới tiêu đề "Lỗi đã biết trong `core/`".
   - Đã so bằng script: không mất mã task nào, mọi dòng bảng trong "Đã xong" giống hệt bản cũ, link từ `architecture.md`, `conventions.md`, `process.md` tới `tasks.md` vẫn đúng.
@@ -178,7 +178,7 @@
 
 ## 2026-11-18 — Chiều học theo bộ (L8)
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:**
   - `core/models.js`: `DECK_DIRECTIONS = ['ja-vi', 'vi-ja']`, `Deck.direction`; `makeDeck` không nhận chiều thì `'ja-vi'`; `validateDeck` báo lỗi với giá trị lạ.
   - `core/repo.js`: `createDeck`, `updateDeck` nhận `direction` (`updateDeck` chỉ đổi khi được truyền). Hàm nội bộ `withColors` đổi tên thành `withDefaults`, điền cả màu lẫn chiều cho bộ cũ khi đọc ra; mọi đường đọc bộ đi qua đây.
@@ -195,14 +195,14 @@
 
 ## 2026-11-18 — Bật bảo vệ main (L2 xong)
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:** ruleset `Main Protection` trong Settings › Rules, áp lên nhánh mặc định `main`: bắt buộc qua PR, 1 lượt duyệt, cần duyệt của Code Owners, bỏ duyệt cũ khi có commit mới, chặn force-push và xóa nhánh. Bypass: Repository admin, chỉ khi merge PR. Đã đọc lại cấu hình qua GitHub API.
 - **Quyết định:** dùng ruleset thay cho classic branch protection. Leader merge PR của chính mình sửa `core/`, `styles/`, `docs/` bằng ô "Merge without waiting for requirements to be met (bypass rules)"; không push thẳng vào `main` được nữa.
 - **Tiếp theo:** C4, C5, C7, L13, rồi L5.
 
 ## 2026-11-18 — Nút bật/tắt furigana (L7)
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:**
   - `core/preferences.js` (file mới): `isFuriganaOn()`, `setFuriganaOn(on)`, lưu ở key riêng `nholau-furigana`, mặc định bật, localStorage lỗi thì coi như bật.
   - `startPage()` trong `core/dom.js` tự nối nút `.rail-furigana` ở cả 4 trang: đặt `aria-pressed`, bấm thì đổi `data-furigana="off"` trên `<html>`. Không sửa JS của trang nào.
@@ -217,7 +217,7 @@
 
 ## 2026-11-18 — Bảo vệ main và CODEOWNERS (L2)
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:**
   - Điền `.github/CODEOWNERS` bằng username thật, đã đối chiếu với danh sách collaborator của repo: Leader `ngphat516` (mặc định, `core/`, `styles/`), Daika `tanphat-trinh` (`pages/album/`), kakushi `phattnt` (`pages/create/`), At `Peter-Kohi` (`pages/study/`). Mỗi folder trang có thêm Leader.
   - Ghi luật duyệt PR vào [conventions.md › Nhánh, commit, PR](conventions.md#nhánh-commit-pr).
@@ -229,7 +229,7 @@
 
 ## 2026-11-18 — Bỏ lớp tương thích front/back (L6b)
 
-- **Người làm:** kakushi, cùng Claude.
+- **Người làm:** kakushi.
 - **Đã xong:**
   - Xóa `core/card-compat.js`; `core/repo.js` bỏ mọi chỗ gọi `readCard` / `writeCard`. API giữ nguyên tên và chữ ký; thẻ trả ra không còn kèm `front` / `back`, gửi `{ front, back }` thì báo `ValidationError`.
   - Thêm `core/migrate.js`: `migrateCards()` đổi thẻ cũ sang trường mới và ghi lại.
@@ -246,7 +246,7 @@
 
 ## 2026-11-18 — Làm rõ đợt 2 song song, lộ trình sau đợt 2
 
-- **Người làm:** kakushi, cùng Claude.
+- **Người làm:** kakushi.
 - **Đã xong:**
   - `tasks.md`: thay "Lộ trình còn lại…" (3 bước) bằng đoạn **Đợt 2 (xong)** và danh sách **Tiếp theo**. Đoạn mới ghi rõ A9 + A5, C9 + C8, S10 làm song song, chỉ cần L6; đã merge PR #14, #12, #13.
   - Thêm task L15: chạy thử luồng Tạo thẻ → Album → Học trên `main`, làm trước L6b.
@@ -259,7 +259,7 @@
 
 ## 2026-11-17 — Đồng bộ main vào Album (A9, A5)
 
-- **Người làm:** Banana (`tanphat-trinh`), cùng Codex.
+- **Người làm:** Banana (`tanphat-trinh`).
 - **Đã xong:** merge `main` `02894d9` vào `feature/album-a9`, giữ lịch sử A9/A5. Conflict duy nhất ở nhật ký: giữ đầy đủ 21 mục của hai nhánh, xếp ngày mới trước. Các thay đổi C9/C8/L9 và tài liệu được tích hợp nguyên bản; không sửa code hoặc giao diện Album.
 - **Kiểm tra:** API/model không đổi. 74/74 test Node và 75 kiểm tra hồi quy Album qua. Luồng tạo bộ/thẻ mới → Album → Học/hoàn tác → Trang chủ qua ở 1440/375px; thêm luồng với `?seed` tiếng Nhật mới: xem cả 3 bộ, sửa bằng C9 → tìm/sửa trong Album giữ tiến độ → đổi màu → học/chấm/hoàn tác → Album, qua ở cả hai kích thước. Không có lỗi JavaScript; giới hạn tải Google Fonts và favicon cục bộ như đã ghi trước đó.
 - **Vướng mắc:** Study chưa có S10 trên main, vẫn dùng màu theo vị trí; không sửa phần của thành viên khác.
@@ -277,14 +277,14 @@
 
 ## 2026-11-16 — Thẻ tiếng Nhật trên trang Học (S10)
 
-- **Người làm:** AT, cùng Codex.
+- **Người làm:** AT.
 - **Đã xong:** hiện từ và ví dụ có furigana, kèm nghĩa và cách đọc nếu có. Bìa lấy màu từ bộ thẻ. Hoàn tác hiện thẻ do core trả về.
 - **Kiểm tra:** 70 bài test qua. Edge chạy hết một lượt với dữ liệu mẫu, kiểm tra phím tắt và ví dụ dài ở 375 px.
 - **Tiếp theo:** gửi S10 để review cùng các thay đổi đợt 2.
 
 ## 2026-11-16 — Chọn màu bìa trong Album (A5)
 
-- **Người làm:** Banana (`tanphat-trinh`, `trinhphat2931@gmail.com`), cùng Codex.
+- **Người làm:** Banana (`tanphat-trinh`, `trinhphat2931@gmail.com`).
 - **Đã xong:** `#deck-dialog` dùng `color-picker` chung với đủ 6 màu, chọn sẵn `deck.color`; form lưu màu qua `updateDeck()`. Giữ nguyên chức năng A9, không sửa phần chung hoặc trang khác.
 - **Kiểm tra:** 74 test Node; kiểm tra chọn sẵn, mũi tên đổi radio, lưu/mở lại, Esc hủy ở 1440/375px. Album và Trang chủ đọc đúng màu mới. Ảnh tại `pages/album/screenshots/album-a5-*.png`.
 - **Vướng mắc:** Study vẫn dùng `COVER_COLORS[index % ...]` trên main hiện tại, nên chưa hiện màu mới. Đây là phần S10 của thành viên 4; không sửa vượt phạm vi. A5 chưa đánh dấu Xong toàn bộ vì còn phụ thuộc này.
@@ -292,7 +292,7 @@
 
 ## 2026-11-16 — Thẻ tiếng Nhật trong Album (A9)
 
-- **Người làm:** Banana (`tanphat-trinh`, `trinhphat2931@gmail.com`), cùng Codex.
+- **Người làm:** Banana (`tanphat-trinh`, `trinhphat2931@gmail.com`).
 - **Đã xong:** A9 trên nhánh `feature/album-a9`, từ `main` `df8aaeb`: mặt trước và ví dụ có furigana, nghĩa/cách đọc ở mặt sau, ẩn trường trống; tìm cả 4 trường, bỏ furigana khi tìm và xác nhận xóa; hộp sửa đủ 4 ô; bìa dùng `deck.color`. Giữ lịch ôn và trường JLPT trong dữ liệu, không hiện JLPT trên giao diện. Cập nhật trạng thái A9.
 - **Kiểm tra:** 74/74 test Node; 75 kiểm tra Chromium về A9, chức năng Album cũ, XSS, bàn phím, giảm chuyển động, nội dung dài, kích thước 1440/1280/768/375/320px. Luồng tạo bộ → thêm thẻ → Album sửa → học/chấm/hoàn tác → Trang chủ → Album qua ở 1440 và 375px. Báo cáo và ảnh chụp trình duyệt tại [pages/album/REVIEW.md](../pages/album/REVIEW.md).
 - **Quyết định:** chỉ sửa Album và cập nhật tiến độ; giữ bố cục/điều hướng chung, không làm thêm A5, không thêm dependency. Không tạo PR hoặc merge theo yêu cầu người dùng.
@@ -301,7 +301,7 @@
 
 ## 2026-11-16 — Bỏ JLPT khỏi giao diện, chỉnh việc đợt 2
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:**
   - `product.md` › Thẻ tiếng Nhật: thêm câu "giao diện chưa dùng trường `jlpt`" dưới bảng trường; danh sách trang còn phải làm trỏ tới A9, C9, S10, bỏ `jlpt` khỏi dòng Tạo thẻ.
   - `tasks.md`: A9, S10 bỏ badge JLPT, mặt sau gọn lại (nghĩa, kèm cách đọc và ví dụ nếu có); S10 bỏ đường kẻ mảnh; A9 hộp thoại sửa thẻ còn 4 ô; C9 mỗi dòng 4 ô, bỏ nút "Thêm chi tiết" và `CARD_FIELDS`, `JLPT_LEVELS`; L6b chỉ cần A9, C9, S10; viết lại dòng "Đợt 2".
@@ -311,7 +311,7 @@
 
 ## 2026-11-16 — Chuẩn bị đợt 2 (L14, H9)
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:**
   - L14: class `color-picker` (6 chấm màu bìa, radio dùng được bằng bàn phím, ô đang chọn có viền và dấu ✓) và kiểu chữ furigana (`rt` 0.5em màu `--text-2`, khối chứa `<ruby>` giãn dòng gấp đôi) trong `styles/components.css`. Thêm mẫu vào styleguide, ghi vào bảng class (conventions.md) và design.md › Thành phần.
   - H9: Trang chủ bỏ `COVER_COLORS`, bìa dùng thẳng `deck.color`; đã so với `?seed`, màu từng bộ trùng Album.
@@ -323,7 +323,7 @@
 
 ## 2026-11-14 — Thẻ tiếng Nhật, màu bìa, sửa lỗi core (L6, B1–B5)
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:**
   - `Card` đổi sang `term`, `meaning`, `reading`, `example`, `jlpt` (`core/models.js`, `core/repo.js`). `term`, `meaning` bắt buộc; `jlpt` chỉ nhận `''`, `N5`…`N1`.
   - Lớp tương thích tạm `core/card-compat.js`: đọc thẻ cũ `front`/`back` thành `term`/`meaning`, thẻ trả ra kèm `front`/`back`, repo nhận `{ front, back }`, storage chỉ lưu trường mới. Bỏ ở L6b.
@@ -356,13 +356,13 @@
 
 ## 2026-11-13 — Thao tác với flashcard (S2–S3)
 
-- **Người làm:** AT, cùng Codex.
+- **Người làm:** AT.
 - **Đã xong:** lật qua lại bằng Space hoặc bấm thẻ, đặt gợi ý phím ở đáy thẻ, hiện bốn nút chấm ngay và hỗ trợ phím mũi tên để xem thẻ trước hoặc sau trong hàng đợi.
 - **Kiểm tra:** 37 test qua. Edge xác nhận Space không chấm điểm kể cả khi nút chấm đang được focus, mũi tên dừng ở hai đầu và bốn nút vẫn nằm trên một hàng ở 375 px.
 
 ## 2026-11-11 — Deploy lên Vercel
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:**
   - Deploy `main` lên Vercel bằng CLI, project `nho-lau`. Link ghi trong README.
   - Thêm `.vercelignore`, để không đưa tài liệu, test, `pages/styleguide/` và `package.json` lên Vercel.
@@ -376,7 +376,7 @@
 
 ## 2026-11-11 — Tiến độ sau 4 PR đầu tiên (L3)
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:**
   - Cả 4 trang đã vào `main`:
     - [PR #1](https://github.com/ngphat516/Nihongo-Flashcard/pull/1): trang Học (S1–S8);
@@ -425,7 +425,7 @@
 
 ## 2026-11-11 — Trang Tạo thẻ (C1, C2, C3)
 
-- **Người làm:** Leader, cùng Claude (Leader nhận C1–C3 thay Thành viên 3).
+- **Người làm:** Leader (Leader nhận C1–C3 thay Thành viên 3).
 - **Đã xong:**
   - Trang Tạo thẻ thành nơi soạn một bộ thẻ: `pages/create/` tạo bộ mới, `?deck=<id>` sửa bộ đó. Dropdown chọn bộ, ô tên / số thẻ mới mỗi ngày / mô tả, danh sách dòng thẻ 2 mặt có nút xóa, nút "Thêm thẻ", thanh Lưu dính ở đáy (Ctrl+Enter cũng lưu).
   - Kiểm tra mọi ô trước khi ghi; nhắc thẻ trùng mặt trước; hỏi xác nhận khi xóa thẻ đã lưu, khi đổi bộ lúc còn thay đổi chưa lưu, và khi rời trang.
@@ -442,7 +442,7 @@
 
 ## 2026-11-11 — Trang Album (A1–A8)
 
-- **Người làm:** Thành viên 2, cùng Claude.
+- **Người làm:** Thành viên 2.
 - **Đã xong:**
   - A1: lưới bìa `cover`; cả bìa là một link tới `routes.album(id)`. Màu bìa lấy theo thứ tự `i % 6` vì chưa có L6.
   - A2, A3: trang chi tiết bộ gồm tên, mô tả, bộ đếm Mới / Đang học / Đến hạn hôm nay, nút Học ngay, Thêm thẻ, Sửa bộ, Xóa bộ; lưới thẻ lật (`flashcard`) kèm badge trạng thái và hạn ôn.
@@ -463,14 +463,14 @@
 
 ## 2026-11-11 — Trang Học (S1–S8)
 
-- **Người làm:** AT, cùng Codex.
+- **Người làm:** AT.
 - **Đã xong:** luồng chọn bộ, lật thẻ, chấm điểm, xem kết quả và tiếp tục khi thẻ đến hạn. Hoàn tác hiện lại đúng thẻ vừa chấm kể cả khi thẻ khác đến hạn. Dùng các thành phần chung của styleguide, bỏ nút phát âm theo phạm vi sản phẩm. Bản triển khai ở nhánh `feature/study`.
 - **Kiểm tra:** 37 test qua. Đã thử trên Edge với `?seed`, `?reset`, mã bộ sai, phím tắt, hoàn tác, tự tiếp tục, chế độ giảm chuyển động và màn hình 375px.
 - **Tiếp theo:** mở PR cho Leader review. Khi L6 xong, cập nhật mặt thẻ theo cấu trúc thẻ tiếng Nhật.
 
 ## 2026-11-11 — Cột điều hướng và khung Trang chủ (L12)
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:**
   - Thay header ngang bằng cột điều hướng ở cả 4 trang và styleguide, làm giống cột icon trong mẫu: cột nổi bo góc, logo, 4 nút tròn chỉ có icon Lucide (rê chuột hoặc Tab tới thì hiện tên), nút furigana ở đáy. Dưới 768px thành thanh tab 5 ô ở đáy, có nhãn chữ.
   - Thêm biến `--rail-width`, `--tabbar-height`; đổi `--z-header` thành `--z-nav`; toast nằm giữa phần nội dung và nổi trên thanh tab.
@@ -492,7 +492,7 @@
 
 ## 2026-11-11 — Màu và chữ mới, tài liệu giao diện (L11)
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:**
   - Học theo một mẫu dashboard giáo dục, chốt qua 2 vòng hỏi đáp.
   - Đổi `styles/tokens.css`: màu chính xanh matcha `#527a2e`, nền xám ánh lục, heatmap xanh, 6 màu bìa pastel, biến cho biểu đồ.
@@ -512,7 +512,7 @@
 
 ## 2026-11-11 — Bộ tài liệu `docs/` (L10)
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:** chuyển `TASKS.md` thành `docs/tasks.md` (thêm cột trạng thái, task L6–L10, bảng lỗi B1–B5, bỏ S9); viết `docs/product.md`, `docs/architecture.md`, `docs/conventions.md` và file này; thêm `AGENTS.md` + `CLAUDE.md` cho agent; rút gọn `README.md`. Nhánh `docs/tai-lieu-du-an`.
 - **Quyết định:** tài liệu để trong `docs/`, viết bằng tiếng Việt. Mỗi thông tin chỉ ghi ở một file (bảng ở [conventions.md › Tài liệu](conventions.md#tài-liệu)). Mỗi PR cập nhật `tasks.md` và thêm một mục vào nhật ký này.
 - **Tiếp theo:** L6 thẻ tiếng Nhật, sửa luôn B1–B5; L2 bật bảo vệ nhánh `main`, điền `CODEOWNERS`.
@@ -520,7 +520,7 @@
 
 ## 2026-11-10 — Hệ thống giao diện (L4)
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:** `styles/tokens.css`, `styles/components.css`, font Noto Sans JP, trang `pages/styleguide/`, đổi tên class sang kiểu Bootstrap ở 4 trang. Commit `e80b4a2`, 37/37 test xanh.
 - **Quyết định:**
   - Giao diện: chỉ CSS tự viết (bỏ ý dùng Tailwind và thư viện Bootstrap), không có JS cho component, bỏ dark mode, tên class kiểu Bootstrap, `base.css` `@import` 2 file mới nên 4 file HTML không phải sửa. Styleguide là công cụ dev, xóa trước khi nộp.
@@ -529,7 +529,7 @@
 
 ## 2026-11-10 — Review `core/` và chốt cấu trúc code
 
-- **Người làm:** Leader, cùng Claude.
+- **Người làm:** Leader.
 - **Đã xong:** review toàn bộ `core/`, 4 trang, CSS và test. 37/37 test xanh, kể cả khi chạy ở 5 múi giờ khác nhau; SM-2 khớp với Anki. Tìm ra 4 lỗi và vài điểm nhỏ, ghi ở [tasks.md › Lỗi đã biết](tasks.md#lỗi-đã-biết-trong-core) (B1–B5).
 - **Quyết định:**
   - 4 lỗi để sau, sửa cùng lúc khi làm lại `core/` cho thẻ tiếng Nhật.
