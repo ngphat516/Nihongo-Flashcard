@@ -16,6 +16,14 @@
 
 ---
 
+## 2026-11-24 — Database và xác thực Google của Daika (BE1, BE2)
+
+- **Người làm:** Banana (`tanphat-trinh`), nhánh `db/init-auth` từ `c417782`, theo mục 4.1 của [kế hoạch bốn vai](backend-trien-khai.md).
+- **Đã xong:** migration `001_init.sql`, sổ migration, pool PostgreSQL và `withTransaction`. Ba route đăng nhập Google, đăng xuất và đọc hồ sơ dùng session JWT HS256 trong cookie 7 ngày. Middleware đối chiếu phiên bản trong DB trên mỗi request và gắn `req.user.id`.
+- **Kiểm tra:** Node 20.20.2, PostgreSQL 16.16, `REQUIRE_TEST_POSTGRES=1 npm test` đạt 122/122, không có test bỏ qua. Đã thử migration đồng thời, rollback rồi chạy lại, role app chỉ có quyền DML, hai chủ bộ, thu hồi phiên riêng từng người, cờ dev trên production và giới hạn IP. Thử TLS riêng với PostgreSQL thật xác nhận từ chối chứng chỉ tự ký và chấp nhận khi tin đúng CA.
+- **Tiếp theo:** At gắn `app.use('/api', createAuthRouter())` trước router collection, dùng `requireAuth` cho route dữ liệu. kakushi nối hai role DB và Tunnel, Leader nối Google Identity Services trên giao diện. Cách chạy migration và test nằm trong [README](../README.md#chạy-migration-postgresql).
+- **Chưa kiểm chứng:** đăng nhập bằng tài khoản Google thật từ origin qua Tunnel. Test xác minh chữ ký bằng thư viện Google với khóa thử nghiệm cục bộ.
+
 ## 2026-11-22 — Chốt hạ tầng backend, AI và chia việc
 
 - **Người làm:** Leader.
