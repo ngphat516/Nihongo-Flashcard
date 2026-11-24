@@ -16,6 +16,13 @@
 
 ---
 
+## 2026-11-24 — Lật thẻ dọc và chuyển thẻ 3D (S8)
+
+- **Người làm:** At.
+- **Đã xong:** theo lựa chọn người dùng, lật đáp án theo trục X (trên–dưới), chuyển thẻ bằng mũi tên có trượt/nghiêng nhẹ 420ms theo hướng. Animation điều hướng bị hủy khi hiện thẻ mới; kết thúc trở về transform none. Mobile bật preserve-3d cho cả trạng thái đã lật để mặt sau không bị ngược. Tắt chuyển động 3D khi prefers-reduced-motion bật.
+- **Kiểm tra:** Chrome 1440×1000 và 375×800, Space lật hai mặt, mũi tên chuyển liên tiếp và reset, không có lỗi Console. Ở mobile không cuộn ngang, bốn nút chấm trên nav. Chế độ giảm chuyển động có transform none. Ảnh motion-pc-*.jpg và motion-mobile-*.jpg.
+- **Tiếp theo:** Leader review nhánh feature/study-motion.
+
 ## 2026-11-22 — Chốt hạ tầng backend, AI và chia việc
 
 - **Người làm:** Leader.

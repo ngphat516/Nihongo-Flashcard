@@ -478,3 +478,17 @@
 #empty-title:focus-visible {
   outline: none;
 }
+
+/* Lật đáp án trên–dưới, theo lựa chọn giảm chuyển động của người học. */
+@media (prefers-reduced-motion: no-preference) {
+  .study-card { perspective: 1200px; }
+  .study-card .flashcard-inner,
+  .study-card.is-flipped .flashcard-inner {
+    transform-style: preserve-3d;
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .study-card.is-flipped .flashcard-inner { transform: rotateX(180deg); }
+  .study-card .flashcard-back { transform: rotateX(180deg); }
+  .study-card .flashcard-face { backface-visibility: hidden; }
+  .study-card .flashcard-face[aria-hidden='true'] { visibility: visible; }
+}

@@ -108,6 +108,7 @@ async function startSession(deckId) {
   let lastCardId = null;
   let busy = false;
   let wakeTimer;
+  let navigationAnimation;
   let direction = 'ja-vi';
   const directionButton = $('#study-direction');
 
@@ -121,6 +122,7 @@ async function startSession(deckId) {
   }
 
   function showFront(card) {
+    navigationAnimation?.cancel();
     current = card;
     shownAt = performance.now();
     revealed = false;
@@ -172,6 +174,12 @@ async function startSession(deckId) {
     if (busy || !current || nextIndex < 0 || nextIndex >= cardsToBrowse.length) return;
     cardIndex = nextIndex;
     showFront(cardsToBrowse[cardIndex]);
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Chỉ xoay khung ngoài khi đổi thẻ, mặt thẻ bên trong vẫn lật độc lập.
+    navigationAnimation = stage.animate([
+      { transform: `perspective(1000px) translateX(${offset * 24}px) rotateY(${offset * -14}deg) scale(0.96)`, opacity: 0.35 },
+      { transform: 'perspective(1000px) translateX(0) rotateY(0deg) scale(1)', opacity: 1 },
+    ], { duration: 420, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
   }
 
   function showDone(nextLearningAt) {
