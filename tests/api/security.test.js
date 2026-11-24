@@ -16,6 +16,8 @@ test('API: static allowlist, header và auth thật ở production', async t => 
       assert.equal(response.status, 401, path);
     }
   }
+  assert.equal((await request('/')).status, 200);
+  assert.equal((await request('/index.html')).status, 200);
   const page = await request('/pages/study/');
   assert.equal(page.status, 200);
   assert.equal(page.headers.get('x-content-type-options'), 'nosniff');

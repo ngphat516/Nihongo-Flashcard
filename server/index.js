@@ -40,7 +40,7 @@ export function createApp() {
         !/\.(html|css|js)$/.test(pathname) && !pathname.endsWith('/')) return next(notFound());
     next();
   });
-  app.get(['/', '/index.html'], (req, res) => res.sendFile(path.join(root, 'index.html')));
+  app.get(['/', '/index.html'], (req, res) => res.sendFile(path.join(root, 'index.html'), { dotfiles: 'allow' }));
   for (const folder of ['pages', 'core', 'styles', 'dev']) {
     app.use('/' + folder, express.static(path.join(root, folder), { dotfiles: 'deny', index: 'index.html' }));
   }
