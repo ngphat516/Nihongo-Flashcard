@@ -16,6 +16,16 @@
 
 ---
 
+## 2026-11-24 — API của At: khung server, CRUD và giao dịch
+
+- **Người làm:** At.
+- **Đã viết:** `api/crud-reviews` dựa trên `db/init-auth` (schema/pool/auth của Daika). `createApp()` không listen khi import; health kiểm tra DB; allowlist file tĩnh, chặn file test/ảnh review, header bảo mật, JSON tối đa 2 MB, lỗi JSON thống nhất. Mapper BIGINT ↔ số, không lộ user_id; kiểm tra dữ liệu theo core và kiểm tra đầy đủ tiến độ/log phía server.
+- **Dữ liệu:** CRUD/batch/delete và lọc cards theo deckId, reviewLogs theo from/to; lọc user_id ở mọi thao tác; khóa dòng users trong transaction để tuần tự hóa ghi của cùng tài khoản. Tạo/batch dùng UUID idempotent; batch không đè bản đang có; PUT sửa nhận expectedUpdatedAt (fallback updatedAt). Chấm điểm chỉ cập nhật tiến độ, giữ nội dung hiện tại; replay log không chấm lại; undo hỗ trợ card/restoredCard, chặn hoàn tác lượt cũ sau khi đã ôn tiếp; xóa bộ giữ log.
+- **Tương thích:** L16 chưa có trên nhánh nền, validateCard tạm nhận jlpt rỗng khi gọi validator nhưng API/DB không lưu trường này. Không sửa core, schema, auth hoặc phần AI.
+- **Kiểm tra:** test HTTP/header/allowlist/auth production, mapper và validation qua. Có test PostgreSQL cho 2 user, rollback batch, xóa giữ lịch sử, hai máy sửa gây 409, chấm/undo đồng thời và idempotency. Máy chưa có Docker/PostgreSQL nên test tích hợp DB chưa chạy, chưa đánh dấu các task dữ liệu hoàn thành.
+- **Cách chạy:** `npm ci`, cấu hình biến môi trường theo tài liệu backend, chạy migration của Daika rồi `node server/index.js` (mặc định port 3000). Test bắt buộc DB: có image postgres:16-alpine và `REQUIRE_TEST_POSTGRES=1 npm test` (PowerShell gán biến môi trường trước lệnh).
+- **Tiếp theo:** chạy test PostgreSQL trên máy có Docker, Leader review các quyết định hợp đồng còn khác nhau giữa hai tài liệu và ghép phần AI của kakushi.
+
 ## 2026-11-24 — Database và xác thực Google của Daika (BE1, BE2)
 
 - **Người làm:** Banana (`tanphat-trinh`), nhánh `db/init-auth` từ `c417782`, theo mục 4.1 của [kế hoạch bốn vai](backend-trien-khai.md).
