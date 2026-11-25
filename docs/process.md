@@ -16,6 +16,12 @@
 
 ---
 
+## 2026-11-25 — Đồng bộ Node 24 trong tài liệu
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `docs/node-24`, chỉ tài liệu. `AGENTS.md` và [architecture.md](architecture.md) đổi Node 20 thành Node 24, khớp `engines` trong `package.json` (PR #36). `AGENTS.md` thêm bước `npm ci` trước `npm test`, vì test backend cần thư viện trong `node_modules`.
+- **Tiếp theo:** GĐ1.
+
 ## 2026-11-25 — Vá kế hoạch triển khai backend (PR #35)
 
 - **Người làm:** Leader.
