@@ -27,7 +27,7 @@ GĐ1 (chạy song song 4 người, không ai chờ ai)
   ├─ kakushi : Hạ tầng Docker Compose + Dockerfile + .env.example + .gitignore (BE1 phần khung) · BE1
   ├─ Daika   : db/migrations/001_init.sql + db/migrate.js + server/db/pool.js · BE12 ✓
   ├─ At      : server/index.js (Express + allowlist + error handler + GET /api/health) + bộ khung test 2 user · BE13 ✓
-  └─ Tiến Phát: L16 (bỏ jlpt trong core/) + bật GitHub Secret scanning & Push protection · L16, L17
+  └─ Tiến Phát: L16 (bỏ jlpt trong core/) + bật GitHub Secret scanning & Push protection · L16, L17 ✓
 
 GĐ2 (Server lõi chạy song song bằng auth giả X-Dev-User)
   ├─ Daika   : Google OAuth + JWT cookie + requireAuth (thay X-Dev-User khi prod) + POST /api/auth/* & GET /api/me · BE2 ✓
@@ -66,7 +66,7 @@ Một bảng cho mọi việc backend và AI, **gồm cả việc đã xong**, x
 | BE13 | Khung Express 5, file tĩnh theo danh sách cho phép, header, error handler, health, khung test 2 user | At | 1 | GĐ0 | Bắt buộc | **Xong** (PR #37) |
 | BE1 | `Dockerfile` (`node:24-alpine`), `docker-compose.yml` (`db`, migration, `app`, `tunnel` ở profile `prod`), `.env.example`, tạo role `nholau_app` + cấp quyền | kakushi | 1 | — | Bắt buộc | **Chưa làm — đang chặn chạy bằng Docker và deploy** |
 | L16 | Bỏ `jlpt` (+ `validateReviewLog` nếu cần cho client) | Leader | 1 | — | Bắt buộc | Chưa làm |
-| L17 | Bật Secret scanning + Push protection | Leader | 1 | — | Bắt buộc | Chưa làm |
+| L17 | Bật Secret scanning + Push protection | Leader | 1 | — | Bắt buộc | **Xong** (2026-11-26) |
 | BE2 | Google OAuth, JWT cookie, `requireAuth` + `X-Dev-User`, `/api/auth/*`, `GET /api/me`, rate limit | Daika | 2 | BE12 | Bắt buộc | **Xong** phía server (PR #36). Nút đăng nhập ở trình duyệt là BE6 |
 | BE3 | CRUD, batch, xóa, `DELETE /api/me/data` | At | 2 | BE12, BE13 | Bắt buộc | **Xong** (PR #37) |
 | BE10 | Lọc `?deckId=`, `?from=&to=` | At | 2 | BE3 | Nên có | **Xong** (PR #37) |
@@ -89,7 +89,6 @@ Một bảng cho mọi việc backend và AI, **gồm cả việc đã xong**, x
   - **Lưu ý:** `001_init.sql` không tạo role `nholau_app` và không cấp quyền; hiện chỉ helper test làm việc này, xem cách làm ở `tests/helpers/postgres-local.js`. Bản Docker phải tự tạo role và cấp `SELECT, INSERT, UPDATE, DELETE` (VD script init của `db`, hoặc bước trước khi chạy migration bằng role admin). Bảng tạo sau (VD `ai_usage`) cũng phải cấp quyền, nên dùng `ALTER DEFAULT PRIVILEGES` hoặc thêm `GRANT` trong chính migration đó.
   - `.gitignore` đã có `.env`, `.env.*`, `!.env.example`, `backups/`, `docker-compose.override.yml` (Leader thêm ngày 2026-11-25 vì gấp).
 - **L16** (4.3 bước 1): xem [chi tiết L16](#l16--bỏ-trường-jlpt--leader--core).
-- **L17** (4.3 bước 2): Settings › Code security của repo bật cả Secret scanning và Push protection; Leader tự kiểm tra rồi sửa trạng thái.
 - **BE5** (4.3 bước 3–4): 4 trang chạy được ở cả chế độ khách và đã đăng nhập mà không sửa code trang; `updateDeck`/`updateCard`/`resetCard` gửi `expectedUpdatedAt`, `409` báo "Dữ liệu đã được sửa ở máy khác, hãy tải lại trang."; `?seed`/`?reset` bị bỏ qua khi đã đăng nhập.
 - **AI1** (4.4 Phần B bước 1): tách đúng chữ Nhật từ 2–3 PDF mẫu ngay trên trình duyệt; PDF chỉ có ảnh báo "chưa hỗ trợ"; quá 20.000 ký tự thì nhắc thu hẹp khoảng trang.
 - **AI3** (4.4 Phần B bước 3): có test bằng kết quả mẫu đúng và sai định dạng (cả có `<script>`); `npm test` không gọi Gemini thật; `GET /server/ai/provider.js` trả `404`.
@@ -138,12 +137,6 @@ Một bảng cho mọi việc backend và AI, **gồm cả việc đã xong**, x
   - `tests/`: bỏ test `jlpt`; thêm test gửi `jlpt` lên thì bị bỏ qua.
   - Tài liệu: `product.md`, `architecture.md`.
 - **Xong khi:** `grep -rn jlpt core pages tests` chỉ còn test "bị bỏ qua" và chỗ `migrate.js` xóa trường; `npm test` xanh; thẻ cũ có `jlpt` mở lên không lỗi.
-
-### L17 · Bật Secret scanning + Push protection · Leader · GitHub Settings
-
-- **Lý do:** repo public, server đã đọc `JWT_SECRET`, `DATABASE_URL`, `GOOGLE_CLIENT_ID` từ biến môi trường ([backend.md › Bí mật](backend.md#a-bí-mật-secrets)).
-- **Làm gì:** Settings › Code security: bật **Secret scanning** và **Push protection**.
-- **Xong khi:** cả hai đang bật; Leader tự kiểm tra trong Settings rồi sửa trạng thái ở bảng trên.
 
 ---
 
