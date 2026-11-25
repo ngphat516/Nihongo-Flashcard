@@ -27,7 +27,7 @@
   - `tests/repo.test.js`, `tests/scheduler.test.js`: bỏ `jlpt` khỏi thẻ mẫu; test "gửi `jlpt` thì bị bỏ qua"; test migrate thẻ dạng L6.
   - Tài liệu: `product.md`, `architecture.md`.
 - **Quyết định:** không làm `validateReviewLog` ở client: server đã tự kiểm tra lượt ôn trong `server/validate.js`, BE5 không cần.
-- **Kiểm tra:** xem mô tả PR #44 (kết quả `npm test`, bản DB và thử trên trình duyệt).
+- **Kiểm tra:** `npm test` 124 test, 119 pass, 0 fail, 5 skip (bỏ qua test DB); `REQUIRE_TEST_POSTGRES=1 npm test` với Docker `postgres:16-alpine`: 131 test, 131 pass, 0 fail, 0 skip. Trình duyệt: gán `jlpt: 'N5'` cho 5 thẻ trong localStorage, mở Album thì cả 5 thẻ mất `jlpt`; tạo, sửa thẻ và nhập file JSON có `jlpt` đều lưu thẻ không có `jlpt`; 4 trang với `?seed` và sau `?reset` ở 1440px, 375px không cuộn ngang, Console không lỗi.
 - **Tiếp theo:** BE5 (`storage.js` 2 chế độ).
 
 ## 2026-11-25 — Gom việc backend về một bảng
