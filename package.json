@@ -4,6 +4,9 @@
   "private": true,
   "description": "Flashcard học tập với thuật toán SM-2 (kiểu Anki) — HTML/CSS/JS thuần, lưu localStorage",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "test": "node --test",
     "migrate": "node db/migrate.js"
