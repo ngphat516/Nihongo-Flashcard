@@ -1,8 +1,8 @@
 # Thiết kế backend
 
-Tài liệu này nói backend sẽ làm thế nào: tech stack, hạ tầng, database, API, AI, bảo mật. Code hiện tại (chưa có backend) xem [architecture.md](architecture.md); việc cần làm xem [tasks.md › Backend và AI](tasks.md#backend-và-ai).
+Tài liệu này nói backend sẽ làm thế nào: tech stack, hạ tầng, database, API, AI, bảo mật. Code frontend hiện tại xem [architecture.md](architecture.md); việc cần làm xem [tasks.md › Backend và AI](tasks.md#backend-và-ai).
 
-Chưa có code backend. Phần nào **Đã chốt**, phần nào **Đề xuất** ghi ở [Tech stack](#tech-stack); phần còn hỏi xem [Chưa chốt](#chưa-chốt).
+Server và database đã có code (PR #36, #37); chưa có Docker, AI, nối frontend — xem [tasks.md](tasks.md#backend-và-ai). Lựa chọn đã chốt ghi ở [Tech stack](#tech-stack); phần còn hỏi xem [Chưa chốt](#chưa-chốt).
 
 ## Mục tiêu và nguyên tắc
 
@@ -16,15 +16,17 @@ Chưa có code backend. Phần nào **Đã chốt**, phần nào **Đề xuất*
 | Thành phần | Chọn | Trạng thái |
 |---|---|---|
 | Ngôn ngữ server | Node.js | **Đã chốt** (Leader, 2026-11-21) |
-| Framework | Express | Đề xuất — chốt ở buổi GĐ0 |
+| Phiên bản Node | Node.js 24 (`engines: >=24`, image `node:24-alpine`) | **Đã chốt** (2026-11-25) |
+| Framework | Express 5 | **Đã chốt** (GĐ0, 2026-11-25) |
 | Chạy server | Docker Compose trên máy của kakushi | **Đã chốt** (Leader, 2026-11-22) |
 | Database | PostgreSQL 16 (container `postgres:16-alpine`) | **Đã chốt** (Leader, 2026-11-22) |
 | Ra mạng | Cloudflare Tunnel, tên miền riêng, cùng domain cho web và `/api` | **Đã chốt** (Leader, 2026-11-22) |
-| Thư viện DB | `pg` (node-postgres), SQL có tham số; không dùng ORM | Đề xuất |
-| Đăng nhập | Google OAuth (Google Identity Services, server xác minh ID token bằng `google-auth-library`) + JWT của app trong cookie `httpOnly; Secure; SameSite=Lax`, 7 ngày, không có refresh token | Đề xuất |
-| Migration | File SQL đánh số trong `db/migrations/` (VD `001_init.sql`) | Đề xuất |
+| Thư viện DB | `pg` (node-postgres), SQL có tham số; không dùng ORM | **Đã chốt** (GĐ0, 2026-11-25) |
+| Đăng nhập | Google OAuth (Google Identity Services, server xác minh ID token bằng `google-auth-library`) + JWT `HS256` của app trong cookie `nholau_session` (`httpOnly; Secure; SameSite=Lax`), 7 ngày, không có refresh token | **Đã chốt** (GĐ0, 2026-11-25) |
+| Migration | File SQL đánh số trong `db/migrations/` (VD `001_init.sql`), chạy bằng `db/migrate.js` | **Đã chốt** (GĐ0, 2026-11-25) |
 | AI | Gemini API (key lấy từ Google AI Studio), model loại Flash | **Đã chốt** (Leader, 2026-11-22) |
 | Chạy local | `docker compose up` | **Đã chốt** |
+| Chế độ khách | Giữ localStorage cho người chưa đăng nhập; đăng nhập lần đầu mà máy có dữ liệu thì hỏi "Đưa dữ liệu trên máy lên tài khoản?" (BE7) | **Đã chốt** (GĐ0, 2026-11-25) |
 
 **Vì sao chạy bằng Docker trên máy riêng:**
 
@@ -63,17 +65,7 @@ Docker Compose (mạng nội bộ):
 
 ## Hợp đồng chung (GĐ0)
 
-Chốt ở buổi GĐ0, ai cũng làm theo. Đổi điều nào thì báo cả nhóm và sửa mục này trong cùng PR.
-
-- **Thư mục:**
-  - `server/index.js` (điểm vào), `server/routes/`, `server/db/pool.js` (một `Pool` dùng chung), `server/auth/middleware.js`, `server/ai/`.
-  - `db/migrations/`: file đánh số `001_init.sql`, `002_…`.
-  - `docker-compose.yml`, `Dockerfile`, `.env.example` ở gốc repo.
-- **Người đang đăng nhập:** middleware gắn `req.user.id`; mọi route chỉ dùng giá trị này, không đọc `userId` từ body hay query.
-- **Lỗi trả về:** `{ error: { code, message } }`. JSON dùng `camelCase`, DB dùng `snake_case`.
-- **Biến môi trường:** `DATABASE_URL`, `JWT_SECRET`, `GOOGLE_CLIENT_ID`, `GEMINI_API_KEY`, `NODE_ENV`, `DEV_AUTH`, `AI_MOCK`. Tên biến ghi trong `.env.example`, không có giá trị.
-- **Auth giả cho dev:** header `X-Dev-User` được dùng làm `req.user.id`, **chỉ** khi `NODE_ENV=development` **và** `DEV_AUTH=1`. Phải có test chứng minh ở production header này bị bỏ qua. BE2 thay bằng auth thật. PR có phần này Leader review kỹ.
-- **Migration:** hai người cùng cần sửa bảng thì báo nhau trước để không trùng số `00x`.
+**Đã chốt 2026-11-25.** Bản đầy đủ (thư mục và người sở hữu, `req.user.id`, auth giả `X-Dev-User`, dạng lỗi và bảng mã lỗi, biến môi trường, quy tắc migration) ở [backend-trien-khai.md › 2. Hợp đồng chung](backend-trien-khai.md#2-hợp-đồng-chung-shared-contract--chốt-ở-buổi-gđ0). Đổi điều nào thì báo cả nhóm và sửa ở đó trong cùng PR.
 
 ## Database
 
@@ -321,6 +313,5 @@ Chưa cần bảng `idempotency_keys`, vì mọi thao tác đã có id do trình
 
 Hỏi Leader trước khi làm các phần này.
 
-- **Chế độ khách:** giữ localStorage cho người chưa đăng nhập, hay bắt đăng nhập mới dùng được. Đề xuất: giữ (kế hoạch BE5, BE7 đang theo hướng này); đăng nhập lần đầu thì hỏi "Đưa dữ liệu trên máy lên tài khoản?", dùng lại logic nhập JSON của C7.
 - **Hạn nộp** của phần backend.
 - **Vị trí giao diện AI** (nút tạo thẻ từ PDF đặt ở trang nào): chốt sau khi xong AI3, AI4.
