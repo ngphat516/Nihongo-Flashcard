@@ -40,11 +40,19 @@ npm ci
 npm test
 ```
 
-Hai bộ test tích hợp tự tạo PostgreSQL 16 trên loopback, dùng mật khẩu sinh ngẫu nhiên và xóa container sau khi chạy. Nếu Docker hoặc image chưa có, `npm test` ghi rõ các bộ đã bỏ qua. Muốn bắt buộc chạy cả hai, dùng:
+Các bộ test tích hợp DB, auth, collections và reviews tự tạo PostgreSQL 16 riêng trên loopback, dùng mật khẩu sinh ngẫu nhiên và xóa dữ liệu tạm sau khi chạy. Nếu Docker hoặc image chưa có, `npm test` ghi rõ các bộ đã bỏ qua. Muốn bắt buộc chạy đầy đủ, dùng:
 
 ```bash
 docker pull postgres:16-alpine
 REQUIRE_TEST_POSTGRES=1 npm test
+```
+
+Nếu máy có bộ chương trình PostgreSQL 16 nhưng không có Docker, đặt `TEST_POSTGRES_BIN` trỏ tới thư mục chứa `initdb`, `pg_ctl`, `postgres` (kèm `lib`, `share` và extension `pgcrypto` của bản phân phối). Test tạo cluster tạm riêng, không dùng database đã có. Ví dụ PowerShell:
+
+```powershell
+$env:TEST_POSTGRES_BIN = 'C:\pgsql\bin'
+$env:REQUIRE_TEST_POSTGRES = '1'
+npm test
 ```
 
 Test xác minh ID token bằng khóa RSA sinh tại chỗ. Test không cần tài khoản Google, Gemini hay `DATABASE_URL` của máy.

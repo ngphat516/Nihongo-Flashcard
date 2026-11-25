@@ -209,7 +209,7 @@ Mạng chập chờn thì trình duyệt có thể gửi lại một request. G�
 | Hoàn tác | Lượt ôn không còn → trả thành công, không khôi phục thẻ lần nữa |
 | Đăng nhập lại | `google_sub UNIQUE` + `ON CONFLICT DO UPDATE` (cập nhật tên, ảnh) |
 
-**2 máy cùng sửa:** trình duyệt gửi kèm `updatedAt` đang có. Server chạy `UPDATE … WHERE id = $1 AND user_id = $2 AND updated_at = $3`. 0 dòng → `409`, trang báo "Đã được sửa ở nơi khác, tải lại trang".
+**2 máy cùng sửa:** trình duyệt giữ `updatedAt` cũ và gửi riêng `expectedUpdatedAt` cùng item đã sửa. Server kiểm tra phiên bản và cập nhật trong một transaction có khóa theo user; khác phiên bản → `409`, trang báo "Đã được sửa ở nơi khác, tải lại trang". Không gửi `expectedUpdatedAt` thì PUT vẫn upsert có kiểm tra chủ sở hữu. Batch chỉ thêm mới, không ghi đè bản đã có. Chi tiết hợp đồng ở [kế hoạch triển khai](backend-trien-khai.md#3-đặc-tả-api-đầy-đủ).
 
 Chưa cần bảng `idempotency_keys`, vì mọi thao tác đã có id do trình duyệt tạo.
 
@@ -285,7 +285,7 @@ Chưa cần bảng `idempotency_keys`, vì mọi thao tác đã có id do trình
 - Kiểm tra dữ liệu ở server bằng `validateDeck` / `validateCard`; bỏ các trường lạ, không ghi thẳng object từ body vào DB.
 - Không bật CORS cho domain khác (web và API cùng domain). Không trả `Access-Control-Allow-Origin: *`.
 - Thông báo lỗi trả về không chứa stack trace, câu SQL hay tên bảng; chi tiết chỉ ghi vào log server.
-- Thêm header `X-Content-Type-Options: nosniff`, `Referrer-Policy: same-origin`, `X-Frame-Options: DENY` (đặt trong server).
+- Thêm header `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` (dev: `no-referrer-when-downgrade`), `X-Frame-Options: DENY` (đặt trong server). Nếu dùng COOP thì chỉ dùng `same-origin-allow-popups` để đăng nhập Google hoạt động.
 
 ### f. Trình duyệt (XSS)
 

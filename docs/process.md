@@ -16,11 +16,29 @@
 
 ---
 
+## 2026-11-25 — Hoàn tất kiểm thử API PostgreSQL (BE3, BE4, BE10)
+
+- **Người làm:** At.
+- **Đã xong:** đồng bộ `api/crud-reviews` với `main` sau DB/auth; sửa PUT dùng riêng `expectedUpdatedAt` tùy chọn, undo chỉ nhận `{ card }`, giữ auth trước collections và sửa Referrer-Policy theo môi trường. PR #37 chuyển base sang `main` để Leader review.
+- **Kiểm tra:** `npm ci` và `npm test` trên Node 24.22.3, PostgreSQL 16.11: **129 pass, 0 fail, 0 skip**. Gồm DB/migration, auth, 2 user không truy cập chéo, CRUD/filter, xung đột 409 khi ghi đồng thời, rollback, nhập lại không đè tiến độ, review/undo idempotent, chặn undo lượt cũ và giữ nội dung thẻ đã sửa.
+- **Quyết định:** máy này không có Docker; bổ sung `TEST_POSTGRES_BIN` để test tự tạo cluster PostgreSQL 16 tạm trên loopback, mật khẩu ngẫu nhiên, dọn sau test. Không đổi cách chạy Docker mặc định, không thêm dependency và không dùng dữ liệu ứng dụng. Cách chạy ở README.
+- **Tiếp theo:** Leader review/merge PR #37; nối frontend và AI theo phân công. Chưa sửa core/storage hoặc triển khai lên bản thật.
+
 ## 2026-11-25 — Đồng bộ Node 24 trong tài liệu
 
 - **Người làm:** Leader.
 - **Đã xong:** nhánh `docs/node-24`, chỉ tài liệu. `AGENTS.md` và [architecture.md](architecture.md) đổi Node 20 thành Node 24, khớp `engines` trong `package.json` (PR #36). `AGENTS.md` thêm bước `npm ci` trước `npm test`, vì test backend cần thư viện trong `node_modules`.
 - **Tiếp theo:** GĐ1.
+
+## 2026-11-24 — API của At: khung server, CRUD và giao dịch
+
+- **Người làm:** At.
+- **Đã viết:** `api/crud-reviews` dựa trên `db/init-auth` (schema/pool/auth của Daika). `createApp()` không listen khi import; health kiểm tra DB; allowlist file tĩnh, chặn file test/ảnh review, header bảo mật, JSON tối đa 2 MB, lỗi JSON thống nhất. Mapper BIGINT ↔ số, không lộ user_id; kiểm tra dữ liệu theo core và kiểm tra đầy đủ tiến độ/log phía server.
+- **Dữ liệu:** CRUD/batch/delete và lọc cards theo deckId, reviewLogs theo from/to; lọc user_id ở mọi thao tác; khóa dòng users trong transaction để tuần tự hóa ghi của cùng tài khoản. Tạo/batch dùng UUID idempotent; batch không đè bản đang có; PUT sửa nhận expectedUpdatedAt (fallback updatedAt). Chấm điểm chỉ cập nhật tiến độ, giữ nội dung hiện tại; replay log không chấm lại; undo hỗ trợ card/restoredCard, chặn hoàn tác lượt cũ sau khi đã ôn tiếp; xóa bộ giữ log.
+- **Tương thích:** L16 chưa có trên nhánh nền, validateCard tạm nhận jlpt rỗng khi gọi validator nhưng API/DB không lưu trường này. Không sửa core, schema, auth hoặc phần AI.
+- **Kiểm tra:** test HTTP/header/allowlist/auth production, mapper và validation qua. Có test PostgreSQL cho 2 user, rollback batch, xóa giữ lịch sử, hai máy sửa gây 409, chấm/undo đồng thời và idempotency. Máy chưa có Docker/PostgreSQL nên test tích hợp DB chưa chạy, chưa đánh dấu các task dữ liệu hoàn thành.
+- **Cách chạy:** `npm ci`, cấu hình biến môi trường theo tài liệu backend, chạy migration của Daika rồi `node server/index.js` (mặc định port 3000). Test bắt buộc DB: có image postgres:16-alpine và `REQUIRE_TEST_POSTGRES=1 npm test` (PowerShell gán biến môi trường trước lệnh).
+- **Tiếp theo:** chạy test PostgreSQL trên máy có Docker, Leader review các quyết định hợp đồng còn khác nhau giữa hai tài liệu và ghép phần AI của kakushi.
 
 ## 2026-11-25 — Vá kế hoạch triển khai backend (PR #35)
 
