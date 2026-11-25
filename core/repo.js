@@ -98,7 +98,7 @@ export async function getCard(id) {
   return storage.get(CARDS, id);
 }
 
-/** Thêm một thẻ vào bộ: { deckId, term, meaning, reading?, example?, jlpt? }. */
+/** Thêm một thẻ vào bộ: { deckId, term, meaning, reading?, example? }. */
 export async function createCard(input = {}) {
   const { deckId, ...fields } = input;
   await requireDeck(deckId);
@@ -108,7 +108,7 @@ export async function createCard(input = {}) {
 /**
  * Thêm nhiều thẻ một lần (nhập hàng loạt). Thẻ nào sai thì cả lượt không lưu (ném ValidationError).
  * @param {string} deckId
- * @param {{ term: string, meaning: string, reading?: string, example?: string, jlpt?: string }[]} items
+ * @param {{ term: string, meaning: string, reading?: string, example?: string }[]} items
  */
 export async function createCards(deckId, items) {
   await requireDeck(deckId);
@@ -118,7 +118,7 @@ export async function createCards(deckId, items) {
   return cards;
 }
 
-/** Sửa nội dung thẻ: chỉ truyền trường cần đổi (term, meaning, reading, example, jlpt). Tiến độ học giữ nguyên. */
+/** Sửa nội dung thẻ: chỉ truyền trường cần đổi (term, meaning, reading, example). Tiến độ học giữ nguyên. */
 export async function updateCard(id, input = {}) {
   const card = await requireCard(id);
   const next = { ...card, updatedAt: Date.now() };

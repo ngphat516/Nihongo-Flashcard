@@ -23,9 +23,6 @@ export const DECK_COLORS = Object.freeze(['pink', 'peach', 'yellow', 'green', 's
 /** Chiều học của bộ: 'ja-vi' Nhật → Việt (mặc định), 'vi-ja' Việt → Nhật. Lịch ôn dùng chung cho cả 2 chiều. */
 export const DECK_DIRECTIONS = Object.freeze(['ja-vi', 'vi-ja']);
 
-/** Cấp JLPT của thẻ. '' = không ghi cấp. */
-export const JLPT_LEVELS = Object.freeze(['', 'N5', 'N4', 'N3', 'N2', 'N1']);
-
 /** Số thẻ mới mỗi ngày khi tạo bộ mà không ghi số. */
 export const DEFAULT_NEW_PER_DAY = 20;
 
@@ -58,7 +55,6 @@ export const DEFAULT_NEW_PER_DAY = 20;
  * @property {string} meaning     nghĩa tiếng Việt, bắt buộc
  * @property {string} reading     cách đọc bằng kana, '' nếu không ghi
  * @property {string} example     câu ví dụ, '' nếu không ghi
- * @property {''|'N5'|'N4'|'N3'|'N2'|'N1'} jlpt  cấp JLPT, '' nếu không ghi
  * @property {CardState} state
  * @property {number} due         thời điểm đến hạn ôn (ms). Thẻ mới: 0
  * @property {number} interval    số ngày giữa 2 lần ôn
@@ -162,10 +158,10 @@ export function validateDeck(deck) {
 }
 
 /** Các trường nội dung của thẻ (không gồm id, deckId, tiến độ học). */
-export const CARD_FIELDS = Object.freeze(['term', 'meaning', 'reading', 'example', 'jlpt']);
+export const CARD_FIELDS = Object.freeze(['term', 'meaning', 'reading', 'example']);
 
 /** @returns {Card} */
-export function makeCard({ deckId, term, meaning, reading = '', example = '', jlpt = '' } = {}, now = Date.now()) {
+export function makeCard({ deckId, term, meaning, reading = '', example = '' } = {}, now = Date.now()) {
   const card = {
     id: newId(),
     deckId,
@@ -173,7 +169,6 @@ export function makeCard({ deckId, term, meaning, reading = '', example = '', jl
     meaning: cleanText(meaning),
     reading: cleanText(reading),
     example: cleanText(example),
-    jlpt: cleanText(jlpt),
     ...NEW_CARD_PROGRESS,
     createdAt: now,
     updatedAt: now,
@@ -186,9 +181,6 @@ export function validateCard(card) {
   if (!card.deckId) throw new ValidationError('Thẻ phải thuộc một bộ thẻ.');
   if (!card.term) throw new ValidationError('Từ không được để trống.');
   if (!card.meaning) throw new ValidationError('Nghĩa không được để trống.');
-  if (!JLPT_LEVELS.includes(card.jlpt)) {
-    throw new ValidationError('Cấp JLPT phải là N5, N4, N3, N2, N1 hoặc để trống.');
-  }
   if (CARD_FIELDS.some((field) => card[field].length > LIMITS.cardText)) {
     throw new ValidationError(`Mỗi ô của thẻ tối đa ${LIMITS.cardText} ký tự.`);
   }

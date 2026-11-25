@@ -10,7 +10,7 @@
  *   getDeckOverview()                    → [{ deck, total, due: { new, learning, review } }]
  *   getDeck(id), getCards(deckId)
  *   updateDeck(id, { name, description, newPerDay, color }), deleteDeck(id)
- *   updateCard(id, { term, meaning, reading, example, jlpt }), deleteCard(id), resetCard(id)
+ *   updateCard(id, { term, meaning, reading, example }), deleteCard(id), resetCard(id)
  *   deck.color, DECK_COLORS (models.js)  → màu bìa đã lưu trên bộ; bộ cũ cũng đã có màu khi đọc ra
  *   renderFurigana(text), plainFurigana(text) (furigana.js) → hiện term/example; tìm kiếm không tính phần [..]
  *   STATE_LABELS[card.state]             → 'Mới' | 'Đang học' | 'Học lại' | 'Ôn tập'
