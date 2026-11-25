@@ -202,8 +202,8 @@ Mạng chập chờn thì trình duyệt có thể gửi lại một request. G�
 
 | Thao tác | Gửi lại 2 lần thì sao |
 |---|---|
-| Tạo bộ, tạo thẻ, tạo nhiều thẻ, đưa dữ liệu khách lên | `INSERT … ON CONFLICT (id) DO NOTHING`: không có bản thứ hai |
-| Sửa (`PUT`) | Ghi đè cùng giá trị |
+| Tạo/sửa một bản ghi (`PUT`) | Upsert `ON CONFLICT (id) DO UPDATE … WHERE user_id = $me`: gửi lại thì ghi cùng giá trị |
+| Tạo nhiều thẻ, đưa dữ liệu khách lên (`batch`) | `INSERT … ON CONFLICT (id) DO NOTHING`: không có bản thứ hai, không ghi đè |
 | Xóa thứ đã xóa | Trả `204` |
 | **Chấm điểm** | Kiểm tra `review_logs.id` trước; đã có thì trả kết quả cũ, không chạy SM-2 lần nữa |
 | Hoàn tác | Lượt ôn không còn → trả thành công, không khôi phục thẻ lần nữa |
