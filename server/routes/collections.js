@@ -56,7 +56,7 @@ export function createCollectionsRouter() {
     const item = validateItem(req.params.c, req.body, uuid(req.params.id));
     const saved = await withTransaction(async client => {
       await lockUser(client, req.user.id);
-      return putItem(client, req.params.c, item, req.user.id, req.body.expectedUpdatedAt ?? item.updatedAt);
+      return putItem(client, req.params.c, item, req.user.id, req.body.expectedUpdatedAt);
     });
     res.json({ item: saved });
   });

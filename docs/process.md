@@ -16,6 +16,14 @@
 
 ---
 
+## 2026-11-25 — Hoàn tất kiểm thử API PostgreSQL (BE3, BE4, BE10)
+
+- **Người làm:** At.
+- **Đã xong:** đồng bộ `api/crud-reviews` với `main` sau DB/auth; sửa PUT dùng riêng `expectedUpdatedAt` tùy chọn, undo chỉ nhận `{ card }`, giữ auth trước collections và sửa Referrer-Policy theo môi trường. PR #37 chuyển base sang `main` để Leader review.
+- **Kiểm tra:** `npm ci` và `npm test` trên Node 24.22.3, PostgreSQL 16.11: **129 pass, 0 fail, 0 skip**. Gồm DB/migration, auth, 2 user không truy cập chéo, CRUD/filter, xung đột 409 khi ghi đồng thời, rollback, nhập lại không đè tiến độ, review/undo idempotent, chặn undo lượt cũ và giữ nội dung thẻ đã sửa.
+- **Quyết định:** máy này không có Docker; bổ sung `TEST_POSTGRES_BIN` để test tự tạo cluster PostgreSQL 16 tạm trên loopback, mật khẩu ngẫu nhiên, dọn sau test. Không đổi cách chạy Docker mặc định, không thêm dependency và không dùng dữ liệu ứng dụng. Cách chạy ở README.
+- **Tiếp theo:** Leader review/merge PR #37; nối frontend và AI theo phân công. Chưa sửa core/storage hoặc triển khai lên bản thật.
+
 ## 2026-11-25 — Đồng bộ Node 24 trong tài liệu
 
 - **Người làm:** Leader.

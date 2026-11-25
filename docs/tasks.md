@@ -16,15 +16,15 @@ Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong 
 
 ## Triển khai API theo phân công 4 vai
 
-At thực hiện phần API theo `backend-trien-khai.md`, được người dùng xác nhận ngày 2026-11-24. Nhánh `api/crud-reviews` dựa trên `db/init-auth` để dùng schema, pool và middleware thật.
+At thực hiện phần API theo `backend-trien-khai.md`, được người dùng xác nhận ngày 2026-11-24. Nhánh `api/crud-reviews` đã đồng bộ `main` sau khi DB/auth được merge (PR #36), dùng schema, pool và middleware thật.
 
 | Phần | Người | Trạng thái |
 |---|---|---|
 | Khung Express, health, static allowlist, JSON/error handler | At | Đã viết, chờ review |
-| CRUD, batch/delete, lọc theo bộ và thời gian (BE3, BE10) | At | Đang làm — cần chạy test PostgreSQL |
-| Chấm điểm và hoàn tác transaction (BE4) | At | Đang làm — cần chạy test PostgreSQL |
+| CRUD, batch/delete, lọc theo bộ và thời gian (BE3, BE10) | At | Xong, đã test PostgreSQL 16 — chờ review PR #37 |
+| Chấm điểm và hoàn tác transaction (BE4) | At | Xong, đã test PostgreSQL 16 — chờ review PR #37 |
 
-Các test PostgreSQL bắt buộc trước khi merge: máy chạy Docker, có image `postgres:16-alpine`, đặt `REQUIRE_TEST_POSTGRES=1` rồi chạy `npm test`. Thiếu Docker thì các test này được skip theo helper của nhánh DB/auth.
+Các test PostgreSQL bắt buộc trước khi merge: đặt `REQUIRE_TEST_POSTGRES=1` rồi chạy `npm test`, dùng Docker hoặc bộ chương trình PostgreSQL 16 riêng. Cách chạy đầy đủ ở [README › Chạy test](../README.md#chạy-test).
 
 ## Backend và AI
 

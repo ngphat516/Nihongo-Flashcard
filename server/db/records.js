@@ -48,12 +48,7 @@ export async function putItem(client, collection, item, userId, expected) {
   const current = await readItem(client, collection, item.id, userId);
   if (!current) return insertItem(client, collection, item, userId);
   if (collection === 'reviewLogs') return current;
-  if (current.updatedAt !== expected) {
-    // Gửi lại đúng nội dung đã lưu thành công không tạo xung đột giả.
-    const same = collections[collection].fields.every(f => f === 'updatedAt' || current[f] === item[f]);
-    if (same) return current;
-    throw conflict();
-  }
+  if (expected !== undefined && current.updatedAt !== expected) throw conflict();
   return updateItem(client, collection, {
     ...item, createdAt: current.createdAt, updatedAt: Math.max(Date.now(), current.updatedAt + 1),
   }, userId);

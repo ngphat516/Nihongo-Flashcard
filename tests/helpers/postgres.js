@@ -3,6 +3,7 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 import { promisify } from 'node:util';
 import pg from 'pg';
+import { postgresCommand, startLocalDatabase } from './postgres-local.js';
 
 const run = promisify(execFile);
 const image = 'postgres:16-alpine';
@@ -10,10 +11,15 @@ const image = 'postgres:16-alpine';
 // npm test không tải image. CI đặt REQUIRE_TEST_POSTGRES=1 để thiếu DB sẽ báo lỗi.
 export async function postgresUnavailable() {
   try {
+    if (process.env.TEST_POSTGRES_BIN) {
+      const { stdout } = await run(postgresCommand('postgres'), ['--version'], { timeout: 10_000 });
+      if (!/PostgreSQL\) 16\./.test(stdout)) throw new Error('Cần PostgreSQL 16.');
+      return false;
+    }
     await run('docker', ['image', 'inspect', '--format', '{{.Id}}', image], { timeout: 10_000 });
     return false;
   } catch {
-    const reason = 'Cần Docker đang chạy và image postgres:16-alpine (docker pull postgres:16-alpine).';
+    const reason = 'Cần Docker với image postgres:16-alpine, hoặc TEST_POSTGRES_BIN trỏ đến bin PostgreSQL 16.';
     if (process.env.REQUIRE_TEST_POSTGRES === '1') throw new Error(reason);
     return reason;
   }
@@ -21,6 +27,7 @@ export async function postgresUnavailable() {
 
 /** Mỗi bộ test có một PostgreSQL riêng trên loopback, dữ liệu ở tmpfs. Không đọc DATABASE_URL của máy. */
 export async function startTestDatabase() {
+  if (process.env.TEST_POSTGRES_BIN) return startLocalDatabase();
   const name = 'nholau-test-' + randomUUID();
   const password = randomBytes(32).toString('hex');
   const appPassword = randomBytes(32).toString('hex');

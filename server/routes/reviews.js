@@ -38,7 +38,7 @@ export function createReviewsRouter() {
   });
   router.post('/reviews/:id/undo', requireAuth, async (req, res) => {
     const id = uuid(req.params.id);
-    const restored = validateItem('cards', req.body?.restoredCard ?? req.body?.card);
+    const restored = validateItem('cards', req.body?.card);
     const card = await withTransaction(async client => {
       await lockUser(client, req.user.id);
       const current = await requireItem(client, 'cards', restored.id, req.user.id);

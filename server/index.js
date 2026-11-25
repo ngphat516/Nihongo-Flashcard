@@ -12,7 +12,7 @@ export function createApp() {
   const app = express();
   app.disable('x-powered-by');
   app.use((req, res, next) => {
-    res.set({ 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'X-Frame-Options': 'DENY' });
+    res.set({ 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': process.env.NODE_ENV === 'development' ? 'no-referrer-when-downgrade' : 'strict-origin-when-cross-origin', 'X-Frame-Options': 'DENY' });
     next();
   });
   app.use('/api', (req, res, next) => {

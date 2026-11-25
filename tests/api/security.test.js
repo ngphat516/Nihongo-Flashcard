@@ -22,7 +22,10 @@ test('API: static allowlist, header và auth thật ở production', async t => 
   assert.equal(page.status, 200);
   assert.equal(page.headers.get('x-content-type-options'), 'nosniff');
   assert.equal(page.headers.get('x-frame-options'), 'DENY');
-  assert.equal(page.headers.get('referrer-policy'), 'same-origin');
+  assert.equal(page.headers.get('referrer-policy'), 'strict-origin-when-cross-origin');
+  assert.equal((await request('/api/me')).status, 401);
+  process.env.NODE_ENV = 'development';
+  assert.equal((await request('/')).headers.get('referrer-policy'), 'no-referrer-when-downgrade');
   assert.equal(page.headers.get('access-control-allow-origin'), null);
 });
 
