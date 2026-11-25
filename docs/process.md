@@ -16,6 +16,12 @@
 
 ---
 
+## 2026-11-25 — Đồng bộ Node 24 trong tài liệu
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `docs/node-24`, chỉ tài liệu. `AGENTS.md` và [architecture.md](architecture.md) đổi Node 20 thành Node 24, khớp `engines` trong `package.json` (PR #36). `AGENTS.md` thêm bước `npm ci` trước `npm test`, vì test backend cần thư viện trong `node_modules`.
+- **Tiếp theo:** GĐ1.
+
 ## 2026-11-24 — API của At: khung server, CRUD và giao dịch
 
 - **Người làm:** At.
@@ -25,6 +31,7 @@
 - **Kiểm tra:** test HTTP/header/allowlist/auth production, mapper và validation qua. Có test PostgreSQL cho 2 user, rollback batch, xóa giữ lịch sử, hai máy sửa gây 409, chấm/undo đồng thời và idempotency. Máy chưa có Docker/PostgreSQL nên test tích hợp DB chưa chạy, chưa đánh dấu các task dữ liệu hoàn thành.
 - **Cách chạy:** `npm ci`, cấu hình biến môi trường theo tài liệu backend, chạy migration của Daika rồi `node server/index.js` (mặc định port 3000). Test bắt buộc DB: có image postgres:16-alpine và `REQUIRE_TEST_POSTGRES=1 npm test` (PowerShell gán biến môi trường trước lệnh).
 - **Tiếp theo:** chạy test PostgreSQL trên máy có Docker, Leader review các quyết định hợp đồng còn khác nhau giữa hai tài liệu và ghép phần AI của kakushi.
+
 ## 2026-11-25 — Vá kế hoạch triển khai backend (PR #35)
 
 - **Người làm:** Leader.
