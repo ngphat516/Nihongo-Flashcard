@@ -16,6 +16,20 @@
 
 ---
 
+## 2026-11-26 — Bỏ trường jlpt (L16)
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `core/bo-jlpt`.
+  - `core/models.js`: bỏ `JLPT_LEVELS`, `jlpt` trong typedef `Card`, `CARD_FIELDS`, `makeCard`, `validateCard`. Gửi `jlpt` vào `createCard`, `createCards`, `updateCard` thì bị bỏ qua, không lỗi.
+  - `core/migrate.js`: thẻ còn trường `jlpt` (tạo từ L6 đến trước L16) được chuyển một lần: xóa `jlpt`, giữ nội dung và tiến độ. `needsUpgrade` thêm `'jlpt' in card`, nếu không thẻ dạng L6 sẽ giữ `jlpt` mãi trong localStorage.
+  - `core/repo.js`, `pages/album/album.js`: chỉ sửa chú thích.
+  - `server/validate.js`: bỏ đoạn tạm `validateCard({ ...item, jlpt: '' })`, gọi thẳng `validateCard(item)`.
+  - `tests/repo.test.js`, `tests/scheduler.test.js`: bỏ `jlpt` khỏi thẻ mẫu; test "gửi `jlpt` thì bị bỏ qua"; test migrate thẻ dạng L6.
+  - Tài liệu: `product.md`, `architecture.md`.
+- **Quyết định:** không làm `validateReviewLog` ở client: server đã tự kiểm tra lượt ôn trong `server/validate.js`, BE5 không cần.
+- **Kiểm tra:** xem mô tả PR #44 (kết quả `npm test`, bản DB và thử trên trình duyệt).
+- **Tiếp theo:** BE5 (`storage.js` 2 chế độ).
+
 ## 2026-11-25 — Gom việc backend về một bảng
 
 - **Người làm:** Leader.
