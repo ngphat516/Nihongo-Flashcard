@@ -16,6 +16,13 @@
 
 ---
 
+## 2026-11-25 — Gom việc backend về một bảng
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `docs/gom-bang-backend`, chỉ `docs/`. Trong [tasks.md](tasks.md#bảng-việc-backend-và-ai), 4 bảng theo vai và mục "Backend đợt đầu" ở Đã xong gộp thành **một bảng** có cột Ai, xếp theo GĐ, giữ cả việc đã xong (Trạng thái **Xong** kèm số PR). Dòng "Xong khi" gom thành một danh sách dưới bảng. L16, L17 chỉ còn ở bảng này, bỏ khỏi bảng "Việc đang mở" cho khỏi trùng.
+- **Quyết định:** riêng bảng backend và AI giữ việc đã xong trong bảng, không chuyển xuống Đã xong, để tìm một chỗ là thấy hết.
+- **Tiếp theo:** như mục dưới: kakushi BE1, Leader L16, L17, BE5.
+
 ## 2026-11-25 — Chốt GĐ0, đồng bộ bảng việc theo 4 vai (GĐ0)
 
 - **Người làm:** Leader.
