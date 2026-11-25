@@ -31,8 +31,8 @@ GĐ4  Leader + kakushi BE7 │ mọi người BE8 │ At AI2 │ Leader BE11
 | Mã | Việc | Ai | Cần trước | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
 | GĐ0 | Chốt hợp đồng chung ([backend.md › Hợp đồng chung](backend.md#hợp-đồng-chung-gđ0)) | Cả nhóm | — | Bắt buộc | Chưa làm |
-| BE1 | Khung Docker + DB | kakushi | GĐ0 | Bắt buộc | Chưa làm |
-| BE2 | Đăng nhập Google + JWT, thay auth giả | Leader | BE1 | Bắt buộc | Chưa làm |
+| BE1 | Khung Docker + DB | kakushi | GĐ0 | Bắt buộc | Daika đã làm phần DB và migration theo [mục 4.1](backend-trien-khai.md#41-daika--database--jwt--google-oauth), chờ ghép khung |
+| BE2 | Đăng nhập Google + JWT, thay auth giả | Leader | BE1 | Bắt buộc | Daika đã làm middleware và 3 route auth, chờ ghép Express và đăng nhập từ trình duyệt |
 | BE3 | CRUD theo collection | Daika | BE1 | Bắt buộc | Chưa làm |
 | BE4 | Route transaction | Daika | BE3 | Bắt buộc | Chưa làm |
 | BE5 | `core/storage.js` 2 bản | Leader | BE3, BE2 | Bắt buộc | Chưa làm |

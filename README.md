@@ -33,11 +33,35 @@ ES modules **không chạy** khi mở file trực tiếp (`file://...`), nên ph
 
 ## Chạy test
 
-Cần Node 20 trở lên (chỉ để chạy test, app không cần Node).
+Cần Node.js 24 trở lên. Cài thư viện từ lockfile trước khi chạy test.
 
 ```bash
+npm ci
 npm test
 ```
+
+Hai bộ test tích hợp tự tạo PostgreSQL 16 trên loopback, dùng mật khẩu sinh ngẫu nhiên và xóa container sau khi chạy. Nếu Docker hoặc image chưa có, `npm test` ghi rõ các bộ đã bỏ qua. Muốn bắt buộc chạy cả hai, dùng:
+
+```bash
+docker pull postgres:16-alpine
+REQUIRE_TEST_POSTGRES=1 npm test
+```
+
+Test xác minh ID token bằng khóa RSA sinh tại chỗ. Test không cần tài khoản Google, Gemini hay `DATABASE_URL` của máy.
+
+## Chạy migration PostgreSQL
+
+Chạy `npm run migrate` trong tiến trình riêng với `DATABASE_URL` của role migration sở hữu database. Đặt `PGSSLMODE=disable` trong mạng Docker nội bộ hoặc `require` khi nối DB từ xa. Nếu DB dùng CA riêng, cấp chứng chỉ CA cho Node qua `NODE_EXTRA_CA_CERTS`.
+
+Cho ứng dụng một role đăng nhập riêng, không sở hữu database/bảng và không có quyền quản trị. Trên database mới của PostgreSQL 16, sau khi chạy migration, chủ bảng cấp quyền như sau (thay `nholau_app` bằng role đã tạo):
+
+```sql
+GRANT USAGE ON SCHEMA public TO nholau_app;
+GRANT SELECT, INSERT, UPDATE, DELETE
+  ON public.users, public.decks, public.cards, public.review_logs TO nholau_app;
+```
+
+Container app chỉ nhận `DATABASE_URL` của role này. Bảng `schema_migrations` thuộc role migration. Khi có migration thêm bảng ứng dụng, chủ bảng cấp quyền cho bảng mới.
 
 ## Tài liệu
 

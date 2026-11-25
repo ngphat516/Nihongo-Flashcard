@@ -29,6 +29,17 @@
 - **Quyết định:** không đổi phân công, giữ nguyên như PR #35.
 - **Tiếp theo:** GĐ1.
 
+## 2026-11-24 — Database và xác thực Google của Daika (BE1, BE2)
+
+- **Người làm:** Banana (`tanphat-trinh`), nhánh `db/init-auth` từ `c417782`, theo mục 4.1 của [kế hoạch bốn vai](backend-trien-khai.md).
+- **Đã xong:**
+  - Migration `001_init.sql`, sổ migration, pool PostgreSQL và `withTransaction`. Ba route đăng nhập Google, đăng xuất và đọc hồ sơ dùng JWT HS256 trong cookie 7 ngày. Middleware đối chiếu phiên bản trong DB trên mỗi request và gắn `req.user.id`.
+  - Lần đầu kiểm thử trên Node 20.20.2 với PostgreSQL 16.16 đạt 122/122. Đã thử migration đồng thời, rollback, quyền DML của role app, hai chủ bộ, thu hồi phiên riêng từng người, cờ dev trên production và giới hạn IP. Kiểm thử TLS xác nhận DB từ chối chứng chỉ chưa tin cậy và kết nối được khi cấp đúng CA.
+  - Ngày 25/11, chạy lại `REQUIRE_TEST_POSTGRES=1 npm test` trên Node.js 24.22.1 với PostgreSQL 16.16. Cả 122 test đều đạt, không bỏ qua test nào. `npm audit --omit=dev` phát hiện 0 lỗ hổng.
+- **Quyết định:** giữ `pgcrypto` theo schema trong [backend.md](backend.md#database). README và cấu hình npm dùng Node.js 24 trở lên theo PR #39.
+- **Tiếp theo:** At gắn `app.use('/api', createAuthRouter())` trước router collection, dùng `requireAuth` cho route dữ liệu. kakushi nối hai role DB và Tunnel. Leader nối Google Identity Services trên giao diện. Cách chạy migration và test nằm trong [README](../README.md#chạy-migration-postgresql).
+- **Vướng mắc:** luồng đăng nhập bằng tài khoản Google thật qua Tunnel chờ ghép frontend và hạ tầng. Test xác minh chữ ký bằng thư viện Google với khóa thử nghiệm cục bộ.
+
 ## 2026-11-22 — Chốt hạ tầng backend, AI và chia việc
 
 - **Người làm:** Leader.
