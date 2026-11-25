@@ -28,7 +28,7 @@ App web học tiếng Nhật bằng flashcard, lịch ôn theo SM-2 kiểu Anki.
 
 ## Chạy
 
-- Test: `npm test` (Node 20+).
+- Test: `npm ci` rồi `npm test` (Node 24+).
 - Server: `python -m http.server 5500`, mở http://localhost:5500. Thêm `?seed` để có dữ liệu mẫu, `?reset` để xóa.
 
 ## Xong việc
