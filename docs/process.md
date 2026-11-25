@@ -23,6 +23,18 @@
 - **Kiểm tra:** Node 20.20.2, PostgreSQL 16.16, `REQUIRE_TEST_POSTGRES=1 npm test` đạt 122/122, không có test bỏ qua. Đã thử migration đồng thời, rollback rồi chạy lại, role app chỉ có quyền DML, hai chủ bộ, thu hồi phiên riêng từng người, cờ dev trên production và giới hạn IP. Thử TLS riêng với PostgreSQL thật xác nhận từ chối chứng chỉ tự ký và chấp nhận khi tin đúng CA.
 - **Tiếp theo:** At gắn `app.use('/api', createAuthRouter())` trước router collection, dùng `requireAuth` cho route dữ liệu. kakushi nối hai role DB và Tunnel, Leader nối Google Identity Services trên giao diện. Cách chạy migration và test nằm trong [README](../README.md#chạy-migration-postgresql).
 - **Chưa kiểm chứng:** đăng nhập bằng tài khoản Google thật từ origin qua Tunnel. Test xác minh chữ ký bằng thư viện Google với khóa thử nghiệm cục bộ.
+## 2026-11-25 — Vá kế hoạch triển khai backend (PR #35)
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `docs/va-ke-hoach-backend`, chỉ tài liệu. Vá 6 điểm trong [backend-trien-khai.md](backend-trien-khai.md), sửa bảng Idempotency trong [backend.md](backend.md):
+  1. Hoàn tác chỉ nhận `{ card }` (thẻ trước lượt ôn), không khôi phục từ `review_logs` vì bảng thiếu `due`, `step`, `reps`, `lapses`, `last_review`.
+  2. Thứ tự gắn router: `collections` luôn để cuối, nếu không `GET /api/me` khớp `/api/:c` và trả `404`.
+  3. `409`: `storage.put` thêm tham số `{ expectedUpdatedAt }`, vì `repo.js` gán `updatedAt` mới trước khi gọi `put` nên mất giá trị cũ.
+  4. `PUT` là upsert có chặn `user_id`, `batch` chỉ thêm mới (`DO NOTHING`), để đưa dữ liệu khách lên lần 2 không đè tiến độ trên server.
+  5. `Referrer-Policy` đổi từ `same-origin` sang `strict-origin-when-cross-origin` (dev: `no-referrer-when-downgrade`), COOP chỉ dùng `same-origin-allow-popups`, để nút đăng nhập Google chạy được.
+  6. Node 24 thay Node 20 (Node 20 hết hỗ trợ từ 30/4/2026).
+- **Quyết định:** không đổi phân công, giữ nguyên như PR #35.
+- **Tiếp theo:** GĐ1.
 
 ## 2026-11-22 — Chốt hạ tầng backend, AI và chia việc
 
