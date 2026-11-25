@@ -1,6 +1,7 @@
 # Ai phải duyệt PR đụng vào folder nào (GitHub tự gắn reviewer).
 # Dòng viết sau được ưu tiên hơn dòng viết trước.
-# Leader: ngphat516 · Daika (Album): tanphat-trinh · kakushi (Tạo thẻ): phattnt · At (Học): Peter-Kohi
+# Leader: ngphat516 · Daika (Album; backend: database + đăng nhập): tanphat-trinh
+# kakushi (Tạo thẻ; backend: AI + hạ tầng): phattnt · At (Học; backend: API): Peter-Kohi
 
 * @ngphat516
 
@@ -11,9 +12,22 @@
 /core/   @ngphat516
 /styles/ @ngphat516
 
-# Backend (xem docs/backend.md)
-/server/            @ngphat516
-/db/                @ngphat516
-/docker-compose.yml @phattnt @ngphat516
-/Dockerfile         @phattnt @ngphat516
-/server/ai/         @Peter-Kohi @ngphat516
+# Backend (xem docs/backend-trien-khai.md › 2.1)
+/server/                @ngphat516
+/server/index.js        @Peter-Kohi @ngphat516
+/server/errors.js       @Peter-Kohi @ngphat516
+/server/validate.js     @Peter-Kohi @ngphat516
+/server/routes/         @Peter-Kohi @ngphat516
+/server/db/             @Peter-Kohi @ngphat516
+/server/db/pool.js      @tanphat-trinh @ngphat516
+/server/auth/           @tanphat-trinh @ngphat516
+/server/routes/auth.js  @tanphat-trinh @ngphat516
+/server/ai/             @phattnt @ngphat516
+/server/routes/ai.js    @phattnt @ngphat516
+/db/                    @tanphat-trinh @ngphat516
+/db/migrations/002_ai_usage.sql @phattnt @ngphat516
+/tests/api/             @Peter-Kohi @ngphat516
+/tests/api/auth.test.js @tanphat-trinh @ngphat516
+/docker-compose.yml     @phattnt @ngphat516
+/Dockerfile             @phattnt @ngphat516
+/.env.example           @phattnt @ngphat516

@@ -3,3 +3,10 @@ node_modules/
 Thumbs.db
 *.log
 .vercel
+
+# Bí mật và dữ liệu máy chạy server (không bao giờ commit)
+.env
+.env.*
+!.env.example
+backups/
+docker-compose.override.yml

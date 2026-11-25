@@ -16,12 +16,27 @@
 
 ---
 
-## 2026-11-24 — Lật thẻ dọc và chuyển thẻ 3D (S8)
+## 2026-11-25 — Chốt GĐ0, đồng bộ bảng việc theo 4 vai (GĐ0)
 
-- **Người làm:** At.
-- **Đã xong:** theo lựa chọn người dùng, lật đáp án theo trục X (trên–dưới), chuyển thẻ bằng mũi tên có trượt/nghiêng nhẹ 420ms theo hướng. Animation điều hướng bị hủy khi hiện thẻ mới; kết thúc trở về transform none. Mobile bật preserve-3d cho cả trạng thái đã lật để mặt sau không bị ngược. Tắt chuyển động 3D khi prefers-reduced-motion bật.
-- **Kiểm tra:** Chrome 1440×1000 và 375×800, Space lật hai mặt, mũi tên chuyển liên tiếp và reset, không có lỗi Console. Ở mobile không cuộn ngang, bốn nút chấm trên nav. Chế độ giảm chuyển động có transform none. Ảnh motion-pc-*.jpg và motion-mobile-*.jpg.
-- **Tiếp theo:** Leader review nhánh feature/study-motion.
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `docs/dong-bo-tasks-gd0`, chỉ tài liệu, `.github/` và `.gitignore`, không sửa code.
+  - [tasks.md](tasks.md#backend-và-ai): bỏ mục tạm "Triển khai API theo phân công 4 vai", bảng BE/AI và mục chi tiết chia theo ngày 2026-11-22; viết lại phần Backend và AI theo 4 vai của [backend-trien-khai.md](backend-trien-khai.md) (sơ đồ thứ tự có mã task, bảng 4 vai, mỗi vai một bảng việc và dòng "Xong khi"). Thêm mã BE12 (DB), BE13 (khung Express), BE14 (test 2 user trên DB thật), L17 (Secret scanning). Việc đã xong chuyển xuống Đã xong.
+  - [backend.md](backend.md): Tech stack đổi Express 5, `pg`, đăng nhập, migration sang Đã chốt, thêm dòng Node.js 24 và Chế độ khách; Hợp đồng chung trỏ sang bản đầy đủ ở mục 2 của backend-trien-khai.md; Chưa chốt chỉ còn hạn nộp và vị trí giao diện AI. `backend-trien-khai.md` ghi đã chốt, gắn mã task vào mục 4 và 5. `product.md`, `AGENTS.md` (`api/` → `server/`, thêm backend-trien-khai.md) sửa theo.
+  - `.gitignore` thêm `.env`, `.env.*`, `!.env.example`, `backups/`, `docker-compose.override.yml`. Theo PR #35 file này của kakushi, nhưng server đã đọc `JWT_SECRET`, `DATABASE_URL`, `GOOGLE_CLIENT_ID` từ biến môi trường nên Leader làm luôn. Đã kiểm tra `git ls-files`: chưa có file `.env` nào trong repo.
+  - `.github/CODEOWNERS`: phần Backend gắn reviewer theo 4 vai (mục 2.1); `server/errors.js`, `server/validate.js` giao At (người viết).
+  - Sắp lại các mục 2026-11-24 và 2026-11-25 bên dưới cho đúng "mới nhất ở trên", không sửa chữ bên trong.
+- **Quyết định (GĐ0, Leader, 2026-11-25):**
+  1. Chia việc y như [backend-trien-khai.md](backend-trien-khai.md) (PR #35): đúng 4 vai, phạm vi file, lộ trình. Thay cho cách chia ngày 2026-11-22. Không đổi người làm, không chuyển việc sang GĐ khác.
+  2. Đã chốt: Express 5, `pg` + SQL có tham số, Google OAuth + JWT `HS256` trong cookie `nholau_session`, migration SQL đánh số + `db/migrate.js`, Node.js 24. Chế độ khách: giữ localStorage; đăng nhập lần đầu mà máy có dữ liệu thì hỏi "Đưa dữ liệu trên máy lên tài khoản?".
+  3. Còn chưa chốt: hạn nộp phần backend; vị trí giao diện AI (chốt sau AI3, AI4).
+- **Trạng thái thật** (kiểm tra ở `084b3b7`):
+  - PR #36 (Daika): `001_init.sql`, `db/migrate.js`, `server/db/pool.js`, `server/auth/*`, `server/routes/auth.js`. Đã merge.
+  - PR #37 (At): `server/index.js`, health, collections, reviews, `tests/api/*`. Đã merge; `npm test` trên PostgreSQL 16 thật 129/129.
+  - PR #38 (At): lật thẻ dọc, chuyển thẻ 3D (S8). Đã merge.
+  - PR #39, #40 (Leader): vá kế hoạch, đồng bộ Node 24. Đã merge.
+  - Chưa có: Docker, `.env.example`, `server/ai/`, `002_ai_usage.sql`, pdf.js; L16; BE5–BE7 (frontend vẫn chỉ dùng localStorage).
+- **Tiếp theo:** kakushi làm BE1 (đang chặn chạy bằng Docker và deploy; nhớ tạo role `nholau_app` và cấp quyền, `001_init.sql` chưa làm việc này). Leader làm L16, BE5 và tự kiểm tra L17 trong Settings.
+
 ## 2026-11-25 — Hoàn tất kiểm thử API PostgreSQL (BE3, BE4, BE10)
 
 - **Người làm:** At.
@@ -36,16 +51,6 @@
 - **Đã xong:** nhánh `docs/node-24`, chỉ tài liệu. `AGENTS.md` và [architecture.md](architecture.md) đổi Node 20 thành Node 24, khớp `engines` trong `package.json` (PR #36). `AGENTS.md` thêm bước `npm ci` trước `npm test`, vì test backend cần thư viện trong `node_modules`.
 - **Tiếp theo:** GĐ1.
 
-## 2026-11-24 — API của At: khung server, CRUD và giao dịch
-
-- **Người làm:** At.
-- **Đã viết:** `api/crud-reviews` dựa trên `db/init-auth` (schema/pool/auth của Daika). `createApp()` không listen khi import; health kiểm tra DB; allowlist file tĩnh, chặn file test/ảnh review, header bảo mật, JSON tối đa 2 MB, lỗi JSON thống nhất. Mapper BIGINT ↔ số, không lộ user_id; kiểm tra dữ liệu theo core và kiểm tra đầy đủ tiến độ/log phía server.
-- **Dữ liệu:** CRUD/batch/delete và lọc cards theo deckId, reviewLogs theo from/to; lọc user_id ở mọi thao tác; khóa dòng users trong transaction để tuần tự hóa ghi của cùng tài khoản. Tạo/batch dùng UUID idempotent; batch không đè bản đang có; PUT sửa nhận expectedUpdatedAt (fallback updatedAt). Chấm điểm chỉ cập nhật tiến độ, giữ nội dung hiện tại; replay log không chấm lại; undo hỗ trợ card/restoredCard, chặn hoàn tác lượt cũ sau khi đã ôn tiếp; xóa bộ giữ log.
-- **Tương thích:** L16 chưa có trên nhánh nền, validateCard tạm nhận jlpt rỗng khi gọi validator nhưng API/DB không lưu trường này. Không sửa core, schema, auth hoặc phần AI.
-- **Kiểm tra:** test HTTP/header/allowlist/auth production, mapper và validation qua. Có test PostgreSQL cho 2 user, rollback batch, xóa giữ lịch sử, hai máy sửa gây 409, chấm/undo đồng thời và idempotency. Máy chưa có Docker/PostgreSQL nên test tích hợp DB chưa chạy, chưa đánh dấu các task dữ liệu hoàn thành.
-- **Cách chạy:** `npm ci`, cấu hình biến môi trường theo tài liệu backend, chạy migration của Daika rồi `node server/index.js` (mặc định port 3000). Test bắt buộc DB: có image postgres:16-alpine và `REQUIRE_TEST_POSTGRES=1 npm test` (PowerShell gán biến môi trường trước lệnh).
-- **Tiếp theo:** chạy test PostgreSQL trên máy có Docker, Leader review các quyết định hợp đồng còn khác nhau giữa hai tài liệu và ghép phần AI của kakushi.
-
 ## 2026-11-25 — Vá kế hoạch triển khai backend (PR #35)
 
 - **Người làm:** Leader.
@@ -58,6 +63,23 @@
   6. Node 24 thay Node 20 (Node 20 hết hỗ trợ từ 30/4/2026).
 - **Quyết định:** không đổi phân công, giữ nguyên như PR #35.
 - **Tiếp theo:** GĐ1.
+
+## 2026-11-24 — Lật thẻ dọc và chuyển thẻ 3D (S8)
+
+- **Người làm:** At.
+- **Đã xong:** theo lựa chọn người dùng, lật đáp án theo trục X (trên–dưới), chuyển thẻ bằng mũi tên có trượt/nghiêng nhẹ 420ms theo hướng. Animation điều hướng bị hủy khi hiện thẻ mới; kết thúc trở về transform none. Mobile bật preserve-3d cho cả trạng thái đã lật để mặt sau không bị ngược. Tắt chuyển động 3D khi prefers-reduced-motion bật.
+- **Kiểm tra:** Chrome 1440×1000 và 375×800, Space lật hai mặt, mũi tên chuyển liên tiếp và reset, không có lỗi Console. Ở mobile không cuộn ngang, bốn nút chấm trên nav. Chế độ giảm chuyển động có transform none. Ảnh motion-pc-*.jpg và motion-mobile-*.jpg.
+- **Tiếp theo:** Leader review nhánh feature/study-motion.
+
+## 2026-11-24 — API của At: khung server, CRUD và giao dịch
+
+- **Người làm:** At.
+- **Đã viết:** `api/crud-reviews` dựa trên `db/init-auth` (schema/pool/auth của Daika). `createApp()` không listen khi import; health kiểm tra DB; allowlist file tĩnh, chặn file test/ảnh review, header bảo mật, JSON tối đa 2 MB, lỗi JSON thống nhất. Mapper BIGINT ↔ số, không lộ user_id; kiểm tra dữ liệu theo core và kiểm tra đầy đủ tiến độ/log phía server.
+- **Dữ liệu:** CRUD/batch/delete và lọc cards theo deckId, reviewLogs theo from/to; lọc user_id ở mọi thao tác; khóa dòng users trong transaction để tuần tự hóa ghi của cùng tài khoản. Tạo/batch dùng UUID idempotent; batch không đè bản đang có; PUT sửa nhận expectedUpdatedAt (fallback updatedAt). Chấm điểm chỉ cập nhật tiến độ, giữ nội dung hiện tại; replay log không chấm lại; undo hỗ trợ card/restoredCard, chặn hoàn tác lượt cũ sau khi đã ôn tiếp; xóa bộ giữ log.
+- **Tương thích:** L16 chưa có trên nhánh nền, validateCard tạm nhận jlpt rỗng khi gọi validator nhưng API/DB không lưu trường này. Không sửa core, schema, auth hoặc phần AI.
+- **Kiểm tra:** test HTTP/header/allowlist/auth production, mapper và validation qua. Có test PostgreSQL cho 2 user, rollback batch, xóa giữ lịch sử, hai máy sửa gây 409, chấm/undo đồng thời và idempotency. Máy chưa có Docker/PostgreSQL nên test tích hợp DB chưa chạy, chưa đánh dấu các task dữ liệu hoàn thành.
+- **Cách chạy:** `npm ci`, cấu hình biến môi trường theo tài liệu backend, chạy migration của Daika rồi `node server/index.js` (mặc định port 3000). Test bắt buộc DB: có image postgres:16-alpine và `REQUIRE_TEST_POSTGRES=1 npm test` (PowerShell gán biến môi trường trước lệnh).
+- **Tiếp theo:** chạy test PostgreSQL trên máy có Docker, Leader review các quyết định hợp đồng còn khác nhau giữa hai tài liệu và ghép phần AI của kakushi.
 
 ## 2026-11-24 — Database và xác thực Google của Daika (BE1, BE2)
 

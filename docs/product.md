@@ -115,7 +115,7 @@ Các quyết định này đã chốt nhưng code chưa có. Ai làm thì cập 
 Hỏi Leader trước khi làm các phần này.
 
 - **Giai đoạn 2:** dạng bài tập nào (trắc nghiệm, gõ cách đọc, nối cặp, điền chỗ trống), kết quả có tính vào lịch ôn SM-2 không; "ghi chú" gồm những gì.
-- **Backend:** Đã chốt: Node.js, PostgreSQL 16 chạy bằng Docker trên máy của kakushi, ra mạng qua Cloudflare Tunnel; AI tạo thẻ gọi Gemini. Thiết kế ở [backend.md](backend.md). Còn chưa chốt (chế độ khách, hạn nộp, vị trí giao diện AI): xem [backend.md › Chưa chốt](backend.md#chưa-chốt).
+- **Backend:** Đã chốt: Node.js, PostgreSQL 16 chạy bằng Docker trên máy của kakushi, ra mạng qua Cloudflare Tunnel; AI tạo thẻ gọi Gemini. Thiết kế ở [backend.md](backend.md). Chế độ khách: giữ localStorage cho người chưa đăng nhập (chốt 2026-11-25). Còn chưa chốt (hạn nộp, vị trí giao diện AI): xem [backend.md › Chưa chốt](backend.md#chưa-chốt).
 
 ## Không làm
 

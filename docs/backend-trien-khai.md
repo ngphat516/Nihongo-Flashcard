@@ -1,6 +1,6 @@
 # Kế hoạch triển khai Backend & AI (chia theo 4 vai)
 
-> **Lưu ý:** Tài liệu này tổ chức lại việc triển khai backend và AI theo **4 vai trò** để nhóm dễ chia nhau làm song song và bàn giao cho dev/agent thực thi. Tài liệu này **không ghi đè** [`docs/tasks.md`](tasks.md) và [`docs/backend.md`](backend.md). Nếu cả nhóm thống nhất phân công này ở buổi **GĐ0**, Leader sẽ cập nhật lại [`docs/tasks.md`](tasks.md) và [`.github/CODEOWNERS`](../.github/CODEOWNERS).
+> **Đã chốt ở buổi GĐ0 (2026-11-25).** Hướng dẫn chi tiết từng vai; mã task và trạng thái xem [tasks.md](tasks.md#backend-và-ai).
 
 Mọi quyết định kỹ thuật (PostgreSQL 16, Node.js + Express, Docker Compose, Cloudflare Tunnel, Google OAuth + JWT cookie, Gemini Flash, bảo mật, idempotency) đều bám theo [`docs/backend.md`](backend.md).
 
@@ -149,7 +149,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
 | **CRUD** | `GET /api/:c` | `?deckId=` (cho `cards`), `?from=&to=` (cho `reviewLogs`) | `200 { items: [...] }` | `:c` ∈ `{decks, cards, reviewLogs}`, khác → `404` |
 | **CRUD** | `GET /api/:c/:id` | — | `200 { item: {...} }` hoặc `404` | Lọc `AND user_id = $me`; của người khác vẫn trả `404` |
 | **CRUD** | `PUT /api/:c/:id` | Body là object item (`camelCase`), kèm `expectedUpdatedAt?` khi sửa | `200 { item: {...} }` hoặc `409` | Upsert có chặn chủ sở hữu (`ON CONFLICT (id) DO UPDATE … WHERE user_id = $me`, 0 dòng → `404`); có `expectedUpdatedAt` thì kiểm tra `updated_at` |
-| **CRUD** | `POST /api/:c/batch` | `{ items: [...] }` | `200 { items: [...] }` | **Chỉ thêm mới** (`ON CONFLICT (id) DO NOTHING`, không ghi đè); id thuộc user khác → `404`; chạy trong 1 transaction, 1 item lỗi → rollback toàn bộ |
+| **CRUD** | `POST /api/:c/batch` | `{ items: [...] }` | `200 { items: [...] }` | **Chỉ thêm mới** (`ON CONFLICT (id) DO NOTHING`, giữ nguyên bản đã có); id thuộc user khác → `404`; chạy trong 1 transaction, 1 item lỗi → rollback toàn bộ |
 | **CRUD** | `DELETE /api/:c/:id` | — | `204` | Idempotent: đã xóa rồi vẫn trả `204` |
 | **CRUD** | `POST /api/:c/delete` | `{ ids: [...] }` | `204` | Xóa nhiều bản ghi thuộc `user_id = $me` trong 1 transaction |
 | **Data** | `DELETE /api/me/data` | — | `204` | Xóa toàn bộ `review_logs`, `cards`, `decks` của `req.user.id` trong 1 transaction |
@@ -174,7 +174,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
 
 #### Việc cần làm theo bước
 
-1. **Viết `db/migrations/001_init.sql`**
+1. **Viết `db/migrations/001_init.sql`** (BE12)
    - Tạo extension `pgcrypto` (`gen_random_uuid()` cho `users.id`).
    - Tạo đủ 4 bảng `users`, `decks`, `cards`, `review_logs` đúng như schema ở [`docs/backend.md#database`](backend.md#database):
      - **`users`**: `id UUID PK`, `google_sub TEXT NOT NULL UNIQUE`, `email`, `name`, `avatar_url`, `token_version INT NOT NULL DEFAULT 0`, `created_at BIGINT NOT NULL`.
@@ -183,18 +183,18 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
      - **`review_logs`**: `id UUID PK`, `user_id`, `card_id` (**không FK tới `cards`** để xóa bộ/thẻ vẫn giữ lịch sử ôn), `deck_id`, `rating (1..4)`, `prev_state`, `prev_interval`, `new_interval`, `prev_ease`, `reviewed_at`, `time_ms`.
    - Tạo đủ các index: `decks_user_idx`, `cards_deck_idx`, `cards_due_idx`, `logs_time_idx`, `logs_card_idx`.
 
-2. **Viết `db/migrate.js` & tách role DB**
+2. **Viết `db/migrate.js` & tách role DB** (BE12; tạo role cho bản Docker: BE1)
    - Tạo bảng `schema_migrations (filename TEXT PRIMARY KEY, applied_at BIGINT NOT NULL)`.
    - Đọc `db/migrations/*.sql` sắp xếp tăng dần, bỏ qua file đã chạy, chạy mỗi file mới trong một `BEGIN ... COMMIT` (chạy lại nhiều lần vẫn an toàn).
    - Thêm script trong `package.json`: `"migrate": "node db/migrate.js"`.
    - Quy ước vận hành: tài khoản DB cho container `app` chỉ cấp quyền `SELECT, INSERT, UPDATE, DELETE` trên các bảng (không cấp `CREATE/DROP/ALTER`); việc chạy migration dùng tài khoản admin/migration riêng.
 
-3. **Viết `server/db/pool.js`**
+3. **Viết `server/db/pool.js`** (BE12)
    - Tạo **duy nhất một `pg.Pool`** đọc `process.env.DATABASE_URL`.
    - Xử lý TLS theo `process.env.PGSSLMODE`: nếu `PGSSLMODE === 'require'` thì truyền `ssl: { rejectUnauthorized: true }` (hoặc theo cấu hình cert), còn `'disable'` thì tắt SSL (cho mạng nội bộ Docker).
    - Export `query(text, params)`, `withTransaction(async (client) => { ... })` tự `BEGIN`, `COMMIT`, và `ROLLBACK` khi có lỗi rồi `client.release()`.
 
-4. **Viết `server/auth/` và `server/routes/auth.js`**
+4. **Viết `server/auth/` và `server/routes/auth.js`** (BE2)
    - **`google.js`**: dùng `OAuth2Client` từ `google-auth-library` gọi `verifyIdToken({ idToken, audience: process.env.GOOGLE_CLIENT_ID })`. Kiểm tra đủ: `aud === GOOGLE_CLIENT_ID`, `iss` là `accounts.google.com` hoặc `https://accounts.google.com`, chưa hết hạn `exp`, và `payload.email_verified === true`.
    - **`routes/auth.js` (`POST /api/auth/google`)**:
      - Gắn rate-limit theo IP lấy từ `req.headers['cf-connecting-ip'] || req.ip` (VD: tối đa 20 lần / 15 phút / IP; quá thì `429`).
@@ -239,7 +239,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
 
 #### Việc cần làm theo bước
 
-1. **Khung Express & Bảo mật HTTP (`server/index.js`)**
+1. **Khung Express & Bảo mật HTTP (`server/index.js`)** (BE13)
    - Tách hàm `export function createApp()` (không gọi `app.listen()` khi import trong test) và chỉ `app.listen(PORT)` khi chạy trực tiếp `node server/index.js`.
    - **Không bật `trust proxy` bừa bãi hoặc cấu hình cẩn thận cho `CF-Connecting-IP`**; tuyệt đối **không** bật `Access-Control-Allow-Origin: *`.
    - **Header bảo mật cho mọi response:**
@@ -265,7 +265,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
      - Mọi đường dẫn nhạy cảm (`/.env`, `/.env.example`, `/server/*`, `/db/*`, `/package.json`, `/tests/*`) phải rơi vào `404` — không dùng `express.static('.')` trên gốc repo!
    - **Error handler cuối cùng:** log lỗi chi tiết (`console.error`) ở server, chỉ trả `{ error: { code, message } }` cho client — không trả `err.stack`, SQL hay tên bảng.
 
-2. **Chuyển đổi dữ liệu & Validate (`server/db/mapper.js`)**
+2. **Chuyển đổi dữ liệu & Validate (`server/db/mapper.js`)** (BE3)
    - Import trực tiếp `validateDeck`, `validateCard`, `COLLECTIONS`, `ValidationError` từ `../../core/models.js` (cả repo đã là `"type": "module"` nên Node import thẳng).
    - Viết hàm chuyển đổi rõ ràng (chỉ pick đúng danh sách trường cho phép, **vứt bỏ mọi trường lạ** kể cả `userId` hay `jlpt`):
      - `toDbDeck` / `fromDbDeck`
@@ -274,7 +274,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
    - `expectedUpdatedAt` đọc riêng từ body, không thuộc danh sách trường được ghi vào DB.
    - Kiểm tra mọi `:id` và `deckId` phải đúng định dạng UUID trước khi đưa vào SQL (sai định dạng → `400 VALIDATION_ERROR` thay vì để Postgres ném lỗi syntax `22P02`).
 
-3. **CRUD theo collection (`server/routes/collections.js`)**
+3. **CRUD theo collection (`server/routes/collections.js`)** (BE3; lọc `?deckId=`, `?from=&to=`: BE10)
    - Whitelist `:c` chỉ nhận đúng 3 giá trị: `decks`, `cards`, `reviewLogs`. Giá trị khác → `404`.
    - **Mọi câu SQL `SELECT`, `UPDATE`, `DELETE` đều phải kèm `AND user_id = $me`**, dùng `$1, $2` tham số hóa. Không tìm thấy bản ghi (kể cả bản ghi thuộc về user khác) → trả `404 NOT_FOUND`.
    - **`GET /api/:c`:**
@@ -305,7 +305,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
    - **`DELETE /api/me/data`:**
      - Trong 1 transaction: `DELETE FROM review_logs WHERE user_id = $1`, `DELETE FROM cards WHERE user_id = $1`, `DELETE FROM decks WHERE user_id = $1`.
 
-4. **Route Transaction (`server/routes/reviews.js`)**
+4. **Route Transaction (`server/routes/reviews.js`)** (BE4)
    - **`POST /api/reviews`:**
      - Nhận `{ card, log }` (đều đã có `id` UUID do trình duyệt tạo, đã tính SM-2 ở trình duyệt).
      - Validate `card` bằng `validateCard` và validate `log` (`rating` 1..4, `prevState`, `reviewedAt`, `timeMs`).
@@ -322,7 +322,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
 
 #### Bẫy cần tránh & Checklist nghiệm thu (At)
 - **Chống cướp UUID xuyên user:** Nếu user B gửi `PUT /api/decks/<id_cua_user_A>`, câu `ON CONFLICT (id) DO UPDATE` có `WHERE decks.user_id = $me` sẽ không cập nhật được dòng nào (0 rows returned) → phải bắt trường hợp này và trả `404`, tuyệt đối không cho user B ghi đè dữ liệu user A. Với `POST /api/:c/batch`, user B gửi item có id của user A thì `DO NOTHING` bỏ qua, bước `SELECT … user_id <> $me` phát hiện ra → rollback cả lượt, trả `404`, dữ liệu user A còn nguyên.
-- **Kế hoạch test 2 user (bắt buộc cho mọi route mới):**
+- **Kế hoạch test 2 user (bắt buộc cho mọi route mới; khung ở BE13, chạy lại trên DB Docker ở BE14):**
   - Tạo 2 user giả `USER_A` và `USER_B` (qua `X-Dev-User` khi test tích hợp hoặc token JWT test).
   - Với mọi route (`GET`, `PUT`, `POST /batch`, `DELETE`, `POST /delete`, `POST /reviews`, `POST /reviews/:id/undo`): User A tạo dữ liệu → User B đọc/sửa/xóa/chấm điểm/gắn thẻ vào `deckId` của User A đều phải trả `404` và dữ liệu User A còn nguyên.
   - Test idempotency: gọi `POST /api/reviews` 2 lần với cùng `log.id` → chỉ có 1 dòng `review_logs`, `reps` chỉ tăng 1.
@@ -342,18 +342,18 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
 
 #### Việc cần làm theo bước
 
-1. **Làm `L16` — Bỏ trường `jlpt` (làm ngay ở GĐ1 trước khi chốt backend)**
+1. **Làm `L16` — Bỏ trường `jlpt` (làm ngay ở GĐ1 trước khi chốt backend)** (L16)
    - `core/models.js`: xóa `JLPT_LEVELS`, `jlpt` khỏi JSDoc `@typedef Card`, `CARD_FIELDS`, `makeCard`, `validateCard`.
    - `core/migrate.js`: khi migrate thẻ cũ, xóa thuộc tính `jlpt` (`delete card.jlpt`) thay vì điền `''`.
    - Cập nhật JSDoc ở `core/repo.js`, `pages/album/album.js` và tài liệu `docs/product.md`, `docs/architecture.md`.
    - `tests/`: bỏ test kiểm tra `jlpt`; thêm test xác nhận nếu dữ liệu đầu vào cố gửi `jlpt: 'N5'` thì bị bỏ qua không lưu vào `Card`.
    - Chạy kiểm tra: `grep -rn jlpt core pages tests` chỉ còn chỗ xóa trong `migrate.js` và test "bị bỏ qua".
 
-2. **Quản trị repo & bảo mật (làm ngay đầu GĐ1)**
+2. **Quản trị repo & bảo mật (làm ngay đầu GĐ1)** (L17)
    - Trên GitHub Settings › Code security: bật **Secret scanning** và **Push protection**.
    - Cập nhật `.github/CODEOWNERS` nếu nhóm chốt chuyển sang sơ đồ 4 vai mới.
 
-3. **Viết `core/storage.js` 2 chế độ + nối `core/repo.js`**
+3. **Viết `core/storage.js` 2 chế độ + nối `core/repo.js`** (BE5)
    - Giữ nguyên **7 hàm** `list`, `get`, `put`, `putMany`, `remove`, `removeMany`, `clearAll`, chỉ thêm cho `put` một tham số thứ 3 không bắt buộc: `put(collection, item, { expectedUpdatedAt } = {})`. Các trang không phải sửa.
      - Lý do: `repo.updateDeck` và `repo.updateCard` gán `updatedAt: Date.now()` **trước** khi gọi `storage.put`, nên `storage.js` không còn giá trị cũ để gửi làm `expectedUpdatedAt`; server sẽ luôn đi nhánh upsert và 2 máy sửa cùng lúc ghi đè nhau mà không báo.
      - Bản localStorage bỏ qua tham số này. Bản API gửi `expectedUpdatedAt` trong body của `PUT /api/:c/:id`.
@@ -373,17 +373,17 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
      - `deleteDeck(id)`: ở chế độ API gọi `DELETE /api/decks/:id` (1 transaction trên server).
      - `getCards(deckId)` và `getReviewLogs({ from, to })`: truyền query `?deckId=` và `?from=&to=` xuống `storage.list(collection, params)` để không phải kéo toàn bộ DB ở chế độ đăng nhập.
 
-4. **Khóa `dev/dev.js` khi đã đăng nhập**
+4. **Khóa `dev/dev.js` khi đã đăng nhập** (BE5)
    - Kiểm tra trạng thái đăng nhập trước khi chạy `?seed` hoặc `?reset` (cả qua URL lẫn `dev.seed()`, `dev.reset()` trong Console).
    - Nếu đã đăng nhập → **bỏ qua**, ghi cảnh báo ra Console (tránh `?reset` lỡ tay xóa sạch dữ liệu thật trên PostgreSQL).
 
-5. **Nút đăng nhập / đăng xuất & đồng bộ dữ liệu khách**
+5. **Nút đăng nhập / đăng xuất & đồng bộ dữ liệu khách** (BE6, BE7)
    - Thêm script Google Identity Services vào 4 file HTML (`index.html`, `pages/album/index.html`, `pages/create/index.html`, `pages/study/index.html`).
    - Thêm khu vực tài khoản ở cột điều hướng `.rail` (cả 4 file HTML + `styles/base.css`): hiển thị nút **"Đăng nhập Google"** khi là khách; khi đã đăng nhập hiện avatar nhỏ + tên + nút **"Đăng xuất"** (`POST /api/auth/logout`). Kiểm tra gọn ở cả `1440px` và `375px` (thanh tab dưới đáy).
    - **Đưa dữ liệu khách lên tài khoản:** khi vừa đăng nhập thành công mà `localStorage` (`nholau:decks`, `nholau:cards`, `nholau:reviewLogs`) có dữ liệu, bật hộp thoại hỏi: *"Bạn đang có dữ liệu trên máy. Đưa lên tài khoản?"*.
      - Nếu đồng ý → validate lại bằng logic nhập của C7 rồi đẩy lên server qua `POST /api/decks/batch`, `POST /api/cards/batch`, `POST /api/reviewLogs/batch` (dùng UUID sẵn có nên bấm lại không nhân đôi). Sau đó xóa hoặc đánh dấu đã chuyển ở localStorage.
 
-6. **Trạng thái mạng & Điều phối / Kiểm thử cuối**
+6. **Trạng thái mạng & Điều phối / Kiểm thử cuối** (BE8, L3, BE11)
    - Hoàn thiện trạng thái đang tải, báo lỗi mạng rõ ràng (tận dụng khung lỗi của `startPage`) trên **Trang chủ**, đồng thời nhắc Daika (`Album`), kakushi (`Tạo thẻ`), At (`Học`) làm phần của trang mình (mỗi người chỉ sửa folder trang của mình).
    - Review mọi PR đụng `server/`, `db/`, `core/`, `styles/`.
    - Thực hiện kiểm thử bảo mật cuối cùng trên bản deploy thật (toàn bộ mục Bảo mật trong `docs/backend.md`).
@@ -408,10 +408,10 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
 #### Việc cần làm theo bước
 
 ##### Phần A — Hạ tầng Docker & Deploy (làm `BE1` sớm ở GĐ1 để cả nhóm có môi trường chạy chung)
-1. **Bảo vệ bí mật trước tiên:**
+1. **Bảo vệ bí mật trước tiên:** (BE1)
    - Thêm `.env`, `.env.*`, `!.env.example`, `backups/` vào `.gitignore` **trước khi** tạo bất kỳ file `.env` nào.
    - Tạo `.env.example` đúng danh sách biến ở mục 2.4 (chỉ tên biến, không có secret).
-2. **Viết `Dockerfile` & `docker-compose.yml`:**
+2. **Viết `Dockerfile` & `docker-compose.yml`:** (BE1)
    - `Dockerfile`: base `node:24-alpine`, copy `package.json`, `package-lock.json`, chạy `npm ci --omit=dev`, copy source (`server/`, `db/`, `core/`, `pages/`, `styles/`, `dev/`, `index.html`), `CMD ["node", "server/index.js"]`.
    - `package.json` thêm `"engines": { "node": ">=24" }`; mọi người cài Node 24 ở máy (Node 20 hết hỗ trợ từ 30/4/2026, không còn bản vá bảo mật, mà server public ra internet).
    - `docker-compose.yml` gồm 3 service:
@@ -419,20 +419,20 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
      - `app`: build từ `Dockerfile`, `depends_on` `db` healthy, đọc `.env`, `ports: ["127.0.0.1:3000:3000"]`, `restart: unless-stopped`.
      - `tunnel`: image `cloudflare/cloudflared:latest`, lệnh `tunnel --no-autoupdate run`, đặt `profiles: ["prod"]`, `restart: unless-stopped`, truyền `TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}`.
    - Đảm bảo chạy local chỉ cần `docker compose up` (bật `app` + `db`), còn bản thật chạy `docker compose --profile prod up -d --build`.
-3. **Cloudflare Tunnel, OAuth & Backup:**
+3. **Cloudflare Tunnel, OAuth & Backup:** (BE9)
    - Cấu hình tên miền trên Cloudflare trỏ vào `http://app:3000` qua Tunnel.
    - Tạo Cache Rule trên Cloudflare: **Bypass cache** cho mọi đường dẫn `/api/*`.
    - Phối hợp Leader thêm tên miền thật (`https://<ten-mien>`) và `http://localhost:3000` vào *Authorized JavaScript origins* trên Google Cloud Console.
    - Thiết lập cron `pg_dump` hằng ngày trên máy host ra file nén (`.sql.gz`), và **diễn tập xóa thử DB local / khôi phục lại từ file backup ít nhất 1 lần** để chắc chắn backup dùng được.
 
 ##### Phần B — AI tạo thẻ từ PDF
-1. **Tách chữ PDF trên trình duyệt (`pdf.js`):**
+1. **Tách chữ PDF trên trình duyệt (`pdf.js`):** (AI1)
    - Tải/tích hợp `pdf.js` ở trình duyệt; **không gửi file PDF lên server**.
    - Cho người dùng chọn file PDF (giới hạn kích thước file hợp lý ở trình duyệt, VD `<= 15 MB`) và **chọn khoảng trang** (VD từ trang 1 đến trang 5).
    - Ghép chữ các trang đã chọn; nếu tổng số ký tự trích ra bằng 0 (PDF chỉ là ảnh scan) → báo `"PDF chỉ có ảnh (bản scan) — chưa hỗ trợ."`.
    - Nếu vượt quá 20.000 ký tự → cảnh báo người dùng thu hẹp khoảng trang (khớp giới hạn server).
 
-2. **Migration `db/migrations/002_ai_usage.sql`:**
+2. **Migration `db/migrations/002_ai_usage.sql`:** (AI4)
    - Tạo bảng `ai_usage`:
      ```sql
      CREATE TABLE ai_usage (
@@ -444,7 +444,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
      );
      ```
 
-3. **Server AI (`server/ai/` và `server/routes/ai.js`):**
+3. **Server AI (`server/ai/` và `server/routes/ai.js`):** (AI3; hạn mức `ai_usage`, 20k ký tự, `429`: AI4)
    - **`server/ai/provider.js`**: chỉ nơi này được gọi SDK Gemini (`@google/genai` hoặc `@google/generative-ai`).
      - Export `generateCards(text)` để sau này đổi model/provider không phải sửa chỗ khác.
      - Dùng model Gemini loại **Flash**, bật chế độ **Structured Output / JSON Schema** ép trả mảng `[{ term, meaning, reading, example }]`.
@@ -462,7 +462,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
      - Kiểm tra & tăng hạn mức ngày trong `ai_usage` (chỉ tính lượt hoặc hoàn lại lượt nếu Gemini lỗi/429 tùy chính sách nhóm chốt, nhưng phải chặn vượt `AI_DAILY_LIMIT` với `429`).
      - Nếu Gemini trả `429` (quota project trên Google AI Studio hết) → trả `429` với thông điệp `"AI đang quá tải, vui lòng thử lại sau."`, **không retry liên tục**.
 
-4. **Giao diện xem trước AI & đưa vào bộ:**
+4. **Giao diện xem trước AI & đưa vào bộ:** (AI2; trạng thái mạng trang Tạo thẻ: BE8)
    - **Không bao giờ lưu thẳng kết quả AI.** Luôn mở bảng xem trước cho phép:
      - Sửa lại `term`, `meaning`, `reading`, `example` từng dòng.
      - Bỏ chọn những thẻ không muốn thêm.
@@ -484,29 +484,29 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
 
 ```text
 GĐ0 (1 buổi cả nhóm)
-  └─ Chốt Hợp đồng chung (mục 2), chọn Express, chốt 3 điểm còn mở (chế độ khách, hạn nộp, vị trí nút AI)
+  └─ Chốt Hợp đồng chung (mục 2), chọn Express, chốt 3 điểm còn mở (chế độ khách, hạn nộp, vị trí nút AI) · GĐ0
 
 GĐ1 (chạy song song 4 người, không ai chờ ai)
-  ├─ kakushi : Hạ tầng Docker Compose + Dockerfile + .env.example + .gitignore (BE1 phần khung)
-  ├─ Daika   : db/migrations/001_init.sql + db/migrate.js + server/db/pool.js
-  ├─ At      : server/index.js (Express + allowlist + error handler + GET /api/health) + bộ khung test 2 user
-  └─ Tiến Phát: L16 (bỏ jlpt trong core/) + bật GitHub Secret scanning & Push protection
+  ├─ kakushi : Hạ tầng Docker Compose + Dockerfile + .env.example + .gitignore (BE1 phần khung) · BE1
+  ├─ Daika   : db/migrations/001_init.sql + db/migrate.js + server/db/pool.js · BE12
+  ├─ At      : server/index.js (Express + allowlist + error handler + GET /api/health) + bộ khung test 2 user · BE13
+  └─ Tiến Phát: L16 (bỏ jlpt trong core/) + bật GitHub Secret scanning & Push protection · L16, L17
 
 GĐ2 (Server lõi chạy song song bằng auth giả X-Dev-User)
-  ├─ Daika   : Google OAuth + JWT cookie + requireAuth (thay X-Dev-User khi prod) + POST /api/auth/* & GET /api/me
-  ├─ At      : CRUD /api/:c + batch/delete + filter (?deckId, ?from, ?to) + /api/reviews & undo + test 2 user
-  ├─ kakushi : server/ai/* + 002_ai_usage.sql + POST /api/ai/cards (test với AI_MOCK=1) + tách chữ pdf.js
-  └─ Tiến Phát: core/storage.js 2 chế độ + nối core/repo.js + khóa dev.js khi đã đăng nhập
+  ├─ Daika   : Google OAuth + JWT cookie + requireAuth (thay X-Dev-User khi prod) + POST /api/auth/* & GET /api/me · BE2
+  ├─ At      : CRUD /api/:c + batch/delete + filter (?deckId, ?from, ?to) + /api/reviews & undo + test 2 user · BE3, BE10, BE4
+  ├─ kakushi : server/ai/* + 002_ai_usage.sql + POST /api/ai/cards (test với AI_MOCK=1) + tách chữ pdf.js · AI3, AI4, AI1
+  └─ Tiến Phát: core/storage.js 2 chế độ + nối core/repo.js + khóa dev.js khi đã đăng nhập · BE5
 
 GĐ3 (Ghép nối & Deploy thử nghiệm)
-  ├─ Tiến Phát: Nút đăng nhập/xuất ở 4 trang HTML + CSS + luồng đưa dữ liệu khách lên tài khoản
-  ├─ kakushi : Deploy Cloudflare Tunnel + bypass cache /api/* + cron pg_dump & test restore
-  └─ At + Daika: Hoàn tất test tích hợp 2 user trên DB thật + rà soát lỗi 409 / idempotency
+  ├─ Tiến Phát: Nút đăng nhập/xuất ở 4 trang HTML + CSS + luồng đưa dữ liệu khách lên tài khoản · BE6, BE7
+  ├─ kakushi : Deploy Cloudflare Tunnel + bypass cache /api/* + cron pg_dump & test restore · BE9
+  └─ At + Daika: Hoàn tất test tích hợp 2 user trên DB thật + rà soát lỗi 409 / idempotency · BE14
 
 GĐ4 (Hoàn thiện UI & Kiểm thử bảo mật cuối)
-  ├─ Cả 4 người: Trạng thái loading / lỗi mạng / khóa nút Lưu ở từng trang (Tiến Phát: Home, Daika: Album, kakushi: Create, At: Study)
-  ├─ kakushi : Giao diện xem trước AI + thêm vào bộ (sau khi chốt vị trí UI với Leader)
-  └─ Tiến Phát: Chạy toàn bộ checklist Bảo mật (docs/backend.md) trên domain thật qua Cloudflare Tunnel
+  ├─ Cả 4 người: Trạng thái loading / lỗi mạng / khóa nút Lưu ở từng trang (Tiến Phát: Home, Daika: Album, kakushi: Create, At: Study) · BE8
+  ├─ kakushi : Giao diện xem trước AI + thêm vào bộ (sau khi chốt vị trí UI với Leader) · AI2
+  └─ Tiến Phát: Chạy toàn bộ checklist Bảo mật (docs/backend.md) trên domain thật qua Cloudflare Tunnel · BE11
 ```
 
 ---
