@@ -13,7 +13,7 @@ Tài liệu này nói code được tổ chức thế nào. App làm gì xem [pr
 - ES modules không chạy khi mở file trực tiếp (`file://`), phải mở qua server cục bộ (xem [README](../README.md#chạy-thử)).
 - Cần trình duyệt mới: ES modules, thẻ `<dialog>`, CSS `@import`.
 - Font Plus Jakarta Sans và Noto Sans JP tải từ Google Fonts. Không có mạng thì rơi về font có sẵn trên máy (Hiragino, Yu Gothic, Meiryo, font hệ thống).
-- Node 20 trở lên chỉ để chạy test; app không cần Node.
+- Node 24 trở lên để chạy test và code backend (`server/`, `db/`); các trang web không cần Node.
 
 ## Cấu trúc thư mục
 
