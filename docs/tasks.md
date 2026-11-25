@@ -8,12 +8,10 @@ Trạng thái hiện tại: còn việc gì, ai làm. Đã làm gì, khi nào th
 |---|---|---|---|---|---|
 | C11 | Tách `create.js` | kakushi | — | Nếu kịp | Để sau |
 | L3 | Review & merge | Leader | — | Bắt buộc | Làm liên tục |
-| L16 | Bỏ trường `jlpt` | Leader | — | Bắt buộc (GĐ1) | Chưa làm |
-| L17 | Bật Secret scanning + Push protection | Leader | — | Bắt buộc (GĐ1) | Chưa làm |
 
-**Sẵn sàng nộp:** đợt 3 (S11, A10, C4, C5, C7, C10) và L13 đã xong; L5 đã kiểm thử và dọn code ngày 2026-11-20. Hai lỗi nhỏ ở trang Học S12, S13 đã sửa và kiểm tra. C11 để sau (Leader chốt ngày 2026-11-20). **Đợt đang làm:** backend và AI tạo thẻ từ PDF; GĐ0 đã chốt ngày 2026-11-25, server và database đã có code (PR #36, #37), việc còn lại ở [Backend và AI](#backend-và-ai).
+**Sẵn sàng nộp:** đợt 3 (S11, A10, C4, C5, C7, C10) và L13 đã xong; L5 đã kiểm thử và dọn code ngày 2026-11-20. Hai lỗi nhỏ ở trang Học S12, S13 đã sửa và kiểm tra. C11 để sau (Leader chốt ngày 2026-11-20). **Đợt đang làm:** backend và AI tạo thẻ từ PDF; GĐ0 đã chốt ngày 2026-11-25, server và database đã có code (PR #36, #37), mọi việc backend và AI (kể cả L16, L17 và việc đã xong) ở một bảng: [Bảng việc backend và AI](#bảng-việc-backend-và-ai).
 
-Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong PR đầu tiên; xong thì đổi thành **Xong** và chuyển dòng đó xuống phần [Đã xong](#đã-xong).
+Bắt đầu một việc thì đổi Trạng thái thành **Đang làm** trong PR đầu tiên; xong thì đổi thành **Xong** và chuyển dòng đó xuống phần [Đã xong](#đã-xong). Riêng [bảng việc backend và AI](#bảng-việc-backend-và-ai) giữ cả việc đã xong trong cùng bảng, chỉ đổi Trạng thái thành **Xong** kèm số PR.
 
 ## Backend và AI
 
@@ -57,76 +55,52 @@ GĐ4 (Hoàn thiện UI & Kiểm thử bảo mật cuối)
 | **Tiến Phát (Leader)** | **Nối Frontend + Quản lý** | `core/models.js`, `core/migrate.js`, `core/storage.js`, `core/repo.js`, `dev/dev.js`, 4 file `index.html`, `styles/`, `pages/*/` | `L16` bỏ `jlpt`, `storage.js` 2 chế độ (khách/đăng nhập), nút đăng nhập/đăng xuất, đồng bộ dữ liệu khách, trạng thái mạng/loading, review PR & kiểm thử bảo mật cuối |
 | **kakushi** | **AI tạo thẻ từ PDF + Deploy / Hạ tầng** | `Dockerfile`, `docker-compose.yml`, `.env.example`, `.gitignore`, `db/migrations/002_ai_usage.sql`, `server/ai/`, `server/routes/ai.js`, UI tách PDF & xem trước AI | Docker Compose (`app`, `db`, `tunnel`), Cloudflare Tunnel + backup `pg_dump`, `pdf.js` client, `/api/ai/cards` + Gemini Flash + `AI_MOCK=1` + hạn mức `ai_usage` + UI xem trước |
 
-Việc đã xong (GĐ0, BE12, BE2, BE13, BE3, BE10, BE4) ở [Đã xong](#đã-xong). Bảng dưới chỉ còn việc đang mở.
+### Bảng việc backend và AI
 
-### Daika — Database + Đăng nhập
+Một bảng cho mọi việc backend và AI, **gồm cả việc đã xong**, xếp theo giai đoạn (GĐ). Đặc tả: [4.1 Daika](backend-trien-khai.md#41-daika--database--jwt--google-oauth) · [4.2 At](backend-trien-khai.md#42-at--thiết-kế--triển-khai-api) · [4.3 Leader](backend-trien-khai.md#43-tiến-phát-leader--nối-frontend--quản-lý) · [4.4 kakushi](backend-trien-khai.md#44-kakushi--ai-tạo-thẻ-từ-pdf--deploy--hạ-tầng).
 
-Đặc tả: [backend-trien-khai.md › 4.1](backend-trien-khai.md#41-daika--database--jwt--google-oauth). BE12 và BE2 (phía server) đã xong ở PR #36; nút đăng nhập ở trình duyệt là BE6 của Leader.
+| Mã | Việc | Ai | GĐ | Cần trước | Ưu tiên | Trạng thái |
+|---|---|---|---|---|---|---|
+| GĐ0 | Chốt chia việc 4 vai và [hợp đồng chung](backend-trien-khai.md#2-hợp-đồng-chung-shared-contract--chốt-ở-buổi-gđ0) | Cả nhóm | 0 | — | Bắt buộc | **Xong** (2026-11-25) |
+| BE12 | `001_init.sql`, `db/migrate.js`, `server/db/pool.js` | Daika | 1 | GĐ0 | Bắt buộc | **Xong** (PR #36) |
+| BE13 | Khung Express 5, file tĩnh theo danh sách cho phép, header, error handler, health, khung test 2 user | At | 1 | GĐ0 | Bắt buộc | **Xong** (PR #37) |
+| BE1 | `Dockerfile` (`node:24-alpine`), `docker-compose.yml` (`db`, migration, `app`, `tunnel` ở profile `prod`), `.env.example`, tạo role `nholau_app` + cấp quyền | kakushi | 1 | — | Bắt buộc | **Chưa làm — đang chặn chạy bằng Docker và deploy** |
+| L16 | Bỏ `jlpt` (+ `validateReviewLog` nếu cần cho client) | Leader | 1 | — | Bắt buộc | Chưa làm |
+| L17 | Bật Secret scanning + Push protection | Leader | 1 | — | Bắt buộc | Chưa làm |
+| BE2 | Google OAuth, JWT cookie, `requireAuth` + `X-Dev-User`, `/api/auth/*`, `GET /api/me`, rate limit | Daika | 2 | BE12 | Bắt buộc | **Xong** phía server (PR #36). Nút đăng nhập ở trình duyệt là BE6 |
+| BE3 | CRUD, batch, xóa, `DELETE /api/me/data` | At | 2 | BE12, BE13 | Bắt buộc | **Xong** (PR #37) |
+| BE10 | Lọc `?deckId=`, `?from=&to=` | At | 2 | BE3 | Nên có | **Xong** (PR #37) |
+| BE4 | `/api/reviews`, hoàn tác, xóa bộ (transaction) | At | 2 | BE3 | Bắt buộc | **Xong** (PR #37) |
+| BE5 | `storage.js` 2 chế độ (có `expectedUpdatedAt`), nối `repo.js`, khóa `dev.js` khi đã đăng nhập | Leader | 2 | L16 | Bắt buộc | Chưa làm (API đã sẵn) |
+| AI1 | Tách chữ PDF bằng pdf.js | kakushi | 2 | — | Nên có | Chưa làm |
+| AI3 | `server/ai/*`, `POST /api/ai/cards`, `AI_MOCK=1` | kakushi | 2 | BE13 | Nên có | Chưa làm |
+| AI4 | `002_ai_usage.sql`, hạn mức, 20k ký tự, `429` | kakushi | 2 | AI3, BE2 | Nên có | Chưa làm |
+| BE14 | Test 2 user trên DB thật, rà `409` / idempotency | At + Daika | 3 | BE3, BE4, BE1 | Bắt buộc | **Đang làm**: đã qua 129/129 trên PostgreSQL 16; còn chạy lại trên Docker khi có BE1 |
+| BE6 | Nút đăng nhập/đăng xuất ở 4 trang | Leader | 3 | BE5 | Bắt buộc | Chưa làm |
+| BE7 | Đưa dữ liệu khách lên tài khoản | Leader | 3 | BE5, BE6 | Nên có | Chưa làm |
+| BE9 | Cloudflare Tunnel, bỏ cache `/api/*`, cron `pg_dump`, thử khôi phục | kakushi | 3 | BE1 | Bắt buộc | Chưa làm |
+| BE8 | Trạng thái tải / lỗi mạng ở trang của mình | Mỗi người: Leader (Trang chủ), Daika (Album), kakushi (Tạo thẻ), At (Học) | 4 | BE5 | Bắt buộc | Chưa làm |
+| AI2 | Giao diện xem trước AI + thêm vào bộ (vị trí chốt sau AI3, AI4) | kakushi | 4 | AI1, AI4 | Nên có | Chưa làm |
+| BE11 | Kiểm thử bảo mật cuối trên domain thật | Leader | 4 | BE1–BE10, BE14 | Bắt buộc | Chưa làm |
 
-| Mã | Việc | GĐ | Cần trước | Ưu tiên | Trạng thái |
-|---|---|---|---|---|---|
-| BE14 | Test 2 user trên DB thật, rà `409` / idempotency (cùng At) | 3 | BE3, BE4, BE1 | Bắt buộc | **Đang làm** (xem mục At) |
-| BE8 | Trạng thái tải / lỗi mạng ở trang Album | 4 | BE5 | Bắt buộc | Chưa làm |
+**Xong khi** (việc chưa xong; số trong ngoặc là bước ở mục 4 của [backend-trien-khai.md](backend-trien-khai.md)):
 
-- **BE8 · Xong khi:** tắt mạng thì Album báo lỗi rõ; nút Lưu khóa khi đang gửi ([4.3 bước 6](backend-trien-khai.md#43-tiến-phát-leader--nối-frontend--quản-lý)).
-
-### At — API
-
-Đặc tả: [backend-trien-khai.md › 4.2](backend-trien-khai.md#42-at--thiết-kế--triển-khai-api). BE13, BE3, BE10, BE4 đã xong ở PR #37.
-
-| Mã | Việc | GĐ | Cần trước | Ưu tiên | Trạng thái |
-|---|---|---|---|---|---|
-| BE14 | Test 2 user trên DB thật, rà `409` / idempotency (cùng Daika) | 3 | BE3, BE4, BE1 | Bắt buộc | **Đang làm**: test tự động đã qua 129/129 trên PostgreSQL 16; còn chạy lại trên Docker khi có BE1 |
-| BE8 | Trạng thái tải / lỗi mạng ở trang Học | 4 | BE5 | Bắt buộc | Chưa làm |
-
-- **BE14 · Xong khi:** `REQUIRE_TEST_POSTGRES=1 npm test` qua hết trên PostgreSQL chạy bằng `docker compose` của BE1, gồm test 2 user cho mọi route, `POST /api/reviews` gửi 2 lần chỉ có 1 dòng log, `409` khi 2 máy cùng sửa ([4.2 › Checklist](backend-trien-khai.md#42-at--thiết-kế--triển-khai-api)).
-- **BE8 · Xong khi:** tắt mạng thì trang Học báo lỗi rõ; nút chấm điểm khóa khi đang gửi ([4.3 bước 6](backend-trien-khai.md#43-tiến-phát-leader--nối-frontend--quản-lý)).
-
-### Leader — Nối frontend + Quản lý
-
-Đặc tả: [backend-trien-khai.md › 4.3](backend-trien-khai.md#43-tiến-phát-leader--nối-frontend--quản-lý).
-
-| Mã | Việc | GĐ | Cần trước | Ưu tiên | Trạng thái |
-|---|---|---|---|---|---|
-| L16 | Bỏ `jlpt` (+ `validateReviewLog` nếu cần cho client) | 1 | — | Bắt buộc | Chưa làm |
-| L17 | Bật Secret scanning + Push protection | 1 | — | Bắt buộc | Chưa làm |
-| BE5 | `storage.js` 2 chế độ (có `expectedUpdatedAt`), nối `repo.js`, khóa `dev.js` khi đã đăng nhập | 2 | L16 | Bắt buộc | Chưa làm (API đã sẵn) |
-| BE6 | Nút đăng nhập/đăng xuất ở 4 trang | 3 | BE5 | Bắt buộc | Chưa làm |
-| BE7 | Đưa dữ liệu khách lên tài khoản | 3 | BE5, BE6 | Nên có | Chưa làm |
-| BE8 | Trạng thái tải / lỗi mạng ở Trang chủ | 4 | BE5 | Bắt buộc | Chưa làm |
-| BE11 | Kiểm thử bảo mật cuối trên domain thật | 4 | BE1–BE10, BE14 | Bắt buộc | Chưa làm |
-
-- **L16 · Xong khi:** xem [chi tiết L16](#l16--bỏ-trường-jlpt--leader--core) ([4.3 bước 1](backend-trien-khai.md#43-tiến-phát-leader--nối-frontend--quản-lý)).
-- **L17 · Xong khi:** Settings › Code security của repo bật cả Secret scanning và Push protection; Leader tự kiểm tra rồi sửa trạng thái ([4.3 bước 2](backend-trien-khai.md#43-tiến-phát-leader--nối-frontend--quản-lý)).
-- **BE5 · Xong khi:** 4 trang chạy được ở cả chế độ khách và đã đăng nhập mà không sửa code trang; `updateDeck`/`updateCard`/`resetCard` gửi `expectedUpdatedAt`, `409` báo "Dữ liệu đã được sửa ở máy khác, hãy tải lại trang."; `?seed`/`?reset` bị bỏ qua khi đã đăng nhập ([4.3 bước 3–4](backend-trien-khai.md#43-tiến-phát-leader--nối-frontend--quản-lý)).
-- **BE6 · Xong khi:** đăng nhập Google và đăng xuất được ở 1440px và 375px, ở cả `localhost:3000` và domain thật; tên, avatar dựng bằng `h()` ([4.3 bước 5](backend-trien-khai.md#43-tiến-phát-leader--nối-frontend--quản-lý)).
-- **BE7 · Xong khi:** đăng nhập lần đầu mà máy có dữ liệu thì hỏi "Đưa dữ liệu trên máy lên tài khoản?"; bấm 2 lần không nhân đôi thẻ, không đè tiến độ trên server ([4.3 bước 5](backend-trien-khai.md#43-tiến-phát-leader--nối-frontend--quản-lý)).
-- **BE8 · Xong khi:** tắt mạng thì Trang chủ báo lỗi rõ ([4.3 bước 6](backend-trien-khai.md#43-tiến-phát-leader--nối-frontend--quản-lý)).
-- **BE11 · Xong khi:** mọi mục [backend.md › Bảo mật](backend.md#bảo-mật) qua trên domain thật, có báo cáo trong `process.md` ([4.3 bước 6](backend-trien-khai.md#43-tiến-phát-leader--nối-frontend--quản-lý)).
-
-### kakushi — AI + Hạ tầng
-
-Đặc tả: [backend-trien-khai.md › 4.4](backend-trien-khai.md#44-kakushi--ai-tạo-thẻ-từ-pdf--deploy--hạ-tầng).
-
-| Mã | Việc | GĐ | Cần trước | Ưu tiên | Trạng thái |
-|---|---|---|---|---|---|
-| BE1 | `Dockerfile` (`node:24-alpine`), `docker-compose.yml` (`db`, migration, `app`, `tunnel` ở profile `prod`), `.env.example`, tạo role `nholau_app` + cấp quyền | 1 | — | Bắt buộc | **Chưa làm — đang chặn chạy bằng Docker và deploy** |
-| AI1 | Tách chữ PDF bằng pdf.js | 2 | — | Nên có | Chưa làm |
-| AI3 | `server/ai/*`, `POST /api/ai/cards`, `AI_MOCK=1` | 2 | BE13 | Nên có | Chưa làm |
-| AI4 | `002_ai_usage.sql`, hạn mức, 20k ký tự, `429` | 2 | AI3, BE2 | Nên có | Chưa làm |
-| BE9 | Cloudflare Tunnel, bỏ cache `/api/*`, cron `pg_dump`, thử khôi phục | 3 | BE1 | Bắt buộc | Chưa làm |
-| AI2 | Giao diện xem trước AI + thêm vào bộ (vị trí chốt sau AI3, AI4) | 4 | AI1, AI4 | Nên có | Chưa làm |
-| BE8 | Trạng thái tải / lỗi mạng ở trang Tạo thẻ | 4 | BE5 | Bắt buộc | Chưa làm |
-
-- **BE1 · Xong khi:** `docker compose up` là có web + API + DB, migration tự chạy; app nối DB bằng role `nholau_app` chỉ có `SELECT, INSERT, UPDATE, DELETE`; container `db` không mở port; `GET /.env`, `/server/`, `/db/` đều `404` ([4.4 Phần A bước 1–2](backend-trien-khai.md#44-kakushi--ai-tạo-thẻ-từ-pdf--deploy--hạ-tầng)).
+- **BE1** (4.4 Phần A bước 1–2): `docker compose up` là có web + API + DB, migration tự chạy; app nối DB bằng role `nholau_app` chỉ có `SELECT, INSERT, UPDATE, DELETE`; container `db` không mở port; `GET /.env`, `/server/`, `/db/` đều `404`.
   - **Lưu ý:** `001_init.sql` không tạo role `nholau_app` và không cấp quyền; hiện chỉ helper test làm việc này, xem cách làm ở `tests/helpers/postgres-local.js`. Bản Docker phải tự tạo role và cấp `SELECT, INSERT, UPDATE, DELETE` (VD script init của `db`, hoặc bước trước khi chạy migration bằng role admin). Bảng tạo sau (VD `ai_usage`) cũng phải cấp quyền, nên dùng `ALTER DEFAULT PRIVILEGES` hoặc thêm `GRANT` trong chính migration đó.
   - `.gitignore` đã có `.env`, `.env.*`, `!.env.example`, `backups/`, `docker-compose.override.yml` (Leader thêm ngày 2026-11-25 vì gấp).
-- **AI1 · Xong khi:** tách đúng chữ Nhật từ 2–3 PDF mẫu ngay trên trình duyệt; PDF chỉ có ảnh báo "chưa hỗ trợ"; quá 20.000 ký tự thì nhắc thu hẹp khoảng trang ([4.4 Phần B bước 1](backend-trien-khai.md#44-kakushi--ai-tạo-thẻ-từ-pdf--deploy--hạ-tầng)).
-- **AI3 · Xong khi:** có test bằng kết quả mẫu đúng và sai định dạng (cả có `<script>`); `npm test` không gọi Gemini thật; `GET /server/ai/provider.js` trả `404` ([4.4 Phần B bước 3](backend-trien-khai.md#44-kakushi--ai-tạo-thẻ-từ-pdf--deploy--hạ-tầng)).
-- **AI4 · Xong khi:** vượt hạn mức ngày trả `429` có thông báo rõ; Gemini `429` hay lỗi mạng thì báo lỗi, không retry liên tục, không treo; không log chữ PDF ([4.4 Phần B bước 2–3](backend-trien-khai.md#44-kakushi--ai-tạo-thẻ-từ-pdf--deploy--hạ-tầng)).
-- **BE9 · Xong khi:** mở tên miền thật thấy app; `/api/*` không bị cache; xóa thử DB rồi khôi phục được từ backup ([4.4 Phần A bước 3](backend-trien-khai.md#44-kakushi--ai-tạo-thẻ-từ-pdf--deploy--hạ-tầng)).
-- **AI2 · Xong khi:** thêm được thẻ từ PDF mẫu vào một bộ, chỉ thẻ đã chọn được lưu; có dòng "Chữ trong PDF được gửi tới Google Gemini để tạo thẻ"; không dùng `innerHTML`; chạy ở 1440px và 375px ([4.4 Phần B bước 4](backend-trien-khai.md#44-kakushi--ai-tạo-thẻ-từ-pdf--deploy--hạ-tầng)).
-- **BE8 · Xong khi:** tắt mạng thì Tạo thẻ báo lỗi rõ; nút Lưu khóa khi đang gửi ([4.4 Phần B bước 4](backend-trien-khai.md#44-kakushi--ai-tạo-thẻ-từ-pdf--deploy--hạ-tầng)).
+- **L16** (4.3 bước 1): xem [chi tiết L16](#l16--bỏ-trường-jlpt--leader--core).
+- **L17** (4.3 bước 2): Settings › Code security của repo bật cả Secret scanning và Push protection; Leader tự kiểm tra rồi sửa trạng thái.
+- **BE5** (4.3 bước 3–4): 4 trang chạy được ở cả chế độ khách và đã đăng nhập mà không sửa code trang; `updateDeck`/`updateCard`/`resetCard` gửi `expectedUpdatedAt`, `409` báo "Dữ liệu đã được sửa ở máy khác, hãy tải lại trang."; `?seed`/`?reset` bị bỏ qua khi đã đăng nhập.
+- **AI1** (4.4 Phần B bước 1): tách đúng chữ Nhật từ 2–3 PDF mẫu ngay trên trình duyệt; PDF chỉ có ảnh báo "chưa hỗ trợ"; quá 20.000 ký tự thì nhắc thu hẹp khoảng trang.
+- **AI3** (4.4 Phần B bước 3): có test bằng kết quả mẫu đúng và sai định dạng (cả có `<script>`); `npm test` không gọi Gemini thật; `GET /server/ai/provider.js` trả `404`.
+- **AI4** (4.4 Phần B bước 2–3): vượt hạn mức ngày trả `429` có thông báo rõ; Gemini `429` hay lỗi mạng thì báo lỗi, không retry liên tục, không treo; không log chữ PDF.
+- **BE14** (4.2 › Checklist): `REQUIRE_TEST_POSTGRES=1 npm test` qua hết trên PostgreSQL chạy bằng `docker compose` của BE1, gồm test 2 user cho mọi route, `POST /api/reviews` gửi 2 lần chỉ có 1 dòng log, `409` khi 2 máy cùng sửa.
+- **BE6** (4.3 bước 5): đăng nhập Google và đăng xuất được ở 1440px và 375px, ở cả `localhost:3000` và domain thật; tên, avatar dựng bằng `h()`.
+- **BE7** (4.3 bước 5): đăng nhập lần đầu mà máy có dữ liệu thì hỏi "Đưa dữ liệu trên máy lên tài khoản?"; bấm 2 lần không nhân đôi thẻ, không đè tiến độ trên server.
+- **BE9** (4.4 Phần A bước 3): mở tên miền thật thấy app; `/api/*` không bị cache; xóa thử DB rồi khôi phục được từ backup.
+- **BE8** (4.3 bước 6, 4.4 Phần B bước 4): tắt mạng thì trang báo lỗi rõ; nút Lưu / nút chấm điểm khóa khi đang gửi.
+- **AI2** (4.4 Phần B bước 4): thêm được thẻ từ PDF mẫu vào một bộ, chỉ thẻ đã chọn được lưu; có dòng "Chữ trong PDF được gửi tới Google Gemini để tạo thẻ"; không dùng `innerHTML`; chạy ở 1440px và 375px.
+- **BE11** (4.3 bước 6): mọi mục [backend.md › Bảo mật](backend.md#bảo-mật) qua trên domain thật, có báo cáo trong `process.md`.
 
 **Luật chung đợt backend** (theo [backend-trien-khai.md › 6](backend-trien-khai.md#6-quy-trình-git-pr-và-checklist-trước-khi-merge)):
 
@@ -199,17 +173,6 @@ Việc đã xong (GĐ0, BE12, BE2, BE13, BE3, BE10, BE4) ở [Đã xong](#đã-x
 ---
 
 ## Đã xong
-
-### Backend đợt đầu (GĐ0, BE12, BE2, BE13, BE3, BE10, BE4) và S8 — Xong
-
-- **GĐ0** (cả nhóm, 2026-11-25): chốt chia việc theo 4 vai và [hợp đồng chung](backend-trien-khai.md#2-hợp-đồng-chung-shared-contract--chốt-ở-buổi-gđ0); Express 5, `pg`, Google OAuth + JWT cookie, migration SQL, Node.js 24, giữ chế độ khách.
-- **BE12** (Daika, PR #36): `001_init.sql` (4 bảng, không có `jlpt`), `db/migrate.js`, `server/db/pool.js` có `withTransaction`.
-- **BE2** (Daika, PR #36): xong phía server: xác minh ID token Google, JWT `HS256` trong cookie `nholau_session`, `requireAuth` + `X-Dev-User`, rate limit, `/api/auth/google`, `/api/auth/logout`, `GET /api/me`. Nút đăng nhập ở trình duyệt là BE6.
-- **BE13** (At, PR #37): khung Express 5 (`createApp()`), file tĩnh theo danh sách cho phép, header bảo mật, error handler, `GET /api/health`, khung test 2 user.
-- **BE3** (At, PR #37): CRUD theo collection, batch chỉ thêm, xóa, `DELETE /api/me/data`.
-- **BE10** (At, PR #37): lọc `?deckId=`, `?from=&to=`.
-- **BE4** (At, PR #37): `/api/reviews` và hoàn tác nhận `{ card }`, xóa bộ, mỗi route 1 transaction. `npm test` trên PostgreSQL 16 thật: 129/129 qua.
-- **S8** (At, PR #38): lật thẻ dọc, chuyển thẻ 3D, tắt khi giảm chuyển động.
 
 ### S12, S13 — At — Xong
 
