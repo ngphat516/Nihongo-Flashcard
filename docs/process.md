@@ -25,14 +25,29 @@
 - **Kiểm tra:** test HTTP/header/allowlist/auth production, mapper và validation qua. Có test PostgreSQL cho 2 user, rollback batch, xóa giữ lịch sử, hai máy sửa gây 409, chấm/undo đồng thời và idempotency. Máy chưa có Docker/PostgreSQL nên test tích hợp DB chưa chạy, chưa đánh dấu các task dữ liệu hoàn thành.
 - **Cách chạy:** `npm ci`, cấu hình biến môi trường theo tài liệu backend, chạy migration của Daika rồi `node server/index.js` (mặc định port 3000). Test bắt buộc DB: có image postgres:16-alpine và `REQUIRE_TEST_POSTGRES=1 npm test` (PowerShell gán biến môi trường trước lệnh).
 - **Tiếp theo:** chạy test PostgreSQL trên máy có Docker, Leader review các quyết định hợp đồng còn khác nhau giữa hai tài liệu và ghép phần AI của kakushi.
+## 2026-11-25 — Vá kế hoạch triển khai backend (PR #35)
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `docs/va-ke-hoach-backend`, chỉ tài liệu. Vá 6 điểm trong [backend-trien-khai.md](backend-trien-khai.md), sửa bảng Idempotency trong [backend.md](backend.md):
+  1. Hoàn tác chỉ nhận `{ card }` (thẻ trước lượt ôn), không khôi phục từ `review_logs` vì bảng thiếu `due`, `step`, `reps`, `lapses`, `last_review`.
+  2. Thứ tự gắn router: `collections` luôn để cuối, nếu không `GET /api/me` khớp `/api/:c` và trả `404`.
+  3. `409`: `storage.put` thêm tham số `{ expectedUpdatedAt }`, vì `repo.js` gán `updatedAt` mới trước khi gọi `put` nên mất giá trị cũ.
+  4. `PUT` là upsert có chặn `user_id`, `batch` chỉ thêm mới (`DO NOTHING`), để đưa dữ liệu khách lên lần 2 không đè tiến độ trên server.
+  5. `Referrer-Policy` đổi từ `same-origin` sang `strict-origin-when-cross-origin` (dev: `no-referrer-when-downgrade`), COOP chỉ dùng `same-origin-allow-popups`, để nút đăng nhập Google chạy được.
+  6. Node 24 thay Node 20 (Node 20 hết hỗ trợ từ 30/4/2026).
+- **Quyết định:** không đổi phân công, giữ nguyên như PR #35.
+- **Tiếp theo:** GĐ1.
 
 ## 2026-11-24 — Database và xác thực Google của Daika (BE1, BE2)
 
 - **Người làm:** Banana (`tanphat-trinh`), nhánh `db/init-auth` từ `c417782`, theo mục 4.1 của [kế hoạch bốn vai](backend-trien-khai.md).
-- **Đã xong:** migration `001_init.sql`, sổ migration, pool PostgreSQL và `withTransaction`. Ba route đăng nhập Google, đăng xuất và đọc hồ sơ dùng session JWT HS256 trong cookie 7 ngày. Middleware đối chiếu phiên bản trong DB trên mỗi request và gắn `req.user.id`.
-- **Kiểm tra:** Node 20.20.2, PostgreSQL 16.16, `REQUIRE_TEST_POSTGRES=1 npm test` đạt 122/122, không có test bỏ qua. Đã thử migration đồng thời, rollback rồi chạy lại, role app chỉ có quyền DML, hai chủ bộ, thu hồi phiên riêng từng người, cờ dev trên production và giới hạn IP. Thử TLS riêng với PostgreSQL thật xác nhận từ chối chứng chỉ tự ký và chấp nhận khi tin đúng CA.
-- **Tiếp theo:** At gắn `app.use('/api', createAuthRouter())` trước router collection, dùng `requireAuth` cho route dữ liệu. kakushi nối hai role DB và Tunnel, Leader nối Google Identity Services trên giao diện. Cách chạy migration và test nằm trong [README](../README.md#chạy-migration-postgresql).
-- **Chưa kiểm chứng:** đăng nhập bằng tài khoản Google thật từ origin qua Tunnel. Test xác minh chữ ký bằng thư viện Google với khóa thử nghiệm cục bộ.
+- **Đã xong:**
+  - Migration `001_init.sql`, sổ migration, pool PostgreSQL và `withTransaction`. Ba route đăng nhập Google, đăng xuất và đọc hồ sơ dùng JWT HS256 trong cookie 7 ngày. Middleware đối chiếu phiên bản trong DB trên mỗi request và gắn `req.user.id`.
+  - Lần đầu kiểm thử trên Node 20.20.2 với PostgreSQL 16.16 đạt 122/122. Đã thử migration đồng thời, rollback, quyền DML của role app, hai chủ bộ, thu hồi phiên riêng từng người, cờ dev trên production và giới hạn IP. Kiểm thử TLS xác nhận DB từ chối chứng chỉ chưa tin cậy và kết nối được khi cấp đúng CA.
+  - Ngày 25/11, chạy lại `REQUIRE_TEST_POSTGRES=1 npm test` trên Node.js 24.22.1 với PostgreSQL 16.16. Cả 122 test đều đạt, không bỏ qua test nào. `npm audit --omit=dev` phát hiện 0 lỗ hổng.
+- **Quyết định:** giữ `pgcrypto` theo schema trong [backend.md](backend.md#database). README và cấu hình npm dùng Node.js 24 trở lên theo PR #39.
+- **Tiếp theo:** At gắn `app.use('/api', createAuthRouter())` trước router collection, dùng `requireAuth` cho route dữ liệu. kakushi nối hai role DB và Tunnel. Leader nối Google Identity Services trên giao diện. Cách chạy migration và test nằm trong [README](../README.md#chạy-migration-postgresql).
+- **Vướng mắc:** luồng đăng nhập bằng tài khoản Google thật qua Tunnel chờ ghép frontend và hạ tầng. Test xác minh chữ ký bằng thư viện Google với khóa thử nghiệm cục bộ.
 
 ## 2026-11-22 — Chốt hạ tầng backend, AI và chia việc
 

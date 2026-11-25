@@ -33,7 +33,7 @@ ES modules **không chạy** khi mở file trực tiếp (`file://...`), nên ph
 
 ## Chạy test
 
-Cần Node 20 trở lên. Cài thư viện từ lockfile trước khi chạy test.
+Cần Node.js 24 trở lên. Cài thư viện từ lockfile trước khi chạy test.
 
 ```bash
 npm ci
