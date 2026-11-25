@@ -38,7 +38,7 @@ db/
     002_ai_usage.sql            # kakushi (bảng ai_usage cho hạn mức AI)
 
 server/
-  index.js                      # At (export createApp() + khởi động listen khi chạy trực tiếp)
+  index.js                      # At (export createApp() + khởi động listen khi chạy trực tiếp; gắn router theo thứ tự ở 4.2 bước 1)
   db/
     pool.js                     # Daika (1 Pool dùng chung + helper withTransaction)
     mapper.js                   # At (đổi snake_case DB <-> camelCase JSON)
@@ -148,14 +148,14 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
 | **Auth** | `GET /api/me` | — | `200 { user: { id, email, name, avatarUrl } }` hoặc `401` | Đọc thông tin user từ DB theo `req.user.id` |
 | **CRUD** | `GET /api/:c` | `?deckId=` (cho `cards`), `?from=&to=` (cho `reviewLogs`) | `200 { items: [...] }` | `:c` ∈ `{decks, cards, reviewLogs}`, khác → `404` |
 | **CRUD** | `GET /api/:c/:id` | — | `200 { item: {...} }` hoặc `404` | Lọc `AND user_id = $me`; của người khác vẫn trả `404` |
-| **CRUD** | `PUT /api/:c/:id` | Body là object item (`camelCase`), kèm `expectedUpdatedAt?` khi sửa | `200 { item: {...} }` hoặc `409` | Tạo mới `ON CONFLICT (id) DO NOTHING`; sửa kiểm tra `updated_at` |
-| **CRUD** | `POST /api/:c/batch` | `{ items: [...] }` | `200 { items: [...] }` | Chạy trong 1 transaction; 1 item lỗi → rollback toàn bộ |
+| **CRUD** | `PUT /api/:c/:id` | Body là object item (`camelCase`), kèm `expectedUpdatedAt?` khi sửa | `200 { item: {...} }` hoặc `409` | Upsert có chặn chủ sở hữu (`ON CONFLICT (id) DO UPDATE … WHERE user_id = $me`, 0 dòng → `404`); có `expectedUpdatedAt` thì kiểm tra `updated_at` |
+| **CRUD** | `POST /api/:c/batch` | `{ items: [...] }` | `200 { items: [...] }` | **Chỉ thêm mới** (`ON CONFLICT (id) DO NOTHING`, không ghi đè); id thuộc user khác → `404`; chạy trong 1 transaction, 1 item lỗi → rollback toàn bộ |
 | **CRUD** | `DELETE /api/:c/:id` | — | `204` | Idempotent: đã xóa rồi vẫn trả `204` |
 | **CRUD** | `POST /api/:c/delete` | `{ ids: [...] }` | `204` | Xóa nhiều bản ghi thuộc `user_id = $me` trong 1 transaction |
 | **Data** | `DELETE /api/me/data` | — | `204` | Xóa toàn bộ `review_logs`, `cards`, `decks` của `req.user.id` trong 1 transaction |
 | **Tx** | `DELETE /api/decks/:id` | — | `204` | Xóa bộ + mọi thẻ trong bộ (`ON DELETE CASCADE`), **giữ lại `review_logs`** |
 | **Tx** | `POST /api/reviews` | `{ card, log }` | `200 { card, log }` | 1 transaction: kiểm tra `review_logs.id` trước; đã có → trả bản cũ, không cập nhật lại |
-| **Tx** | `POST /api/reviews/:id/undo` | `{ restoredCard }` hoặc đọc từ `review_logs` | `200 { card }` | 1 transaction: xóa log `:id` + khôi phục `cards`; log không còn → trả thẻ hiện tại (idempotent) |
+| **Tx** | `POST /api/reviews/:id/undo` | `{ card }` (trạng thái thẻ trước lượt ôn) | `200 { card }` | 1 transaction: xóa log `:id` + khôi phục `cards`; log không còn → trả thẻ hiện tại (idempotent) |
 | **AI** | `POST /api/ai/cards` | `{ text, deckId }` | `200 { cards: [...], remaining }` | Tối đa 20k ký tự; kiểm tra `deckId` thuộc user; trừ hạn mức `ai_usage`; trả tối đa 50 thẻ |
 
 ---
@@ -244,8 +244,19 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
    - **Không bật `trust proxy` bừa bãi hoặc cấu hình cẩn thận cho `CF-Connecting-IP`**; tuyệt đối **không** bật `Access-Control-Allow-Origin: *`.
    - **Header bảo mật cho mọi response:**
      - `X-Content-Type-Options: nosniff`
-     - `Referrer-Policy: same-origin`
+     - `Referrer-Policy: strict-origin-when-cross-origin` (production)
+     - `Referrer-Policy: no-referrer-when-downgrade` khi `NODE_ENV=development` (chạy http localhost). Không dùng giá trị "same-origin": nó không gửi referrer sang `accounts.google.com`, nút đăng nhập Google (Google Identity Services) không chạy.
+     - Nếu đặt `Cross-Origin-Opener-Policy` thì chỉ dùng `same-origin-allow-popups` (để popup đăng nhập Google chạy được).
      - `X-Frame-Options: DENY`
+   - **Thứ tự gắn router (bắt buộc):** Express so route theo thứ tự đăng ký. Nếu `collections` gắn trước thì `GET /api/me` khớp `/api/:c` (`c = "me"`) và trả `404`, khiến `storage.js` luôn coi người dùng là khách; `DELETE /api/me/data` cũng vậy.
+     ```js
+     app.use('/api', healthRouter);       // GET /health
+     app.use('/api', authRouter);         // /auth/*, GET /me   (Daika)
+     app.use('/api', meDataRouter);       // DELETE /me/data    (At)
+     app.use('/api', reviewsRouter);      // /reviews, /reviews/:id/undo
+     app.use('/api', aiRouter);           // /ai/cards          (kakushi)
+     app.use('/api', collectionsRouter);  // /:c, /:c/:id … LUÔN ĐỂ CUỐI
+     ```
    - **Kiểm soát request:**
      - Giới hạn body: `express.json({ limit: '2mb' })` (vượt quá → bắt lỗi trả `413 PAYLOAD_TOO_LARGE`).
      - Với `POST`, `PUT`, `PATCH` có body (hoặc mọi request tới `/api/*` mang body): kiểm tra `Content-Type` phải là `application/json`, sai → `415 UNSUPPORTED_MEDIA_TYPE`.
@@ -260,6 +271,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
      - `toDbDeck` / `fromDbDeck`
      - `toDbCard` / `fromDbCard`
      - `toDbReviewLog` / `fromDbReviewLog`
+   - `expectedUpdatedAt` đọc riêng từ body, không thuộc danh sách trường được ghi vào DB.
    - Kiểm tra mọi `:id` và `deckId` phải đúng định dạng UUID trước khi đưa vào SQL (sai định dạng → `400 VALIDATION_ERROR` thay vì để Postgres ném lỗi syntax `22P02`).
 
 3. **CRUD theo collection (`server/routes/collections.js`)**
@@ -273,10 +285,20 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
      - Với `cards`: kiểm tra `deckId` thuộc về `req.user.id` (nếu không thuộc → `404`).
      - Hỗ trợ **idempotent tạo mới & optimistic lock khi sửa**:
        - Nếu client gửi `expectedUpdatedAt` (lúc sửa ở máy khác): chạy `UPDATE … WHERE id = $1 AND user_id = $2 AND updated_at = $3 RETURNING *`. Nếu 0 dòng cập nhật: kiểm tra bản ghi có tồn tại với `user_id = $2` không — có thì trả `409 CONFLICT` ("Đã được sửa ở nơi khác, tải lại trang"), không có thì `404`.
-       - Nếu tạo mới hoặc upsert từ `storage.put`: dùng `INSERT … ON CONFLICT (id) DO UPDATE … WHERE <table>.user_id = $me` (chú ý chặn trường hợp user B cố ghi đè `id` trùng với bản ghi đã tồn tại của user A!).
-   - **`POST /api/:c/batch` (`putMany`):**
-     - Nhận `{ items }` (validate từng phần tử). Chạy toàn bộ trong `withTransaction`.
-     - Dùng `INSERT … ON CONFLICT (id) DO UPDATE … WHERE <table>.user_id = $me` (hoặc `ON CONFLICT (id) DO NOTHING` cho đưa dữ liệu khách lên để không đè dữ liệu mới trên server).
+       - Không có `expectedUpdatedAt` → **upsert có chặn chủ sở hữu**, vì `createDeck` và `updateDeck` đều đi qua `storage.put`:
+         ```sql
+         INSERT INTO decks (…) VALUES (…)
+         ON CONFLICT (id) DO UPDATE SET … WHERE decks.user_id = $me
+         RETURNING *;
+         ```
+         0 dòng trả về nghĩa là id thuộc người khác → trả `404` (chặn user B ghi đè `id` trùng với bản ghi của user A).
+   - **`POST /api/:c/batch` (`putMany`) — chỉ thêm mới:**
+     - `putMany` chỉ dùng cho `createCards`, nhập JSON, `seed`, `migrate` và đưa dữ liệu khách lên, **không dùng để sửa**. Nếu ghi đè thì bấm "Đưa dữ liệu khách lên" lần 2 sẽ đè tiến độ mới trên server bằng dữ liệu cũ trên máy.
+     - Nhận `{ items }` (validate từng phần tử). Chạy toàn bộ trong `withTransaction`:
+       ```sql
+       INSERT … ON CONFLICT (id) DO NOTHING RETURNING id;
+       ```
+     - Với các id không có trong `RETURNING`, chạy `SELECT id FROM <bảng> WHERE id = ANY($ids) AND user_id <> $me`. Có dòng nào thì rollback cả lượt và trả `404`. Không có thì đó là id của chính mình (gửi lại lần 2), bỏ qua.
    - **`DELETE /api/:c/:id` và `POST /api/:c/delete`:**
      - Riêng xóa deck (`DELETE /api/decks/:id`): FK `ON DELETE CASCADE` ở bảng `cards` sẽ tự xóa thẻ của bộ đó, còn `review_logs` không có FK nên được giữ nguyên.
      - Đã xóa rồi vẫn trả `204` (idempotent).
@@ -291,19 +313,21 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
        1. Kiểm tra `SELECT * FROM review_logs WHERE id = $1 AND user_id = $2`: nếu **đã tồn tại** (do mạng lag gửi lại lần 2) → đọc lại thẻ hiện tại và trả luôn `200 { card, log }` mà **không update `cards` lần nữa**.
        2. Nếu chưa tồn tại → `INSERT INTO review_logs …` rồi `UPDATE cards SET state=…, due=…, interval=…, ease=…, step=…, reps=…, lapses=…, last_review=…, updated_at=… WHERE id = $1 AND user_id = $2 AND deck_id = $3`. Nếu 0 dòng (thẻ không tồn tại hoặc của user khác) → rollback + `404`.
    - **`POST /api/reviews/:id/undo`:**
-     - Nhận `{ card }` (trạng thái thẻ cần khôi phục trước lượt ôn đó — hoặc khôi phục các trường từ `review_logs` kết hợp payload).
+     - Nhận `{ card }`: toàn bộ thẻ **trước** lượt ôn (biến `before` trong `repo.reviewCard`). **Không** khôi phục từ `review_logs`, vì bảng này thiếu `due`, `step`, `reps`, `lapses`, `last_review` (chỉ có `prev_state`, `prev_interval`, `prev_ease`); khôi phục từ log thì `state` về `new` nhưng `due` vẫn ở tương lai, thẻ biến mất khỏi hàng học.
+     - Kiểm tra `card` bằng `validateCard` và kiểm tra `card.id` khớp `card_id` của dòng log vừa xóa. Không khớp thì rollback và trả `400 VALIDATION_ERROR`.
      - Trong `withTransaction`:
        1. `DELETE FROM review_logs WHERE id = $1 AND user_id = $2 RETURNING *`.
        2. Nếu 0 dòng (lượt ôn đã được hoàn tác ở request trước đó): đọc thẻ hiện tại của user và trả `200 { card }` (idempotent, không hoàn tác thêm lần nữa).
-       3. Nếu xóa được log → `UPDATE cards … WHERE id = $1 AND user_id = $2` về trạng thái trước đó và trả `200 { card }`.
+       3. Nếu xóa được log → `UPDATE cards SET state=…, due=…, interval=…, ease=…, step=…, reps=…, lapses=…, last_review=…, updated_at=… WHERE id = $1 AND user_id = $2`, mọi trường tiến độ lấy giá trị của `card` trong body, rồi trả `200 { card }`.
 
 #### Bẫy cần tránh & Checklist nghiệm thu (At)
-- **Chống cướp UUID xuyên user:** Nếu user B gửi `PUT /api/decks/<id_cua_user_A>`, câu `ON CONFLICT (id) DO UPDATE` có `WHERE decks.user_id = $me` sẽ không cập nhật được dòng nào (0 rows returned) → phải bắt trường hợp này và trả `404` / `409`, tuyệt đối không cho user B ghi đè dữ liệu user A.
+- **Chống cướp UUID xuyên user:** Nếu user B gửi `PUT /api/decks/<id_cua_user_A>`, câu `ON CONFLICT (id) DO UPDATE` có `WHERE decks.user_id = $me` sẽ không cập nhật được dòng nào (0 rows returned) → phải bắt trường hợp này và trả `404`, tuyệt đối không cho user B ghi đè dữ liệu user A. Với `POST /api/:c/batch`, user B gửi item có id của user A thì `DO NOTHING` bỏ qua, bước `SELECT … user_id <> $me` phát hiện ra → rollback cả lượt, trả `404`, dữ liệu user A còn nguyên.
 - **Kế hoạch test 2 user (bắt buộc cho mọi route mới):**
   - Tạo 2 user giả `USER_A` và `USER_B` (qua `X-Dev-User` khi test tích hợp hoặc token JWT test).
   - Với mọi route (`GET`, `PUT`, `POST /batch`, `DELETE`, `POST /delete`, `POST /reviews`, `POST /reviews/:id/undo`): User A tạo dữ liệu → User B đọc/sửa/xóa/chấm điểm/gắn thẻ vào `deckId` của User A đều phải trả `404` và dữ liệu User A còn nguyên.
   - Test idempotency: gọi `POST /api/reviews` 2 lần với cùng `log.id` → chỉ có 1 dòng `review_logs`, `reps` chỉ tăng 1.
   - Test static allowlist: `GET /.env`, `GET /server/index.js`, `GET /db/migrations/001_init.sql` đều trả `404`.
+  - Test thứ tự router: `GET /api/me` khi chưa đăng nhập trả `401`, không phải `404`.
 
 ---
 
@@ -330,7 +354,17 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
    - Cập nhật `.github/CODEOWNERS` nếu nhóm chốt chuyển sang sơ đồ 4 vai mới.
 
 3. **Viết `core/storage.js` 2 chế độ + nối `core/repo.js`**
-   - Giữ nguyên chữ ký **7 hàm** `list`, `get`, `put`, `putMany`, `remove`, `removeMany`, `clearAll` để 4 trang không phải sửa logic.
+   - Giữ nguyên **7 hàm** `list`, `get`, `put`, `putMany`, `remove`, `removeMany`, `clearAll`, chỉ thêm cho `put` một tham số thứ 3 không bắt buộc: `put(collection, item, { expectedUpdatedAt } = {})`. Các trang không phải sửa.
+     - Lý do: `repo.updateDeck` và `repo.updateCard` gán `updatedAt: Date.now()` **trước** khi gọi `storage.put`, nên `storage.js` không còn giá trị cũ để gửi làm `expectedUpdatedAt`; server sẽ luôn đi nhánh upsert và 2 máy sửa cùng lúc ghi đè nhau mà không báo.
+     - Bản localStorage bỏ qua tham số này. Bản API gửi `expectedUpdatedAt` trong body của `PUT /api/:c/:id`.
+     - `repo.js`: `updateDeck`, `updateCard`, `resetCard` truyền `{ expectedUpdatedAt: <bản cũ>.updatedAt }`. `createDeck` và `createCard` không truyền.
+       ```js
+       // repo.js – updateDeck
+       const deck = await requireDeck(id);
+       const next = { ...deck, updatedAt: Date.now() };
+       …
+       return storage.put(DECKS, next, { expectedUpdatedAt: deck.updatedAt });
+       ```
    - Cơ chế chọn chế độ khi tải app: gọi `GET /api/me` (cache promise trong phiên trang hoặc lưu trạng thái session hiện tại). Nếu `200` (đã đăng nhập) → dùng adapter API (`fetch` tới `/api/:c`); nếu `401` (khách) → dùng adapter `localStorage` như cũ.
    - Khi adapter API nhận `401` giữa chừng (hết hạn phiên 7 ngày) → báo lỗi rõ ràng mời đăng nhập lại.
    - Khi adapter API nhận `409` (`updatedAt` lệch) → ném lỗi có thông điệp rõ: `"Dữ liệu đã được sửa ở máy khác, hãy tải lại trang."`.
@@ -358,6 +392,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
 - Không làm gãy chế độ khách (`localStorage`) và `?seed` khi chưa đăng nhập.
 - Cẩn thận đường dẫn tương đối khi gọi `/api/...`: vì frontend + API chạy cùng domain qua Express/Cloudflare Tunnel, dùng đường dẫn `/api/...` (hoặc cấu hình gốc) phải hoạt động đồng nhất ở cả `/` và `/pages/study/`.
 - Không dùng `innerHTML` cho tên/avatar/email người dùng Google — chỉ dùng `h()` và `textContent`.
+- Thử đăng nhập Google ở cả `http://localhost:3000` và domain thật (kiểm tra `Referrer-Policy` / COOP không chặn popup).
 
 ---
 
@@ -377,7 +412,8 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
    - Thêm `.env`, `.env.*`, `!.env.example`, `backups/` vào `.gitignore` **trước khi** tạo bất kỳ file `.env` nào.
    - Tạo `.env.example` đúng danh sách biến ở mục 2.4 (chỉ tên biến, không có secret).
 2. **Viết `Dockerfile` & `docker-compose.yml`:**
-   - `Dockerfile`: base `node:20-alpine`, copy `package.json`, `package-lock.json`, chạy `npm ci --omit=dev`, copy source (`server/`, `db/`, `core/`, `pages/`, `styles/`, `dev/`, `index.html`), `CMD ["node", "server/index.js"]`.
+   - `Dockerfile`: base `node:24-alpine`, copy `package.json`, `package-lock.json`, chạy `npm ci --omit=dev`, copy source (`server/`, `db/`, `core/`, `pages/`, `styles/`, `dev/`, `index.html`), `CMD ["node", "server/index.js"]`.
+   - `package.json` thêm `"engines": { "node": ">=24" }`; mọi người cài Node 24 ở máy (Node 20 hết hỗ trợ từ 30/4/2026, không còn bản vá bảo mật, mà server public ra internet).
    - `docker-compose.yml` gồm 3 service:
      - `db`: image `postgres:16-alpine`, volume `pgdata:/var/lib/postgresql/data`, **không mở `ports` ra ngoài** (chỉ giao tiếp trong mạng nội bộ Docker; nếu dev cần nối DB local thì mở qua `docker-compose.override.yml` gắn `127.0.0.1:5432:5432` và gitignore nó). Healthcheck `pg_isready`.
      - `app`: build từ `Dockerfile`, `depends_on` `db` healthy, đọc `.env`, `ports: ["127.0.0.1:3000:3000"]`, `restart: unless-stopped`.
