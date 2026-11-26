@@ -157,15 +157,14 @@ describe('thẻ', () => {
     const deck = await repo.createDeck({ name: 'N5' });
     const full = await repo.createCard({
       deckId: deck.id, term: ' 約束[やくそく] ', meaning: 'lời hứa', reading: 'やくそく',
-      example: '約束[やくそく]を守[まも]る。', jlpt: 'N4',
+      example: '約束[やくそく]を守[まも]る。',
     });
     assert.equal(full.term, '約束[やくそく]');
     assert.equal(full.reading, 'やくそく');
     assert.equal(full.example, '約束[やくそく]を守[まも]る。');
-    assert.equal(full.jlpt, 'N4');
 
     const short = await repo.createCard({ deckId: deck.id, term: 'すし', meaning: 'sushi' });
-    assert.deepEqual([short.reading, short.example, short.jlpt], ['', '', '']);
+    assert.deepEqual([short.reading, short.example], ['', '']);
   });
 
   test('tạo một thẻ và nhiều thẻ, giữ thứ tự', async () => {
@@ -173,20 +172,28 @@ describe('thẻ', () => {
     await repo.createCard({ deckId: deck.id, term: 'một', meaning: '1' });
     await repo.createCards(deck.id, [
       { term: 'hai', meaning: '2' },
-      { term: 'ba', meaning: '3', jlpt: 'N5' },
+      { term: 'ba', meaning: '3' },
     ]);
     const cards = await repo.getCards(deck.id);
     assert.deepEqual(cards.map((c) => c.term), ['một', 'hai', 'ba']);
-    assert.equal(cards[2].jlpt, 'N5');
   });
 
-  test('từ hoặc nghĩa trống, jlpt sai, quá dài, bộ không tồn tại → lỗi', async () => {
+  test('gửi jlpt thì bị bỏ qua, không lỗi (L16)', async () => {
+    const deck = await repo.createDeck({ name: 'A' });
+    const one = await repo.createCard({ deckId: deck.id, term: 'một', meaning: '1', jlpt: 'N5' });
+    const [many] = await repo.createCards(deck.id, [{ term: 'hai', meaning: '2', jlpt: 'N5' }]);
+    const updated = await repo.updateCard(one.id, { meaning: 'số 1', jlpt: 'N5' });
+    for (const card of [one, many, updated, ...Object.values(raw('cards'))]) {
+      assert.equal('jlpt' in card, false, card.term);
+    }
+    assert.equal(updated.meaning, 'số 1');
+  });
+
+  test('từ hoặc nghĩa trống, quá dài, bộ không tồn tại → lỗi', async () => {
     const deck = await repo.createDeck({ name: 'A' });
     const bad = [
       { term: '', meaning: 'y' },
       { term: 'x', meaning: '  ' },
-      { term: 'x', meaning: 'y', jlpt: 'N6' },
-      { term: 'x', meaning: 'y', jlpt: 'n5' },
       { term: 'x', meaning: 'y', reading: 'あ'.repeat(2001) },
       { term: 'x', meaning: 'y', example: 'あ'.repeat(2001) },
     ];
@@ -205,13 +212,12 @@ describe('thẻ', () => {
     const deck = await repo.createDeck({ name: 'A' });
     const card = await repo.createCard({ deckId: deck.id, term: '食[た]べる', meaning: 'ăn' });
     await repo.reviewCard(card.id, Rating.GOOD);
-    const updated = await repo.updateCard(card.id, { reading: 'たべる', jlpt: 'N5', state: 'review', interval: 99 });
+    const updated = await repo.updateCard(card.id, { reading: 'たべる', state: 'review', interval: 99 });
     assert.equal(updated.term, '食[た]べる');
     assert.equal(updated.reading, 'たべる');
-    assert.equal(updated.jlpt, 'N5');
     assert.equal(updated.state, 'learning'); // từ lần chấm ở trên, không lấy từ input
     assert.equal(updated.interval, 0);
-    await assert.rejects(repo.updateCard(card.id, { jlpt: 'N9' }), { name: 'ValidationError' });
+    await assert.rejects(repo.updateCard(card.id, { meaning: '' }), { name: 'ValidationError' });
   });
 });
 
@@ -223,7 +229,7 @@ describe('thẻ cũ front/back (chuyển đổi một lần)', () => {
   };
   const newCard = {
     id: 'new-card', deckId: 'deck-1', term: '約束[やくそく]', meaning: 'lời hứa', reading: 'やくそく',
-    example: '', jlpt: 'N3', state: 'new', due: 0, interval: 0, ease: 0, step: 0, reps: 0, lapses: 0,
+    example: '', state: 'new', due: 0, interval: 0, ease: 0, step: 0, reps: 0, lapses: 0,
     lastReview: null, createdAt: 2, updatedAt: 2,
   };
 
@@ -232,8 +238,17 @@ describe('thẻ cũ front/back (chuyển đổi một lần)', () => {
     assert.equal(await migrateCards(), 1);
     const { front, back, ...progress } = oldCard;
     assert.deepEqual(raw('cards')['old-card'], {
-      ...progress, term: 'dependency', meaning: 'thư viện phụ thuộc', reading: '', example: '', jlpt: '',
+      ...progress, term: 'dependency', meaning: 'thư viện phụ thuộc', reading: '', example: '',
     });
+  });
+
+  test('thẻ dạng L6 còn jlpt: xóa jlpt, giữ nội dung và tiến độ (L16)', async () => {
+    const l6Card = { ...newCard, id: 'l6-card', jlpt: 'N3', state: 'review', due: 9, interval: 4, reps: 3, lastReview: 5 };
+    putRaw('cards', [l6Card]);
+    assert.equal(await migrateCards(), 1);
+    const { jlpt, ...rest } = l6Card;
+    assert.deepEqual(raw('cards')['l6-card'], rest);
+    assert.equal(await migrateCards(), 0);
   });
 
   test('có cả term lẫn front thì term thắng', async () => {

@@ -45,8 +45,7 @@ export function validateItem(collection, body, id = body?.id) {
       if (typeof item[key] !== 'string') throw invalid();
     }
     if (!item.term.trim() || !item.meaning.trim()) throw invalid();
-    // L16 chưa merge: validator hiện tại vẫn yêu cầu jlpt, DB không lưu trường này.
-    validateCard({ ...item, jlpt: '' });
+    validateCard(item);
     if (!states.includes(item.state)) throw invalid();
     for (const key of ['due', 'step', 'reps', 'lapses']) number(item[key], { integer: true });
     for (const key of ['interval', 'ease']) number(item[key], { max: 1e9 });
