@@ -16,6 +16,12 @@
 
 ---
 
+## 2026-11-26 — Bật Secret scanning và Push protection (L17)
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `docs/l17-secret-scanning`, chỉ `docs/`. Bật bằng `gh api -X PATCH repos/ngphat516/Nihongo-Flashcard` (tài khoản admin `ngphat516`) với `secret_scanning` và `secret_scanning_push_protection` là `enabled`.
+- **Kiểm tra:** `gh api repos/ngphat516/Nihongo-Flashcard --jq '.security_and_analysis'` trả `secret_scanning` và `secret_scanning_push_protection` cùng `"status": "enabled"` (đọc trước khi PATCH thì cả hai đã bật sẵn; PATCH giữ nguyên). `.gitignore` có `.env`, `.env.*`, `!.env.example` (PR #41); `git ls-files | grep -i '\.env'` không ra file nào.
+- **Tiếp theo:** L16 (bỏ `jlpt`), rồi BE5.
 ## 2026-11-26 — Bỏ trường jlpt (L16)
 
 - **Người làm:** Leader.
