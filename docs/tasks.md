@@ -72,7 +72,7 @@ Một bảng cho mọi việc backend và AI, **gồm cả việc đã xong**, x
 | BE3 | CRUD, batch, xóa, `DELETE /api/me/data` | At | 2 | BE12, BE13 | Bắt buộc | **Xong** (PR #37) |
 | BE10 | Lọc `?deckId=`, `?from=&to=` | At | 2 | BE3 | Nên có | **Xong** (PR #37) |
 | BE4 | `/api/reviews`, hoàn tác, xóa bộ (transaction) | At | 2 | BE3 | Bắt buộc | **Xong** (PR #37) |
-| BE5 | `storage.js` 2 chế độ (có `expectedUpdatedAt`), nối `repo.js`, khóa `dev.js` khi đã đăng nhập | Leader | 2 | L16 | Bắt buộc | **Xong** (2026-11-26, nhánh `core/storage-2-che-do`) |
+| BE5 | `storage.js` 2 chế độ (có `expectedUpdatedAt`), nối `repo.js`, khóa `dev.js` khi đã đăng nhập | Leader | 2 | L16 | Bắt buộc | **Xong** (2026-11-26, PR #45) |
 | AI1 | Tách chữ PDF bằng pdf.js | kakushi | 2 | — | Nên có | Chưa làm |
 | AI3 | `server/ai/*`, `POST /api/ai/cards`, `AI_MOCK=1` | kakushi | 2 | BE13 | Nên có | Chưa làm |
 | AI4 | `002_ai_usage.sql`, hạn mức, 20k ký tự, `429` | kakushi | 2 | AI3, BE2 | Nên có | Chưa làm |
@@ -320,3 +320,9 @@ Tìm được khi review ngày 10/11/2026, **đã sửa cùng L6** (14/11/2026),
 | B5 | Điểm nhỏ: chú thích sai trong `fuzzRange` (ghi `[23, 27]`, đúng là `[22, 28]`); `formatSpan` hiện "60 phút"/"24 giờ" ở ranh giới (làm tròn trước rồi mới so sánh); `reviewCard` ghi thẻ trước rồi mới ghi lượt ôn (nên ghi lượt ôn trước) | `core/scheduler.js`, `core/date.js`, `core/repo.js` | Xong |
 
 </details>
+
+### Lỗi đang mở
+
+| Mã | Lỗi | Chỗ sửa | Ai | Trạng thái |
+|---|---|---|---|---|
+| B6 | Đã đăng nhập mà PostgreSQL lỗi (hoặc thiếu `JWT_SECRET`) thì `requireAuth` rơi vào nhánh `catch` và trả **401**. Trình duyệt hiểu là hết phiên: báo "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.", xóa dấu đăng nhập, lần mở trang sau thành khách. Người dùng tưởng bị đăng xuất, trong khi lỗi là ở máy chủ. Tìm khi làm BE5 | `server/auth/middleware.js` `requireAuth`: nhánh `catch` trả **503** `{ error: { code: 'INTERNAL_ERROR', message: 'Máy chủ đang lỗi, vui lòng thử lại sau.' } }`, không gọi `unauthorized`. Giữ 401 cho token sai / hết hạn / `token_version` lệch. Thêm test: DB không kết nối được → `GET /api/me` trả 503. Phía trình duyệt không phải sửa: `storage.js` đã đổi 5xx thành `NetworkError` và giữ dấu đăng nhập | Daika | Chưa làm |
