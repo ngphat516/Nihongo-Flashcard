@@ -5,6 +5,8 @@
  * Mọi hàm đều async: luôn dùng `await`.
  * Lỗi do người dùng nhập sai → ValidationError (hiện err.message cho người dùng).
  * Id không tồn tại → NotFoundError.
+ * Khi đã đăng nhập (dữ liệu trên server, xem storage.js) còn có: ConflictError (đã sửa ở máy khác),
+ * AuthError (phiên hết hạn), NetworkError (mất mạng / server lỗi). Đều hiện được `err.message`.
  */
 import * as storage from './storage.js';
 import {
@@ -71,7 +73,7 @@ export async function updateDeck(id, { name, description, newPerDay, color, dire
   if (color !== undefined) next.color = color;
   if (direction !== undefined) next.direction = direction;
   validateDeck(next);
-  return storage.put(DECKS, next);
+  return storage.put(DECKS, next, { expectedUpdatedAt: deck.updatedAt });
 }
 
 /**
@@ -79,9 +81,7 @@ export async function updateDeck(id, { name, description, newPerDay, color, dire
  * Lịch sử ôn (reviewLogs) được GIỮ LẠI để heatmap / chuỗi ngày học không bị mất.
  */
 export async function deleteDeck(id) {
-  const cards = await getCards(id);
-  await storage.removeMany(CARDS, cards.map((c) => c.id));
-  await storage.remove(DECKS, id);
+  await storage.removeDeck(id);
 }
 
 // =============================== Thẻ ================================
@@ -89,7 +89,7 @@ export async function deleteDeck(id) {
 /** Thẻ của một bộ (hoặc mọi thẻ nếu không truyền deckId), cũ trước mới sau. */
 export async function getCards(deckId) {
   await cardsReady();
-  const cards = await storage.list(CARDS);
+  const cards = await storage.list(CARDS, deckId ? { deckId } : {});
   return (deckId ? cards.filter((c) => c.deckId === deckId) : cards).sort(byCreated);
 }
 
@@ -126,7 +126,7 @@ export async function updateCard(id, input = {}) {
     if (input[field] !== undefined) next[field] = cleanText(input[field]);
   }
   validateCard(next);
-  return storage.put(CARDS, next);
+  return storage.put(CARDS, next, { expectedUpdatedAt: card.updatedAt });
 }
 
 export async function deleteCard(id) {
@@ -136,7 +136,7 @@ export async function deleteCard(id) {
 /** Cho thẻ học lại từ đầu (về trạng thái Mới). */
 export async function resetCard(id) {
   const card = await requireCard(id);
-  return storage.put(CARDS, resetProgress(card));
+  return storage.put(CARDS, resetProgress(card), { expectedUpdatedAt: card.updatedAt });
 }
 
 // ============================== Học & ôn =============================
@@ -182,19 +182,14 @@ export async function getStudyQueue(deckId, { now = Date.now(), lastCardId = nul
  */
 export async function reviewCard(cardId, rating, { now = Date.now(), timeMs = 0 } = {}) {
   const before = await requireCard(cardId);
-  const after = { ...schedule(before, rating, { now }), updatedAt: now };
+  // updatedAt không được lùi so với bản đang lưu: server từ chối (409) nếu đồng hồ máy này chậm hơn server
+  const after = { ...schedule(before, rating, { now }), updatedAt: Math.max(now, before.updatedAt + 1) };
   const log = makeReviewLog({ before, after, rating, now, timeMs });
-  // Ghi lượt ôn trước: ghi thẻ có lỗi (VD bộ nhớ đầy) thì thẻ giữ lịch cũ, không mất dấu lượt ôn
-  await storage.put(LOGS, log);
-  await storage.put(CARDS, after);
+  const saved = await storage.review(after, log, { expectedUpdatedAt: before.updatedAt });
   return {
-    card: after,
-    log,
-    undo: async () => {
-      await storage.put(CARDS, before);
-      await storage.remove(LOGS, log.id);
-      return before;
-    },
+    card: saved.card,
+    log: saved.log,
+    undo: () => storage.undoReview(log.id, before),
   };
 }
 
@@ -203,7 +198,7 @@ export async function reviewCard(cardId, rating, { now = Date.now(), timeMs = 0 
  * @param {{ deckId?: string, from?: number, to?: number }} [filter] khoảng thời gian [from, to)
  */
 export async function getReviewLogs({ deckId, from = 0, to = Infinity } = {}) {
-  const logs = await storage.list(LOGS);
+  const logs = await storage.list(LOGS, { from, to });
   return logs
     .filter((l) => (!deckId || l.deckId === deckId) && l.reviewedAt >= from && l.reviewedAt < to)
     .sort((a, b) => a.reviewedAt - b.reviewedAt);

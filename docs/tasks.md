@@ -65,16 +65,14 @@ Một bảng cho mọi việc backend và AI, **gồm cả việc đã xong**, x
 | GĐ0 | Chốt chia việc 4 vai và [hợp đồng chung](backend-trien-khai.md#2-hợp-đồng-chung-shared-contract--chốt-ở-buổi-gđ0) | Cả nhóm | 0 | — | Bắt buộc | **Xong** (2026-11-25) |
 | BE12 | `001_init.sql`, `db/migrate.js`, `server/db/pool.js` | Daika | 1 | GĐ0 | Bắt buộc | **Xong** (PR #36) |
 | BE13 | Khung Express 5, file tĩnh theo danh sách cho phép, header, error handler, health, khung test 2 user | At | 1 | GĐ0 | Bắt buộc | **Xong** (PR #37) |
-| BE1 | `Dockerfile` (`node:24-alpine`), `docker-compose.yml` (`db`, migration, `app`, `tunnel` ở profile `prod`), `.env.example`, tạo role `nholau_app` + cấp quyền | kakushi | 1 | — | Bắt buộc | **Chưa làm — đang chặn chạy bằng Docker và deploy** |
-| L16 | Bỏ `jlpt` (+ `validateReviewLog` nếu cần cho client) | Leader | 1 | — | Bắt buộc | Chưa làm |
+| BE1 | `Dockerfile` (`node:24-alpine`), `docker-compose.yml` (`db`, migration, `app`, `tunnel` ở profile `prod`), `.env.example`, tạo role `nholau_app` + cấp quyền | kakushi | 1 | — | Bắt buộc | Chưa làm. **Dời về cuối** (2026-11-26): BE5–BE8 chạy được không cần Docker; BE9, bước Docker của BE14 và BE11 làm sau BE1 |
 | L17 | Bật Secret scanning + Push protection | Leader | 1 | — | Bắt buộc | **Xong** (2026-11-26) |
 | L16 | Bỏ `jlpt` | Leader | 1 | — | Bắt buộc | **Xong** (2026-11-26, PR #44) |
-| L17 | Bật Secret scanning + Push protection | Leader | 1 | — | Bắt buộc | Chưa làm |
 | BE2 | Google OAuth, JWT cookie, `requireAuth` + `X-Dev-User`, `/api/auth/*`, `GET /api/me`, rate limit | Daika | 2 | BE12 | Bắt buộc | **Xong** phía server (PR #36). Nút đăng nhập ở trình duyệt là BE6 |
 | BE3 | CRUD, batch, xóa, `DELETE /api/me/data` | At | 2 | BE12, BE13 | Bắt buộc | **Xong** (PR #37) |
 | BE10 | Lọc `?deckId=`, `?from=&to=` | At | 2 | BE3 | Nên có | **Xong** (PR #37) |
 | BE4 | `/api/reviews`, hoàn tác, xóa bộ (transaction) | At | 2 | BE3 | Bắt buộc | **Xong** (PR #37) |
-| BE5 | `storage.js` 2 chế độ (có `expectedUpdatedAt`), nối `repo.js`, khóa `dev.js` khi đã đăng nhập | Leader | 2 | L16 | Bắt buộc | Chưa làm (API đã sẵn) |
+| BE5 | `storage.js` 2 chế độ (có `expectedUpdatedAt`), nối `repo.js`, khóa `dev.js` khi đã đăng nhập | Leader | 2 | L16 | Bắt buộc | **Xong** (2026-11-26, nhánh `core/storage-2-che-do`) |
 | AI1 | Tách chữ PDF bằng pdf.js | kakushi | 2 | — | Nên có | Chưa làm |
 | AI3 | `server/ai/*`, `POST /api/ai/cards`, `AI_MOCK=1` | kakushi | 2 | BE13 | Nên có | Chưa làm |
 | AI4 | `002_ai_usage.sql`, hạn mức, 20k ký tự, `429` | kakushi | 2 | AI3, BE2 | Nên có | Chưa làm |

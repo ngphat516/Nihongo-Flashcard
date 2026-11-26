@@ -98,6 +98,30 @@ export class NotFoundError extends Error {
   }
 }
 
+/** Khi đã đăng nhập: bản ghi đã bị sửa ở máy khác sau lần đọc gần nhất (server trả 409). */
+export class ConflictError extends Error {
+  constructor(message = 'Dữ liệu đã được sửa ở máy khác, hãy tải lại trang.') {
+    super(message);
+    this.name = 'ConflictError';
+  }
+}
+
+/** Khi đã đăng nhập: phiên hết hạn hoặc đã đăng xuất ở nơi khác (server trả 401). */
+export class AuthError extends Error {
+  constructor(message = 'Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.') {
+    super(message);
+    this.name = 'AuthError';
+  }
+}
+
+/** Không gọi được máy chủ (mất mạng, server tắt) hoặc server báo lỗi không rõ. */
+export class NetworkError extends Error {
+  constructor(message = 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.') {
+    super(message);
+    this.name = 'NetworkError';
+  }
+}
+
 /** Cắt khoảng trắng 2 đầu + chuẩn hóa Unicode (gõ tiếng Việt trên Mac đôi khi ra dạng tổ hợp). */
 export function cleanText(value) {
   return String(value ?? '').normalize('NFC').trim();
