@@ -16,6 +16,12 @@
 
 ---
 
+## 2026-11-26 — Ghi lỗi B6 cho Daika
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `docs/ghi-loi-b6`, chỉ `docs/tasks.md`. Thêm bảng "Lỗi đang mở" với B6 (`requireAuth` trả 401 khi PostgreSQL lỗi, tìm khi làm BE5), giao Daika. Sửa trạng thái BE5 thành "PR #45".
+- **Tiếp theo:** Daika sửa B6; Leader làm BE6.
+
 ## 2026-11-26 — storage.js 2 chế độ (BE5)
 
 - **Người làm:** Leader.
