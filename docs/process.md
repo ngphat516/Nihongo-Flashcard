@@ -22,6 +22,19 @@
 - **Đã xong:** nhánh `docs/l17-secret-scanning`, chỉ `docs/`. Bật bằng `gh api -X PATCH repos/ngphat516/Nihongo-Flashcard` (tài khoản admin `ngphat516`) với `secret_scanning` và `secret_scanning_push_protection` là `enabled`.
 - **Kiểm tra:** `gh api repos/ngphat516/Nihongo-Flashcard --jq '.security_and_analysis'` trả `secret_scanning` và `secret_scanning_push_protection` cùng `"status": "enabled"` (đọc trước khi PATCH thì cả hai đã bật sẵn; PATCH giữ nguyên). `.gitignore` có `.env`, `.env.*`, `!.env.example` (PR #41); `git ls-files | grep -i '\.env'` không ra file nào.
 - **Tiếp theo:** L16 (bỏ `jlpt`), rồi BE5.
+## 2026-11-26 — Bỏ trường jlpt (L16)
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `core/bo-jlpt`.
+  - `core/models.js`: bỏ `JLPT_LEVELS`, `jlpt` trong typedef `Card`, `CARD_FIELDS`, `makeCard`, `validateCard`. Gửi `jlpt` vào `createCard`, `createCards`, `updateCard` thì bị bỏ qua, không lỗi.
+  - `core/migrate.js`: thẻ còn trường `jlpt` (tạo từ L6 đến trước L16) được chuyển một lần: xóa `jlpt`, giữ nội dung và tiến độ. `needsUpgrade` thêm `'jlpt' in card`, nếu không thẻ dạng L6 sẽ giữ `jlpt` mãi trong localStorage.
+  - `core/repo.js`, `pages/album/album.js`: chỉ sửa chú thích.
+  - `server/validate.js`: bỏ đoạn tạm `validateCard({ ...item, jlpt: '' })`, gọi thẳng `validateCard(item)`.
+  - `tests/repo.test.js`, `tests/scheduler.test.js`: bỏ `jlpt` khỏi thẻ mẫu; test "gửi `jlpt` thì bị bỏ qua"; test migrate thẻ dạng L6.
+  - Tài liệu: `product.md`, `architecture.md`.
+- **Quyết định:** không làm `validateReviewLog` ở client: server đã tự kiểm tra lượt ôn trong `server/validate.js`, BE5 không cần.
+- **Kiểm tra:** `npm test` 124 test, 119 pass, 0 fail, 5 skip (bỏ qua test DB); `REQUIRE_TEST_POSTGRES=1 npm test` với Docker `postgres:16-alpine`: 131 test, 131 pass, 0 fail, 0 skip. Trình duyệt: gán `jlpt: 'N5'` cho 5 thẻ trong localStorage, mở Album thì cả 5 thẻ mất `jlpt`; tạo, sửa thẻ và nhập file JSON có `jlpt` đều lưu thẻ không có `jlpt`; 4 trang với `?seed` và sau `?reset` ở 1440px, 375px không cuộn ngang, Console không lỗi.
+- **Tiếp theo:** BE5 (`storage.js` 2 chế độ).
 
 ## 2026-11-25 — Gom việc backend về một bảng
 

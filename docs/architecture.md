@@ -28,9 +28,9 @@ core/                   phần lõi dùng chung
   repo.js               ★ API dữ liệu cho các trang
   scheduler.js          thuật toán SM-2 (hàm thuần)
   queue.js              chọn thẻ tiếp theo, đếm thẻ cần học, nhãn trạng thái
-  models.js             cấu trúc Deck / Card / ReviewLog + kiểm tra dữ liệu, DECK_COLORS, DECK_DIRECTIONS, JLPT_LEVELS
+  models.js             cấu trúc Deck / Card / ReviewLog + kiểm tra dữ liệu, DECK_COLORS, DECK_DIRECTIONS
   furigana.js           cú pháp 漢字[かんじ]: parseFurigana, plainFurigana, renderFurigana
-  migrate.js            đổi thẻ cũ front/back sang trường mới một lần (chỉ repo.js dùng)
+  migrate.js            đổi thẻ cũ front/back sang trường mới, xóa trường jlpt, một lần (chỉ repo.js dùng)
   storage.js            đọc/ghi localStorage
   preferences.js        lựa chọn hiển thị của người học (bật/tắt furigana), key localStorage riêng
   date.js               ngày học (bắt đầu 4h sáng), định dạng thời gian
@@ -110,11 +110,11 @@ Các trường của `Deck`, `Card`, `ReviewLog` và giới hạn độ dài: xe
 | Bản ghi | Trường nội dung | Ghi chú |
 |---|---|---|
 | `Deck` | `name`, `description`, `newPerDay`, `color`, `direction` | `color` là một trong `DECK_COLORS` (`pink`, `peach`, `yellow`, `green`, `sky`, `lavender`); `direction` là một trong `DECK_DIRECTIONS`: `'ja-vi'` Nhật → Việt (mặc định) hoặc `'vi-ja'` Việt → Nhật, lịch ôn dùng chung cho cả 2 chiều |
-| `Card` | `term`, `meaning`, `reading`, `example`, `jlpt` | `term`, `meaning` bắt buộc; `jlpt` là `''` hoặc `N5`…`N1`; furigana `漢字[かんじ]` trong `term`, `example` |
+| `Card` | `term`, `meaning`, `reading`, `example` | `term`, `meaning` bắt buộc; furigana `漢字[かんじ]` trong `term`, `example` |
 | `Card` (tiến độ) | `state`, `due`, `interval`, `ease`, `step`, `reps`, `lapses`, `lastReview` | do `scheduler.js` tính |
 
 - **Dữ liệu cũ (trước L6):**
-  - Thẻ chỉ có `front` / `back`: ở lần đọc thẻ đầu tiên sau khi mở trang, `repo.js` gọi `migrateCards()` (`core/migrate.js`) đổi sang `term` / `meaning`, điền `''` cho trường thiếu, bỏ `front` / `back` rồi ghi lại. Chạy lại nhiều lần không đổi gì thêm.
+  - Thẻ chỉ có `front` / `back`: ở lần đọc thẻ đầu tiên sau khi mở trang, `repo.js` gọi `migrateCards()` (`core/migrate.js`) đổi sang `term` / `meaning`, điền `''` cho trường thiếu, bỏ `front` / `back` rồi ghi lại. Thẻ còn trường `jlpt` (tạo trước L16) cũng được chuyển: xóa trường `jlpt`, giữ nội dung và tiến độ. Chạy lại nhiều lần không đổi gì thêm.
   - Bộ chưa có `color`: đọc ra màu theo thứ tự danh sách (`DECK_COLORS[i % 6]`); khi bộ được lưu lại thì ghi màu.
   - Bộ chưa có `direction` (tạo trước L8): đọc ra `'ja-vi'`; khi bộ được lưu lại thì ghi.
 
@@ -144,9 +144,9 @@ Mở bất kỳ trang nào kèm `?seed` (hoặc gọi `dev.seed()` trong Console
 | `deleteDeck(id)` | — | xóa luôn thẻ, giữ lịch sử ôn |
 | `getCards(deckId?)` | `Card[]` | không truyền id → mọi thẻ |
 | `getCard(id)` | `Card \| null` | |
-| `createCard({ deckId, term, meaning, reading?, example?, jlpt? })` | `Card` | trường không bắt buộc mặc định `''` |
+| `createCard({ deckId, term, meaning, reading?, example? })` | `Card` | trường không bắt buộc mặc định `''` |
 | `createCards(deckId, [{ term, meaning, … }])` | `Card[]` | một thẻ lỗi → cả lượt không lưu |
-| `updateCard(id, { term?, meaning?, reading?, example?, jlpt? })` | `Card` | giữ nguyên tiến độ học |
+| `updateCard(id, { term?, meaning?, reading?, example? })` | `Card` | giữ nguyên tiến độ học |
 | `deleteCard(id)`, `resetCard(id)` | — / `Card` | `resetCard` đưa thẻ về Mới |
 | `getStudyQueue(deckId, { lastCardId? })` | `{ deck, card, counts, nextLearningAt }` | `card === null` → học xong |
 | `reviewCard(cardId, rating, { timeMs? })` | `{ card, log, undo }` | rating 1 Lại · 2 Khó · 3 Tốt · 4 Dễ; `await undo()` trả về thẻ đã khôi phục |
@@ -163,7 +163,7 @@ Ngoài ra trang hay dùng:
 - `date.js`: `dayKey()`, `daysBetween()`, `formatSpan()`.
 - `dom.js`: `h()`, `$()`, `$$()`, `getParam()`, `startPage()`. `startPage()` tự nối nút bật/tắt furigana `.rail-furigana`: đặt `aria-pressed`, bấm thì đổi `data-furigana="off"` trên `<html>` (CSS ẩn `<rt>`), không vẽ lại trang. Trang không phải viết gì thêm.
 - `preferences.js`: `isFuriganaOn()`, `setFuriganaOn(on)`. localStorage lỗi hoặc bị chặn thì coi như bật.
-- `models.js`: `DECK_COLORS` (6 màu bìa theo thứ tự), `JLPT_LEVELS`, `ValidationError`, `NotFoundError`.
+- `models.js`: `DECK_COLORS` (6 màu bìa theo thứ tự), `ValidationError`, `NotFoundError`.
 - `furigana.js`: `renderFurigana(text)` dựng `<span lang="ja">` có `<ruby>`; `plainFurigana(text)` bỏ phần `[..]` để tìm kiếm, so trùng; `parseFurigana(text)` trả mảng đoạn.
 
 Đầu mỗi file `pages/<trang>/<trang>.js` có chú thích liệt kê các hàm trang đó hay dùng.

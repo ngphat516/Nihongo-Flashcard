@@ -29,7 +29,7 @@ Dùng đúng các từ này trong giao diện, code và tài liệu.
 | **Bộ thẻ** | `Deck` | Một nhóm thẻ, VD "JLPT N5 – Từ vựng" |
 | **Bìa** | class `cover` | Khối màu pastel đại diện cho một bộ thẻ trên Trang chủ và Album |
 | **Màu bìa** | `deck.color` | Một trong 6 màu pastel của bìa: `pink`, `peach`, `yellow`, `green`, `sky`, `lavender` |
-| **Thẻ** | `Card` | Một mục cần nhớ: từ tiếng Nhật và nghĩa, kèm cách đọc, câu ví dụ, cấp JLPT (xem [Thẻ tiếng Nhật](#thẻ-tiếng-nhật)) |
+| **Thẻ** | `Card` | Một mục cần nhớ: từ tiếng Nhật và nghĩa, kèm cách đọc, câu ví dụ (xem [Thẻ tiếng Nhật](#thẻ-tiếng-nhật)) |
 | **Từ / nghĩa** | `term` / `meaning` | Mặt trước / mặt sau khi học chiều Nhật → Việt. `front` / `back` là tên cũ, đã bỏ ở L6b |
 | **Trạng thái thẻ** | `card.state` | **Mới** `new` · **Đang học** `learning` · **Học lại** `relearning` (quên khi đang ôn) · **Ôn tập** `review` |
 | **Chấm điểm** | `rating` 1–4 | Sau khi lật thẻ, người học tự chấm **Lại** / **Khó** / **Tốt** / **Dễ** |
@@ -66,12 +66,11 @@ Thay 2 mặt `front` / `back` bằng các trường riêng, để sau này làm 
 | `meaning` | Có | ăn |
 | `reading` | Không (từ chỉ có kana thì bỏ trống) | たべる |
 | `example` | Không | `毎朝[まいあさ]パンを食[た]べる。` |
-| `jlpt` | Không | N5 … N1 |
 
-Giao diện chưa dùng trường `jlpt`: không có ô nhập, không hiện trên thẻ. Trường vẫn giữ trong dữ liệu (mặc định `''`) để sau này lọc theo cấp.
+Không có trường cấp JLPT (đã bỏ ở L16): giao diện không dùng, database không lưu.
 
 - **Cú pháp furigana:** viết `漢字[かんじ]` trong `term` và `example`, app hiển thị thành `<ruby>`. Cách đọc gắn vào cụm kanji liền ngay trước `[` (kể cả `々`); ngoặc thiếu, ngoặc rỗng, hoặc trước `[` không có kanji thì giữ nguyên là chữ thường. Hàm ở `core/furigana.js`: `renderFurigana()` để hiện, `plainFurigana()` để tìm kiếm và so trùng.
-- `jlpt` chỉ nhận `''`, `N5`, `N4`, `N3`, `N2`, `N1`. `term`, `meaning` bắt buộc; mỗi ô tối đa 2000 ký tự.
+- `term`, `meaning` bắt buộc; mỗi ô tối đa 2000 ký tự.
 
 ## Đã chốt, chưa làm
 
