@@ -80,10 +80,12 @@ const SAMPLE_DECKS = [
 ];
 
 /**
- * Xóa dữ liệu hiện có rồi tạo dữ liệu mẫu.
+ * Xóa dữ liệu hiện có rồi tạo dữ liệu mẫu. Chỉ cho chế độ khách (localStorage):
+ * đang đăng nhập thì ném lỗi, không đụng dữ liệu thật trên server.
  * @returns {Promise<{ decks: number, cards: number, reviewLogs: number }>}
  */
 export async function seedDemoData({ days = 120, now = Date.now(), random = Math.random } = {}) {
+  if (await storage.isSignedIn()) throw new Error('Đang đăng nhập: không tạo dữ liệu mẫu trên tài khoản.');
   await storage.clearAll();
 
   const firstDay = addDays(dayStart(now), -days);

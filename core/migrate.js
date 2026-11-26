@@ -5,6 +5,7 @@
  * Thẻ tạo từ L6 đến trước L16 còn trường `jlpt` (đã bỏ ở L16).
  * `migrateCards()` chuyển các thẻ có `front` / `back` hoặc còn trường `jlpt` một lần rồi ghi lại; thẻ đã đúng dạng thì giữ nguyên.
  * Chạy nhiều lần vẫn cho cùng kết quả, nên repo.js gọi nó ở lần đọc thẻ đầu tiên của mỗi lần mở trang.
+ * Khi đã đăng nhập thì không làm gì: thẻ trên server luôn đúng dạng mới (server kiểm tra lúc lưu).
  */
 import * as storage from './storage.js';
 import { CARD_FIELDS, COLLECTIONS } from './models.js';
@@ -29,6 +30,7 @@ function needsUpgrade(card) {
 
 /** Đổi mọi thẻ dạng cũ sang dạng mới và ghi lại. Trả về số thẻ đã đổi. */
 export async function migrateCards() {
+  if (await storage.isSignedIn()) return 0;
   const old = (await storage.list(COLLECTIONS.cards)).filter(needsUpgrade);
   if (old.length) await storage.putMany(COLLECTIONS.cards, old.map(upgradeCard));
   return old.length;
