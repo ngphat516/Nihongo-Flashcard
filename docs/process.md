@@ -16,12 +16,34 @@
 
 ---
 
+## 2026-11-26 — storage.js 2 chế độ (BE5)
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `core/storage-2-che-do`.
+  - `core/storage.js`: chế độ khách (localStorage, như cũ) và chế độ đăng nhập (`fetch` tới `/api`, đường dẫn tính từ vị trí file nên chạy ở mọi trang). Thêm `session()`, `isSignedIn()`, `rememberSignedIn()`; `put` nhận `{ expectedUpdatedAt }`; `list` nhận bộ lọc `deckId` / `from` / `to`; 3 thao tác nhiều bước `review`, `undoReview`, `removeDeck` gọi route transaction của server. Lỗi HTTP đổi thành `ValidationError`, `NotFoundError`, `ConflictError`, `AuthError`, `NetworkError` (3 lớp sau mới, trong `core/models.js`).
+  - `core/repo.js`: `updateDeck`, `updateCard`, `resetCard` gửi `expectedUpdatedAt`; `reviewCard` / `undo` / `deleteDeck` dùng 3 thao tác trên; `getCards`, `getReviewLogs` truyền bộ lọc xuống. `reviewCard` đặt `updatedAt = max(now, updatedAt cũ + 1)` để đồng hồ máy chậm hơn server không bị 409 oan.
+  - `dev/dev.js`, `core/seed.js`, `core/migrate.js`: đã đăng nhập thì `?seed` / `?reset` bị bỏ qua (cảnh báo Console, bỏ tham số khỏi URL), `seedDemoData()` ném lỗi, `migrateCards()` không chạy.
+  - Test: `tests/storage-api.test.js` (fetch giả), `tests/api/repo-api.test.js` (`repo.js` → Express → PostgreSQL, 2 user, 409, chấm/hoàn tác, xóa bộ giữ lượt ôn).
+  - Tài liệu: `architecture.md`, `backend.md`, `backend-trien-khai.md`.
+- **Quyết định:** chỉ hỏi `GET /api/me` khi trình duyệt có dấu `nholau-signed-in` (BE6 ghi sau khi đăng nhập). Hỏi mọi lần thì khách luôn nhận 401 (server Node) hoặc 404 (`python -m http.server`), Chrome ghi thành lỗi đỏ trong Console ở mọi trang. Mất dấu chỉ làm app coi là khách tới khi đăng nhập lại.
+- **Kiểm tra:** `npm test` (Docker chạy) 147 test, 147 pass. Trình duyệt, khách trên `python -m http.server` và server Node: `?seed`, 4 trang, `?reset` chạy như cũ, không có request `/api/`, Console không lỗi. Đã đăng nhập (server Node + PostgreSQL 16 trong Docker, cookie phiên tự ký cho user thử): `?reset` bị chặn, localStorage của khách còn nguyên; tạo bộ 2 thẻ ở Tạo thẻ lưu lên DB; Học chấm Tốt → DB có 1 lượt ôn, `Z` hoàn tác → mất lượt ôn, `reps` về 0; Album hiện đúng bộ; xóa cookie → 1 lỗi 401, app về khách và xóa dấu.
+- **Tiếp theo:** BE6 (nút đăng nhập/đăng xuất, gọi `rememberSignedIn`), rồi BE7, BE8.
+- **Vướng mắc:** `server/auth/middleware.js` (Daika) trả 401 cả khi PostgreSQL lỗi, nên đã đăng nhập mà DB sập thì app báo "Phiên đăng nhập đã hết hạn" thay vì lỗi máy chủ. Nên đổi thành 500/503 ở nhánh `catch`.
+
+## 2026-11-26 — Dọn bảng việc sau khi merge L16, L17; dời BE1 về cuối
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `core/storage-2-che-do`. Bỏ 2 dòng L16, L17 bị lặp do merge PR #43 và #44 trong bảng backend ở `tasks.md` (giữ dòng **Xong**). Kiểm tra lại L17: `gh api repos/ngphat516/Nihongo-Flashcard --jq '.security_and_analysis'` vẫn trả `secret_scanning` và `secret_scanning_push_protection` là `enabled`.
+- **Quyết định:** BE1 (Docker) dời về cuối. BE5–BE8 nối frontend chạy được với Node + PostgreSQL trên máy. Làm sau BE1: BE9, bước chạy lại trên Docker của BE14, BE11. Cần chừa vài ngày trước hạn nộp cho BE1 + BE9.
+- **Tiếp theo:** BE5.
+
 ## 2026-11-26 — Bật Secret scanning và Push protection (L17)
 
 - **Người làm:** Leader.
 - **Đã xong:** nhánh `docs/l17-secret-scanning`, chỉ `docs/`. Bật bằng `gh api -X PATCH repos/ngphat516/Nihongo-Flashcard` (tài khoản admin `ngphat516`) với `secret_scanning` và `secret_scanning_push_protection` là `enabled`.
 - **Kiểm tra:** `gh api repos/ngphat516/Nihongo-Flashcard --jq '.security_and_analysis'` trả `secret_scanning` và `secret_scanning_push_protection` cùng `"status": "enabled"` (đọc trước khi PATCH thì cả hai đã bật sẵn; PATCH giữ nguyên). `.gitignore` có `.env`, `.env.*`, `!.env.example` (PR #41); `git ls-files | grep -i '\.env'` không ra file nào.
 - **Tiếp theo:** L16 (bỏ `jlpt`), rồi BE5.
+
 ## 2026-11-26 — Bỏ trường jlpt (L16)
 
 - **Người làm:** Leader.

@@ -6,7 +6,7 @@ Tài liệu này nói code được tổ chức thế nào. App làm gì xem [pr
 
 - **Nhiều trang HTML riêng (MPA):** 4 trang, mỗi trang một file HTML. Chuyển trang là tải lại cả trang. Không có router, không có framework.
 - **Không có bước build:** trình duyệt chạy thẳng file JS dạng ES modules và file CSS trong repo.
-- **Dữ liệu trong `localStorage`:** mọi đọc/ghi đi qua `core/repo.js`, để sau này thay bằng backend chỉ phải sửa một file.
+- **Dữ liệu ở 2 nơi:** khách lưu trong `localStorage`; đã đăng nhập thì lưu trên server (PostgreSQL). Mọi đọc/ghi đi qua `core/repo.js` → `core/storage.js`, trang không biết dữ liệu nằm đâu.
 
 ### Môi trường chạy
 
@@ -31,7 +31,7 @@ core/                   phần lõi dùng chung
   models.js             cấu trúc Deck / Card / ReviewLog + kiểm tra dữ liệu, DECK_COLORS, DECK_DIRECTIONS
   furigana.js           cú pháp 漢字[かんじ]: parseFurigana, plainFurigana, renderFurigana
   migrate.js            đổi thẻ cũ front/back sang trường mới, xóa trường jlpt, một lần (chỉ repo.js dùng)
-  storage.js            đọc/ghi localStorage
+  storage.js            đọc/ghi localStorage (khách) hoặc gọi /api (đã đăng nhập)
   preferences.js        lựa chọn hiển thị của người học (bật/tắt furigana), key localStorage riêng
   date.js               ngày học (bắt đầu 4h sáng), định dạng thời gian
   dom.js                h() tạo element an toàn, $(), getParam(), startPage() (kèm nối nút furigana)
@@ -72,7 +72,8 @@ Mỗi file HTML nạp `styles/base.css`, CSS riêng của trang, `dev/dev.js` v�
 pages/<trang>/<trang>.js
         │  import
         ▼
-core/repo.js ──► core/storage.js ──► localStorage
+core/repo.js ──► core/storage.js ──► localStorage   (khách)
+                                 └──► fetch /api/…  (đã đăng nhập)
         │
         └─► scheduler.js · queue.js · models.js · date.js   (hàm thuần, có test)
 
@@ -81,7 +82,12 @@ dom.js, routes.js, furigana.js: tiện ích cho trang
 
 - **Trang** chỉ lo giao diện: đọc dữ liệu qua `repo.js`, vẽ bằng `h()`, gắn sự kiện.
 - **`repo.js`** là API duy nhất để đọc/ghi. Mọi hàm đều `async`. Nó kiểm tra dữ liệu bằng `models.js`, tính lịch ôn bằng `scheduler.js`, chọn thẻ bằng `queue.js`.
-- **`storage.js`** là lớp thấp nhất, chỉ `repo.js` dùng.
+- **`storage.js`** là lớp thấp nhất, chỉ `core/` dùng (và `dev/dev.js`). Có 2 chế độ, chọn một lần mỗi lần mở trang:
+  - Trình duyệt chưa có dấu đăng nhập (key `nholau-signed-in`) → **khách**: localStorage, không gọi mạng.
+  - Có dấu → hỏi `GET /api/me`: `200` → **đã đăng nhập**, gọi API; `401` / `404` → xóa dấu, về khách. Dấu chỉ để khỏi hỏi server khi chắc chắn là khách (Chrome ghi mọi `401`/`404` thành lỗi đỏ trong Console); quyền thật nằm ở cookie phiên. BE6 ghi dấu bằng `rememberSignedIn(true)` sau khi đăng nhập, `false` khi đăng xuất.
+  - Hàm chung: `list(c, filter?)`, `get`, `put(c, item, { expectedUpdatedAt? })`, `putMany`, `remove`, `removeMany`, `clearAll`, và 3 thao tác nhiều bước `review`, `undoReview`, `removeDeck` (chế độ API là 1 transaction trên server). Thêm `session()` / `isSignedIn()` cho biết đang ở chế độ nào.
+  - Chế độ API: `putMany` chỉ thêm mới; `put` trả bản server đã lưu (server tự đặt `updatedAt`); `repo.js` gửi `expectedUpdatedAt` khi sửa bộ / thẻ, bản trên server đã đổi thì báo `ConflictError`.
+  - Đã đăng nhập thì `?seed`, `?reset`, `dev.seed()`, `dev.reset()` bị bỏ qua (cảnh báo ở Console), `seedDemoData()` ném lỗi, `migrateCards()` không chạy.
 - **`scheduler.js`, `queue.js`, `models.js`, `date.js`** là hàm thuần (không đụng DOM hay localStorage), nên test được bằng Node.
 
 Trang được import những module nào: xem [conventions.md › Code](conventions.md#code).
@@ -102,6 +108,8 @@ Các module khác trong `pages/create/` (hàm thuần có test ở `tests/<tên>
 ## Dữ liệu
 
 Ba "bảng" trong localStorage, key có tiền tố `nholau:`: `decks`, `cards`, `reviewLogs`. Mỗi bảng lưu thành một object JSON `{ [id]: bản ghi }`.
+
+Khi đã đăng nhập, cùng 3 bảng đó nằm trên server, xem [backend.md](backend.md#database). localStorage của khách giữ nguyên, không bị đụng tới (đưa lên tài khoản là BE7).
 
 Ngoài ra, lựa chọn bật/tắt furigana (L7) nằm ở key riêng `nholau-furigana` (`'on'` / `'off'`, không có key thì coi như bật), đọc/ghi qua `core/preferences.js`, không đi qua `storage.js`. Key không có tiền tố `nholau:`, nên `?reset` không xóa lựa chọn này.
 
@@ -153,7 +161,7 @@ Mở bất kỳ trang nào kèm `?seed` (hoặc gọi `dev.seed()` trong Console
 | `getReviewLogs({ deckId?, from?, to? })` | `ReviewLog[]` | cho heatmap, thống kê |
 | `getDeckOverview()` | `[{ deck, total, due: { new, learning, review } }]` | |
 
-Lỗi do người dùng nhập sai có `err.name === 'ValidationError'`; `id` không tồn tại thì `NotFoundError`.
+Lỗi do người dùng nhập sai có `err.name === 'ValidationError'`; `id` không tồn tại thì `NotFoundError`. Khi đã đăng nhập còn có `ConflictError` (đã sửa ở máy khác), `AuthError` (phiên hết hạn), `NetworkError` (mất mạng, server lỗi). Mọi lỗi đều có `err.message` tiếng Việt hiện được cho người dùng.
 
 Các hàm thẻ chỉ nhận và trả tên trường mới; gửi `{ front, back }` thì báo `ValidationError` vì thiếu `term` / `meaning`.
 
@@ -191,10 +199,12 @@ Thông số nằm ở `DEFAULT_CONFIG` trong `core/scheduler.js`. Test ở `test
 `npm test` chạy `node --test`, Node tự tìm mọi file `*.test.js`:
 
 - `tests/`: thuật toán SM-2, thứ tự chọn thẻ, ngày học, lớp dữ liệu (`repo.js` chạy trên một localStorage giả trong bộ nhớ, `tests/helpers/memory-storage.js`), thẻ tiếng Nhật, màu bìa, lớp tương thích, furigana, `h()` (trên DOM giả tối giản), và các lỗi B1–B5.
+- `tests/storage-api.test.js`: `storage.js` chế độ API với `fetch` giả (chọn chế độ, route, lỗi HTTP, chia lô, khóa `seed` / `migrate`).
+- `tests/api/`: server thật trên PostgreSQL (bỏ qua khi không có Docker / PostgreSQL 16). `tests/api/repo-api.test.js` chạy `repo.js` → `storage.js` → Express → PostgreSQL với 2 user.
 - `pages/home/analytics.test.js`: phần tính số liệu của Trang chủ (lượt ôn, chuỗi ngày, tỉ lệ nhớ, ô heatmap, cột tháng).
 
 Giao diện các trang chưa có test tự động.
 
-## Thêm backend (sau này)
+## Backend
 
-Server Node.js, database PostgreSQL 16, chạy bằng Docker Compose. `core/storage.js` được viết lại bằng `fetch()` với cùng 7 hàm, nên các trang không phải sửa; SM-2 và chọn thẻ vẫn chạy ở trình duyệt. Database, API, đăng nhập và luật bảo mật: xem [backend.md](backend.md).
+Server Node.js, database PostgreSQL 16, chạy bằng Docker Compose. `core/storage.js` có thêm chế độ API (BE5, xem [Các lớp JS](#các-lớp-js)), nên các trang không phải sửa; SM-2 và chọn thẻ vẫn chạy ở trình duyệt. Database, API, đăng nhập và luật bảo mật: xem [backend.md](backend.md).

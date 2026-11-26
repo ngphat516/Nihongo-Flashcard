@@ -365,7 +365,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
        …
        return storage.put(DECKS, next, { expectedUpdatedAt: deck.updatedAt });
        ```
-   - Cơ chế chọn chế độ khi tải app: gọi `GET /api/me` (cache promise trong phiên trang hoặc lưu trạng thái session hiện tại). Nếu `200` (đã đăng nhập) → dùng adapter API (`fetch` tới `/api/:c`); nếu `401` (khách) → dùng adapter `localStorage` như cũ.
+   - Cơ chế chọn chế độ khi tải app: gọi `GET /api/me` (cache promise trong phiên trang hoặc lưu trạng thái session hiện tại). Nếu `200` (đã đăng nhập) → dùng adapter API (`fetch` tới `/api/:c`); nếu `401` (khách) → dùng adapter `localStorage` như cũ. **Đã làm (BE5):** chỉ hỏi `/api/me` khi trình duyệt có dấu `nholau-signed-in`, để khách không bị lỗi 401 đỏ trong Console; chi tiết ở [architecture.md › Các lớp JS](architecture.md#các-lớp-js).
    - Khi adapter API nhận `401` giữa chừng (hết hạn phiên 7 ngày) → báo lỗi rõ ràng mời đăng nhập lại.
    - Khi adapter API nhận `409` (`updatedAt` lệch) → ném lỗi có thông điệp rõ: `"Dữ liệu đã được sửa ở máy khác, hãy tải lại trang."`.
    - Cập nhật `core/repo.js`:
@@ -378,6 +378,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
    - Nếu đã đăng nhập → **bỏ qua**, ghi cảnh báo ra Console (tránh `?reset` lỡ tay xóa sạch dữ liệu thật trên PostgreSQL).
 
 5. **Nút đăng nhập / đăng xuất & đồng bộ dữ liệu khách** (BE6, BE7)
+   - Đăng nhập thành công thì gọi `rememberSignedIn(true)` (`core/storage.js`) rồi tải lại trang; đăng xuất thì `rememberSignedIn(false)`. Thiếu bước này thì app vẫn coi là khách.
    - Thêm script Google Identity Services vào 4 file HTML (`index.html`, `pages/album/index.html`, `pages/create/index.html`, `pages/study/index.html`).
    - Thêm khu vực tài khoản ở cột điều hướng `.rail` (cả 4 file HTML + `styles/base.css`): hiển thị nút **"Đăng nhập Google"** khi là khách; khi đã đăng nhập hiện avatar nhỏ + tên + nút **"Đăng xuất"** (`POST /api/auth/logout`). Kiểm tra gọn ở cả `1440px` và `375px` (thanh tab dưới đáy).
    - **Đưa dữ liệu khách lên tài khoản:** khi vừa đăng nhập thành công mà `localStorage` (`nholau:decks`, `nholau:cards`, `nholau:reviewLogs`) có dữ liệu, bật hộp thoại hỏi: *"Bạn đang có dữ liệu trên máy. Đưa lên tài khoản?"*.

@@ -169,13 +169,16 @@ Prefix `/api`. `:c` là collection, chỉ nhận đúng 3 giá trị `decks` | `
 
 | Hàm `storage.js` | Route |
 |---|---|
-| `list(c)` | `GET /api/:c` |
+| `list(c, { deckId?, from?, to? })` | `GET /api/:c?deckId=` / `?from=&to=` |
 | `get(c, id)` | `GET /api/:c/:id` |
-| `put(c, item)` | `PUT /api/:c/:id` |
+| `put(c, item, { expectedUpdatedAt? })` | `PUT /api/:c/:id` |
 | `putMany(c, items)` | `POST /api/:c/batch` (1 transaction) |
 | `remove(c, id)` | `DELETE /api/:c/:id` |
 | `removeMany(c, ids)` | `POST /api/:c/delete` |
 | `clearAll()` | `DELETE /api/me/data` |
+| `review(card, log)` | `POST /api/reviews` |
+| `undoReview(logId, card)` | `POST /api/reviews/:id/undo` |
+| `removeDeck(id)` | `DELETE /api/decks/:id` |
 
 **Route riêng chạy trong 1 transaction**, vì thao tác nhiều bước qua mạng có thể đứt giữa chừng:
 - `POST /api/reviews`: ghi lượt ôn + cập nhật thẻ.
