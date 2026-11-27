@@ -30,6 +30,13 @@
 - **Lỗi và thử lại:** giữ thẻ khi lỗi, khóa thao tác tới khi đọc lại dữ liệu thành công. Nút thử lại chỉ đọc hàng đợi, không tự gửi lại lượt chấm/hoàn tác; lỗi mạng sau ghi nhắc yêu cầu có thể đã lưu. Lỗi 409 hiện thông báo từ core; hết phiên yêu cầu tải lại trang. Giữ thẻ vừa hoàn tác nếu server đã lưu nhưng lần tải hàng đợi tiếp theo bị lỗi.
 - **Kiểm tra:** `npm ci`; `npm test` bằng Node 24.22.3 + PostgreSQL 16: **147 pass, 0 fail, 0 skip**. Edge headless 1440×1000 và 375×812: **22 kiểm tra qua** với API giả lập chậm/mất mạng/409/401, bấm phím liên tục chỉ gửi 1 POST, retry không gửi lại POST, lưu hoặc undo thành công rồi lỗi đọc vẫn phục hồi đúng; không lỗi JS ngoài lỗi mạng HTTP cố ý; không cuộn ngang, nút chấm ≥48px. Chế độ khách thật với `?seed`/`?reset` vẫn chạy. Ảnh `pages/study/screenshots/be8-*`.
 - **Tiếp theo:** Leader review phần Học của BE8; các trang khác theo người phụ trách. BE14 vẫn còn bước kiểm tra Docker sau BE1; lỗi B6 thuộc Daika, không sửa trong PR này.
+## 2026-11-27 — Giữ phiên khi máy chủ chưa xác thực được (B6)
+
+- **Người làm:** Daika (Banana).
+- **Đã xong:** nhánh `fix/b6-auth-server-error`. Sửa `requireAuth`, kiểm tra khóa HS256 và miền giá trị `tv`. Cập nhật hợp đồng lỗi ở `backend-trien-khai.md` và test cả API lẫn dấu đăng nhập của frontend.
+- **Quyết định:** trả 401 khi thiếu phiên hoặc có bằng chứng phiên vô hiệu. Khi cấu hình, bộ xác minh hoặc PostgreSQL lỗi, chặn request bằng 503 để trình duyệt giữ dấu cho lần thử sau.
+- **Kiểm tra:** trên code cũ, thiếu khóa, DB từ chối kết nối và thu quyền `SELECT` đều trả nhầm 401. Vòng phản biện phát hiện thêm khóa PEM, lỗi nội bộ của bộ xác minh và `tv` vượt kiểu `INT`. Sau khi sửa, `npm test` và `REQUIRE_TEST_POSTGRES=1 npm test` đều đạt 150/150 trên Node 24.22.1, PostgreSQL 16.16. Chromium 156 giữ dấu qua lần tải lại khi ngắt TCP, dùng lại cùng cookie khi DB phục hồi và xóa dấu sau khi thu hồi phiên.
+- **Tiếp theo:** Leader review B6. Luồng giao diện đăng nhập thuộc BE6.
 
 ## 2026-11-26 — Ghi lỗi B6 cho Daika
 

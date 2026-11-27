@@ -74,9 +74,12 @@ describe('chọn chế độ', () => {
     storage.rememberSignedIn(true);
     fakeFetch(() => ({ throws: true }));
     await assert.rejects(storage.session(), { name: 'NetworkError' });
-    fakeFetch(() => ({ status: 500, body: {} }));
-    await assert.rejects(storage.session(), { name: 'NetworkError' });
-    signedIn();
+    for (const status of [500, 503]) {
+      fakeFetch(() => ({ status, body: {} }));
+      await assert.rejects(storage.session(), { name: 'NetworkError' });
+      assert.equal(local.getItem(storage.SIGNED_IN_KEY), '1');
+    }
+    fakeFetch(() => ({ body: { user: USER } }));
     assert.equal(await storage.isSignedIn(), true);
   });
 
@@ -140,6 +143,10 @@ describe('chế độ API', () => {
     }
     signedIn(() => ({ throws: true }));
     await assert.rejects(storage.remove('decks', ID), { name: 'NetworkError' });
+    const message = 'Máy chủ đang lỗi, vui lòng thử lại sau.';
+    signedIn(() => ({ status: 503, body: { error: { code: 'INTERNAL_ERROR', message } } }));
+    await assert.rejects(storage.get('decks', ID), { name: 'NetworkError', message });
+    assert.equal(local.getItem(storage.SIGNED_IN_KEY), '1', 'lỗi máy chủ giữa phiên vẫn giữ dấu');
     signedIn(() => ({ status: 401, body: {} }));
     await assert.rejects(storage.get('decks', ID), { name: 'AuthError' });
     assert.equal(local.getItem(storage.SIGNED_IN_KEY), null, 'hết phiên giữa chừng thì xóa dấu');
