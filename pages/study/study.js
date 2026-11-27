@@ -7,12 +7,12 @@
 import { $, getParam, h, startPage } from '../../core/dom.js';
 import { renderFurigana } from '../../core/furigana.js';
 import { NotFoundError } from '../../core/models.js';
-import { LEARN_AHEAD_MS, isLearning } from '../../core/queue.js';
 import { getCards, getDeckOverview, getStudyQueue, reviewCard, updateDeck } from '../../core/repo.js';
 import { routes } from '../../core/routes.js';
 import { Rating, RATINGS, RATING_LABELS, previewRatings } from '../../core/scheduler.js';
+import { createStudyFeedback } from './feedback.js';
+import { browsableCards, countItems } from './queue-view.js';
 
-const countLabels = { new: 'Mới', learning: 'Đang học', review: 'Đến hạn' };
 const ratingClasses = {
   [Rating.AGAIN]: 'btn-again',
   [Rating.HARD]: 'btn-hard',
@@ -21,32 +21,22 @@ const ratingClasses = {
 };
 const clock = new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit' });
 
+let feedback;
 startPage(async () => {
+  feedback = createStudyFeedback();
   const deckId = getParam('deck');
   if (deckId) await startSession(deckId);
-  else await showDeckPicker();
+  else await loadDeckPicker();
 });
 
-function countItems(counts) {
-  return Object.entries(countLabels).map(([state, label]) => {
-    const count = counts[state];
-    return h('span', { class: `count count-${state}${count === 0 ? ' is-zero' : ''}` },
-      h('b', {}, count), h('span', {}, label));
-  });
-}
-
-function browsableCards(cards, newLimit, now, lastCardId) {
-  const learning = cards.filter(isLearning).sort((a, b) => a.due - b.due);
-  const reviews = cards.filter((card) => card.state === 'review' && card.due <= now);
-  reviews.sort((a, b) => a.due - b.due);
-
-  return [
-    ...learning.filter((card) => card.due <= now),
-    ...reviews,
-    ...cards.filter((card) => card.state === 'new').slice(0, newLimit),
-    ...learning.filter((card) =>
-      card.due > now && card.due <= now + LEARN_AHEAD_MS && card.id !== lastCardId),
-  ];
+async function loadDeckPicker() {
+  feedback.loading('Đang tải các bộ thẻ…');
+  try {
+    await showDeckPicker();
+    feedback.settled();
+  } catch (error) {
+    feedback.failed(error, loadDeckPicker);
+  }
 }
 
 async function showDeckPicker() {
@@ -92,8 +82,6 @@ async function startSession(deckId) {
   const nextCard = $('#next-card');
   const cardPosition = $('#card-position');
   const undoButtons = [$('#undo-session'), $('#undo-done')];
-  const errorBox = $('#study-error');
-  const retryButton = $('#retry-queue');
   $('#exit-session').href = routes.study();
   $('#done-home').href = routes.home();
 
@@ -107,14 +95,21 @@ async function startSession(deckId) {
   let lastReview = null;
   let lastCardId = null;
   let busy = false;
+  let blocked = false;
+  let pendingPreferred = null;
   let wakeTimer;
   let navigationAnimation;
   let direction = 'ja-vi';
   const directionButton = $('#study-direction');
 
-  function showError(error) {
-    errorBox.textContent = error.message;
-    errorBox.hidden = false;
+  function updateControls() {
+    const locked = busy || blocked;
+    for (const button of [stage, directionButton, ...ratings.querySelectorAll('button')]) {
+      button.disabled = locked || !current;
+    }
+    previousCard.disabled = locked || !current || cardIndex === 0;
+    nextCard.disabled = locked || !current || cardIndex >= cardsToBrowse.length - 1;
+    for (const button of undoButtons) button.disabled = locked || !lastReview;
   }
 
   function updateUndo() {
@@ -149,7 +144,7 @@ async function startSession(deckId) {
   }
 
   function flipCard() {
-    if (!current || busy) return;
+    if (!current || busy || blocked) return;
     revealed = !revealed;
     stage.classList.remove('is-resetting');
     stage.classList.toggle('is-flipped', revealed);
@@ -171,7 +166,7 @@ async function startSession(deckId) {
 
   function moveCard(offset) {
     const nextIndex = cardIndex + offset;
-    if (busy || !current || nextIndex < 0 || nextIndex >= cardsToBrowse.length) return;
+    if (busy || blocked || !current || nextIndex < 0 || nextIndex >= cardsToBrowse.length) return;
     cardIndex = nextIndex;
     showFront(cardsToBrowse[cardIndex]);
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -204,61 +199,58 @@ async function startSession(deckId) {
 
   async function loadQueue(preferredCard) {
     clearTimeout(wakeTimer);
+    const now = Date.now();
+    const queue = await getStudyQueue(deckId, { now, lastCardId });
+    const cards = await getCards(deckId);
     current = null;
-    try {
-      const now = Date.now();
-      const queue = await getStudyQueue(deckId, { now, lastCardId });
-      const cards = await getCards(deckId);
-      empty.hidden = cards.length > 0;
-      if (cards.length === 0) {
-        session.hidden = true;
-        done.hidden = true;
-        $('#empty-title').focus();
-        return;
-      }
-      const card = preferredCard ?? queue.card;
-      if (card) {
-        cardsToBrowse = browsableCards(cards, queue.counts.new, now, lastCardId);
-        cardIndex = cardsToBrowse.findIndex((item) => item.id === card.id);
-        if (cardIndex === -1) {
-          cardsToBrowse.unshift(card);
-          cardIndex = 0;
-        }
-      }
-      direction = queue.deck.direction;
-      directionButton.textContent = direction === 'vi-ja' ? 'Việt → Nhật' : 'Nhật → Việt';
-      $('#deck-name').textContent = queue.deck.name;
-      $('#study-counts').replaceChildren(...countItems(queue.counts));
-      if (card) showFront(card);
-      else showDone(queue.nextLearningAt);
-    } catch (error) {
-      empty.hidden = true;
+    empty.hidden = cards.length > 0;
+    if (cards.length === 0) {
       session.hidden = true;
       done.hidden = true;
-      if (!(error instanceof NotFoundError)) {
-        showError(error);
-        retryButton.onclick = () => run(() => loadQueue(preferredCard));
-        retryButton.hidden = false;
-        retryButton.focus();
-        return;
-      }
-      showError(error);
-      await showDeckPicker();
+      $('#empty-title').focus();
+      return;
     }
+    const card = preferredCard ?? pendingPreferred ?? queue.card;
+    if (card) {
+      cardsToBrowse = browsableCards(cards, queue.counts.new, now, lastCardId);
+      cardIndex = cardsToBrowse.findIndex((item) => item.id === card.id);
+      if (cardIndex === -1) {
+        cardsToBrowse.unshift(card);
+        cardIndex = 0;
+      }
+    }
+    direction = queue.deck.direction;
+    directionButton.textContent = direction === 'vi-ja' ? 'Việt → Nhật' : 'Nhật → Việt';
+    $('#deck-name').textContent = queue.deck.name;
+    $('#study-counts').replaceChildren(...countItems(queue.counts));
+    if (card) showFront(card);
+    else showDone(queue.nextLearningAt);
+    pendingPreferred = null;
   }
 
-  async function run(action) {
+  async function run(action, message = 'Đang tải thẻ…') {
     if (busy) return;
     busy = true;
-    errorBox.hidden = true;
-    retryButton.hidden = true;
+    feedback.loading(message);
+    updateControls();
     try {
       await action();
+      blocked = false;
+      feedback.settled();
     } catch (error) {
-      showError(error);
+      blocked = true;
+      clearTimeout(wakeTimer);
+      if (error instanceof NotFoundError) {
+        current = null;
+        session.hidden = done.hidden = empty.hidden = true;
+        try { await showDeckPicker(); } catch { /* Giữ lỗi gốc và nút thử lại. */ }
+      }
+      feedback.failed(error, reloadQueue, message === 'Đang lưu lượt chấm…' || message === 'Đang hoàn tác…');
     } finally {
       busy = false;
       updateUndo();
+      updateControls();
+      if (!blocked && current) stage.focus({ preventScroll: true });
     }
   }
 
@@ -267,7 +259,7 @@ async function startSession(deckId) {
   }
 
   function answer(rating) {
-    if (!current) return;
+    if (!current || blocked) return;
     return run(async () => {
       const card = current;
       const timeMs = Math.round(performance.now() - shownAt);
@@ -278,33 +270,37 @@ async function startSession(deckId) {
       reviewedCards.add(card.id);
       studyMs += timeMs;
       await loadQueue();
-    });
+    }, 'Đang lưu lượt chấm…');
   }
 
   function undoLast() {
-    if (!lastReview) return;
+    if (!lastReview || blocked) return;
     return run(async () => {
       const { timeMs, wasReviewed, undo } = lastReview;
       const card = await undo();
+      pendingPreferred = card;
       if (!wasReviewed) reviewedCards.delete(card.id);
       studyMs -= timeMs;
       lastReview = null;
       lastCardId = null;
       await loadQueue(card);
-    });
+    }, 'Đang hoàn tác…');
   }
 
   directionButton.addEventListener('keydown', (event) => {
     if (event.key === ' ') event.stopPropagation();
   });
-  directionButton.addEventListener('click', () => run(async () => {
-    const deck = await updateDeck(deckId, {
-      direction: direction === 'ja-vi' ? 'vi-ja' : 'ja-vi',
-    });
-    direction = deck.direction;
-    directionButton.textContent = direction === 'vi-ja' ? 'Việt → Nhật' : 'Nhật → Việt';
-    if (current) showFront(current);
-  }));
+  directionButton.addEventListener('click', () => {
+    if (blocked) return;
+    return run(async () => {
+      const deck = await updateDeck(deckId, {
+        direction: direction === 'ja-vi' ? 'vi-ja' : 'ja-vi',
+      });
+      direction = deck.direction;
+      directionButton.textContent = direction === 'vi-ja' ? 'Việt → Nhật' : 'Nhật → Việt';
+      if (current) showFront(current);
+    }, 'Đang lưu chiều học…');
+  });
   stage.addEventListener('click', flipCard);
   previousCard.addEventListener('click', () => moveCard(-1));
   nextCard.addEventListener('click', () => moveCard(1));
@@ -320,7 +316,7 @@ async function startSession(deckId) {
       if (!event.repeat) flipCard();
       return;
     }
-    if (event.repeat || busy) return;
+    if (event.repeat || busy || blocked) return;
 
     if (current && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
       event.preventDefault();

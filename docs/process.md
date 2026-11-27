@@ -16,6 +16,14 @@
 
 ---
 
+## 2026-11-27 — Trạng thái tải và lỗi mạng ở trang Học (BE8)
+
+- **Người làm:** At.
+- **Đã xong:** nhánh `feature/study-network` từ `main` mới nhất. Hiện trạng thái tải bộ/thẻ, lưu lượt chấm, hoàn tác và lưu chiều học; có `aria-busy` và thông báo trạng thái. Khóa nút chấm, lật/chuyển thẻ, đổi chiều và hoàn tác cùng phím tắt trong lúc gửi. Tách feedback và phần trình bày hàng đợi vào module riêng trong `pages/study/`.
+- **Lỗi và thử lại:** giữ thẻ khi lỗi, khóa thao tác tới khi đọc lại dữ liệu thành công. Nút thử lại chỉ đọc hàng đợi, không tự gửi lại lượt chấm/hoàn tác; lỗi mạng sau ghi nhắc yêu cầu có thể đã lưu. Lỗi 409 hiện thông báo từ core; hết phiên yêu cầu tải lại trang. Giữ thẻ vừa hoàn tác nếu server đã lưu nhưng lần tải hàng đợi tiếp theo bị lỗi.
+- **Kiểm tra:** `npm ci`; `npm test` bằng Node 24.22.3 + PostgreSQL 16: **147 pass, 0 fail, 0 skip**. Edge headless 1440×1000 và 375×812: **22 kiểm tra qua** với API giả lập chậm/mất mạng/409/401, bấm phím liên tục chỉ gửi 1 POST, retry không gửi lại POST, lưu hoặc undo thành công rồi lỗi đọc vẫn phục hồi đúng; không lỗi JS ngoài lỗi mạng HTTP cố ý; không cuộn ngang, nút chấm ≥48px. Chế độ khách thật với `?seed`/`?reset` vẫn chạy. Ảnh `pages/study/screenshots/be8-*`.
+- **Tiếp theo:** Leader review phần Học của BE8; các trang khác theo người phụ trách. BE14 vẫn còn bước kiểm tra Docker sau BE1; lỗi B6 thuộc Daika, không sửa trong PR này.
+
 ## 2026-11-26 — Ghi lỗi B6 cho Daika
 
 - **Người làm:** Leader.
