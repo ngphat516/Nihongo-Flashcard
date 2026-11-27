@@ -158,6 +158,7 @@ async function startSession(deckId) {
       class: `btn ${ratingClasses[rating]}`,
       type: 'button',
       'aria-keyshortcuts': String(rating),
+      title: `Nhấn phím ${rating} để chọn “${RATING_LABELS[rating]}”.`,
       onClick: () => answer(rating),
     },
     h('span', {}, RATING_LABELS[rating]),

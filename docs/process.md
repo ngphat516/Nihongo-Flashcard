@@ -16,6 +16,13 @@
 
 ---
 
+## 2026-11-27 — Gợi ý phím tắt trên nút chấm (S3)
+
+- **Người làm:** At.
+- **Đã xong:** thêm tooltip khi rê chuột lên từng nút: “Nhấn phím 1 để chọn Lại”, 2 → Khó, 3 → Tốt, 4 → Dễ. Giữ xử lý phím 1–4 đang có, bao gồm khóa khi đang gửi hoặc lỗi mạng.
+- **Kiểm tra:** Edge, lật mặt sau rồi rê chuột và nhấn từng phím 1–4: đủ 4 tooltip đúng và 4 lượt ôn lưu đúng rating, không cần click nút. Thay đổi bổ sung trong PR #47.
+- **Tiếp theo:** Leader review PR #47.
+
 ## 2026-11-27 — Trạng thái tải và lỗi mạng ở trang Học (BE8)
 
 - **Người làm:** At.
