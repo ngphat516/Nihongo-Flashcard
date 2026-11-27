@@ -1,3 +1,4 @@
+import { Rating, RATINGS, RATING_LABELS, previewRatings } from '../../core/scheduler.js';
 import { h } from '../../core/dom.js';
 import { LEARN_AHEAD_MS, isLearning } from '../../core/queue.js';
 
@@ -23,5 +24,25 @@ export function browsableCards(cards, newLimit, now, lastCardId) {
     ...learning.filter((card) =>
       card.due > now && card.due <= now + LEARN_AHEAD_MS && card.id !== lastCardId),
   ];
+}
+
+
+const ratingClasses = {
+  [Rating.AGAIN]: 'btn-again',
+  [Rating.HARD]: 'btn-hard',
+  [Rating.GOOD]: 'btn-good',
+  [Rating.EASY]: 'btn-easy',
+};
+export function renderRatingButtons(ratings, card, answer) {
+  const preview = previewRatings(card);
+  ratings.replaceChildren(...RATINGS.map((rating) => h('button', {
+    class: `btn ${ratingClasses[rating]}`,
+    type: 'button',
+    'aria-keyshortcuts': String(rating),
+    title: `Nhấn phím ${rating} để chọn “${RATING_LABELS[rating]}”.`,
+    onClick: () => answer(rating),
+  },
+  h('span', {}, RATING_LABELS[rating]),
+  h('small', {}, preview[rating].label))));
 }
 

@@ -16,6 +16,14 @@
 
 ---
 
+## 2026-11-27 — Sửa theo review PR #47 (BE8)
+
+- **Người làm:** At.
+- **Đã xong:** đọc lại AGENTS và quy ước dự án, đồng bộ commit `fd0c2b3` của nhánh PR (đã chứa B6). Sửa đủ 4 góp ý của Leader: mất thẻ khi chấm/hoàn tác thì tự đọc lại hàng đợi, giữ phiên và thống kê; mất bộ thì về màn chọn bộ và bỏ nút thử lại; truyền cờ `write` riêng thay vì so chữ thông báo; phân biệt yêu cầu chưa rõ kết quả với thao tác đã được xác nhận lưu trước khi lỗi tải hàng đợi.
+- **Cấu trúc:** tách màn chọn bộ và phím tắt thành module trong `pages/study/`; phần tạo nút chấm đặt trong `queue-view.js`, `study.js` còn dưới 300 dòng. Không đổi core/server hoặc quy tắc dữ liệu.
+- **Kiểm tra:** Node 24 + PostgreSQL 16, `npm ci` và `npm test`: **150 pass, 0 fail, 0 skip**. Edge 1440×1000 và 375×812: **36 kiểm tra qua**, gồm xóa thẻ từ nơi khác khi chấm/undo, giữ tổng số thẻ đã học, xóa bộ lúc mở hoặc trong phiên, xác nhận đã lưu khi lỗi đọc sau review/undo; vẫn khóa phím/nút và retry không gửi lại POST. Chế độ khách `?seed`/`?reset` vẫn chạy; ảnh bổ sung `be8-*-deleted-card.jpg`, `be8-*-deleted-deck.jpg`.
+- **Tiếp theo:** Leader review lại PR #47. Các lần sau tách PR theo mã task như góp ý, không gộp việc S3 mới vào BE8.
+
 ## 2026-11-27 — Gợi ý phím tắt trên nút chấm (S3)
 
 - **Người làm:** At.

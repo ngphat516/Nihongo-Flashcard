@@ -24,17 +24,19 @@ export function createStudyFeedback() {
     status.hidden = true;
   }
 
-  function failed(error, reload, uncertainWrite = false) {
+  function failed(error, reload, { write = false, confirmed = false } = {}) {
     settled();
-    const uncertain = error.name === 'NetworkError' && uncertainWrite
-      ? ' Yêu cầu có thể đã được lưu. Hãy tải lại dữ liệu trước khi tiếp tục.' : '';
-    errorBox.textContent = error.message + uncertain;
+    const saved = confirmed ? ' Thao tác đã được lưu. Hãy tải lại dữ liệu để tiếp tục.'
+      : error.name === 'NetworkError' && write
+        ? ' Yêu cầu có thể đã được lưu. Hãy tải lại dữ liệu trước khi tiếp tục.' : '';
+    errorBox.textContent = error.message + saved;
     errorBox.hidden = false;
+    retry.hidden = !reload;
+    errorBox.scrollIntoView({ block: 'nearest' });
+    if (!reload) return;
     const expired = error.name === 'AuthError';
     retry.textContent = expired ? 'Tải lại trang' : 'Thử tải lại dữ liệu';
     retry.onclick = expired ? () => location.reload() : reload;
-    retry.hidden = false;
-    errorBox.scrollIntoView({ block: 'nearest' });
     retry.focus({ preventScroll: true });
   }
 
