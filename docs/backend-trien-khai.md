@@ -92,6 +92,7 @@ server/
 | `429` | `RATE_LIMITED` | Vượt hạn mức đăng nhập theo IP hoặc hết hạn mức AI trong ngày / Gemini trả `429` |
 | `500` | `INTERNAL_ERROR` | Lỗi không lường trước (không lộ stack trace, câu SQL hay tên bảng ra client) |
 | `502` | `AI_UPSTREAM_ERROR` | Gemini lỗi / trả định dạng hỏng / timeout |
+| `503` | `INTERNAL_ERROR` | Máy chủ chưa kiểm tra được phiên do lỗi cấu hình, bộ xác minh hoặc PostgreSQL. Thông báo “Máy chủ đang lỗi, vui lòng thử lại sau.” |
 
 - **JSON ↔ DB:**
   - Mọi JSON request/response dùng `camelCase` khớp `core/models.js` (`deckId`, `newPerDay`, `lastReview`, `createdAt`, `updatedAt`, `cardId`, `prevState`, `prevInterval`, `newInterval`, `prevEase`, `reviewedAt`, `timeMs`).
@@ -145,7 +146,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
 | **Health** | `GET /api/health` | — | `200 { ok: true, db: true }` | Kiểm tra server sống + `SELECT 1` DB |
 | **Auth** | `POST /api/auth/google` | `{ idToken }` | `200 { user: { id, email, name, avatarUrl } }` + `Set-Cookie` | Rate-limit theo `CF-Connecting-IP`; xác minh token Google; upsert `users` |
 | **Auth** | `POST /api/auth/logout` | — | `204` + xóa cookie | Xóa cookie JWT (`Max-Age=0`) |
-| **Auth** | `GET /api/me` | — | `200 { user: { id, email, name, avatarUrl } }` hoặc `401` | Đọc thông tin user từ DB theo `req.user.id` |
+| **Auth** | `GET /api/me` | — | `200 { user: { id, email, name, avatarUrl } }`, `401` hoặc `503` | Đọc thông tin user từ DB theo `req.user.id` |
 | **CRUD** | `GET /api/:c` | `?deckId=` (cho `cards`), `?from=&to=` (cho `reviewLogs`) | `200 { items: [...] }` | `:c` ∈ `{decks, cards, reviewLogs}`, khác → `404` |
 | **CRUD** | `GET /api/:c/:id` | — | `200 { item: {...} }` hoặc `404` | Lọc `AND user_id = $me`; của người khác vẫn trả `404` |
 | **CRUD** | `PUT /api/:c/:id` | Body là object item (`camelCase`), kèm `expectedUpdatedAt?` khi sửa | `200 { item: {...} }` hoặc `409` | Upsert có chặn chủ sở hữu (`ON CONFLICT (id) DO UPDATE … WHERE user_id = $me`, 0 dòng → `404`); có `expectedUpdatedAt` thì kiểm tra `updated_at` |
@@ -214,7 +215,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
      1. Kiểm tra dev bypass: **chỉ** khi `NODE_ENV === 'development' && DEV_AUTH === '1'` và có `X-Dev-User`. Nếu hợp lệ UUID → gắn `req.user = { id }` và `next()`.
      2. Đọc cookie `nholau_session`. Xác minh JWT chỉ cho phép `algorithms: ['HS256']` (chặn `alg: none` và asymmetric confusion).
      3. Truy vấn DB kiểm tra `token_version` trong bảng `users` phải khớp `payload.tv` (để hỗ trợ vô hiệu hóa toàn bộ phiên khi tăng `token_version`).
-     4. Gắn `req.user = { id: user.id }`; lỗi bất kỳ bước nào → `401 UNAUTHORIZED`.
+     4. Chỉ gắn `req.user = { id: user.id }` và gọi `next()` khi tìm thấy phiên khớp. Thiếu cookie, JWT sai hoặc hết hạn, user không còn hoặc phiên bản lệch → `401 UNAUTHORIZED`. Khi lỗi máy chủ cản trở việc kiểm tra, dừng request với `503 INTERNAL_ERROR` theo bảng mã lỗi. Frontend giữ dấu đăng nhập để lần sau kiểm tra lại.
 
 #### Bẫy cần tránh & Checklist nghiệm thu (Daika)
 - Không dùng `TIMESTAMP` của Postgres — giữ nguyên `BIGINT` (ms) để khớp `Date.now()` của JS.

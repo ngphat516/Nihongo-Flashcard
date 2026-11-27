@@ -8,10 +8,11 @@ import { gaxios, OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import { closePool } from '../../server/db/pool.js';
 import { verifyGoogleIdToken } from '../../server/auth/google.js';
-import { readSession } from '../../server/auth/jwt.js';
+import { readSession, signSession } from '../../server/auth/jwt.js';
 import { requireAuth } from '../../server/auth/middleware.js';
 import { createAuthRouter } from '../../server/routes/auth.js';
 import { postgresUnavailable, startTestDatabase } from '../helpers/postgres.js';
+import { database, deck, USER_A, USER_B } from './helpers.js';
 
 const audience = 'nholau-test.invalid';
 const { publicKey, privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
@@ -71,6 +72,61 @@ function assertError(response, status, code) {
   assert.equal(response.headers.get('set-cookie'), null);
 }
 
+function assertUnavailable(response) {
+  assertError(response, 503, 'INTERNAL_ERROR');
+  assert.equal(response.body.error.message, 'Máy chủ đang lỗi, vui lòng thử lại sau.');
+  assert.equal(response.headers.get('cache-control'), 'no-store');
+}
+
+test('thiếu khóa hoặc khóa cấu hình sai: khách vẫn nhận 401, phiên chưa xác minh được nhận 503', async t => {
+  const request = await serve(t);
+  const key = process.env.JWT_SECRET;
+  const cookie = 'nholau_session=' + signSession({ id: randomUUID(), token_version: 0 });
+  t.after(() => { process.env.JWT_SECRET = key; });
+  for (const secret of [undefined, ' '.repeat(32), randomBytes(4).toString('hex'), cert]) {
+    if (secret === undefined) delete process.env.JWT_SECRET;
+    else process.env.JWT_SECRET = secret;
+    assertError(await request('/api/me'), 401, 'UNAUTHORIZED');
+    assertUnavailable(await request('/api/me', { cookie }));
+  }
+});
+
+test('lỗi nội bộ của bộ xác minh JWT không làm hết phiên, không lộ chi tiết', async t => {
+  const request = await serve(t);
+  const cookie = 'nholau_session=' + signSession({ id: randomUUID(), token_version: 0 });
+  for (const ErrorType of [Error, TypeError, SyntaxError]) {
+    const verify = t.mock.method(jwt, 'verify', () => { throw new ErrorType('Chi tiết nội bộ chỉ dành cho test'); });
+    assertUnavailable(await request('/api/me', { cookie }));
+    verify.mock.restore();
+  }
+});
+
+test('mất kết nối PostgreSQL chặn cả đọc và ghi; khi DB phục hồi chỉ phiên còn hiệu lực dùng lại được',
+  { skip: postgresSkip }, async t => {
+    const { db, request } = await database(t);
+    process.env.NODE_ENV = 'production'; // Helper gửi cả X-Dev-User: production phải bỏ qua.
+    const cookieFor = (id, version = 0) => ({ Cookie: 'nholau_session=' + signSession({ id, token_version: version }) });
+    const valid = cookieFor(USER_A);
+    const revoked = cookieFor(USER_B);
+    assert.equal((await request('/api/me', { headers: valid })).body.user.id, USER_A);
+    await db.admin.query('ALTER ROLE nholau_app NOLOGIN');
+    try {
+      await closePool(); // Buộc app mở kết nối thật tới DB đang từ chối kết nối mới.
+      await db.admin.query('UPDATE users SET token_version = token_version + 1 WHERE id = $1', [USER_B]);
+      for (const headers of [valid, revoked]) assertUnavailable(await request('/api/me', { headers }));
+      const item = deck();
+      assertUnavailable(await request('/api/decks/' + item.id, { method: 'PUT', headers: valid, body: item }));
+      assert.equal((await db.admin.query('SELECT id FROM decks')).rowCount, 0);
+      assertError(await request('/api/me', { headers: { Cookie: 'nholau_session=invalid' } }), 401, 'UNAUTHORIZED');
+    } finally {
+      await db.admin.query('ALTER ROLE nholau_app LOGIN');
+    }
+    assert.equal((await request('/api/me', { headers: valid })).body.user.id, USER_A);
+    assertError(await request('/api/me', { headers: revoked }), 401, 'UNAUTHORIZED');
+    await db.admin.query('UPDATE users SET token_version = $1 WHERE id = $2', [2_147_483_647, USER_B]);
+    assert.equal((await request('/api/me', { headers: cookieFor(USER_B, 2_147_483_647) })).body.user.id, USER_B);
+  });
+
 test('Google yêu cầu idToken trong JSON và từ chối thông tin chưa xác minh', async t => {
   const request = await serve(t);
   for (const body of [{}, { idToken: [] }, { idToken: ' ' }, { userId: randomUUID(), email: 'a@example.invalid' }]) {
@@ -98,6 +154,8 @@ test('chỉ chấp nhận JWT có HS256, chữ ký, thời hạn, UUID và phiê
     jwt.sign(active, randomBytes(48)), jwt.sign({ ...claims, exp: now() - 1 }, key), jwt.sign(claims, key),
     jwt.sign({ ...active, sub: 'abc' }, key), jwt.sign({ ...active, tv: '0' }, key),
     jwt.sign({ sub: claims.sub, exp: active.exp }, key),
+    jwt.sign({ ...active, nbf: now() + 600 }, key),
+    jwt.sign('null', key, { header: { typ: 'JWT' } }), jwt.sign('abc', key, { header: { typ: 'JWT' } }),
   ]) {
     const cookie = 'nholau_session=' + token;
     assert.equal(readSession({ headers: { cookie } }), null);
@@ -202,10 +260,13 @@ test('đăng nhập, hồ sơ, thu hồi và đăng xuất với hai người d�
   assert.equal(session.exp - session.iat, 604800);
   const wrongSignature = jwt.sign({ sub: first.id, tv: 0, exp: now() + 3600 }, randomBytes(48));
   assertError(await request('/api/me', { cookie: 'nholau_session=' + wrongSignature }), 401, 'UNAUTHORIZED');
+  // tv phải biểu diễn được trong cột INT của PostgreSQL, kể cả khi chữ ký đúng.
+  const tooLarge = signSession({ id: first.id, token_version: 2_147_483_648 });
+  assertError(await request('/api/me', { cookie: 'nholau_session=' + tooLarge }), 401, 'UNAUTHORIZED');
   // Kể cả chữ ký đúng, nếu không đọc được token_version thì không cho qua middleware.
   await db.admin.query('REVOKE SELECT ON users FROM nholau_app');
   try {
-    assertError(await request('/probe', { cookie: cookieA }), 401, 'UNAUTHORIZED');
+    assertUnavailable(await request('/probe', { cookie: cookieA }));
   } finally {
     await db.admin.query('GRANT SELECT ON users TO nholau_app');
   }

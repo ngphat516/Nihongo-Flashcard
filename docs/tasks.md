@@ -321,8 +321,8 @@ Tìm được khi review ngày 10/11/2026, **đã sửa cùng L6** (14/11/2026),
 
 </details>
 
-### Lỗi đang mở
+### Lỗi backend
 
 | Mã | Lỗi | Chỗ sửa | Ai | Trạng thái |
 |---|---|---|---|---|
-| B6 | Đã đăng nhập mà PostgreSQL lỗi (hoặc thiếu `JWT_SECRET`) thì `requireAuth` rơi vào nhánh `catch` và trả **401**. Trình duyệt hiểu là hết phiên: báo "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.", xóa dấu đăng nhập, lần mở trang sau thành khách. Người dùng tưởng bị đăng xuất, trong khi lỗi là ở máy chủ. Tìm khi làm BE5 | `server/auth/middleware.js` `requireAuth`: nhánh `catch` trả **503** `{ error: { code: 'INTERNAL_ERROR', message: 'Máy chủ đang lỗi, vui lòng thử lại sau.' } }`, không gọi `unauthorized`. Giữ 401 cho token sai / hết hạn / `token_version` lệch. Thêm test: DB không kết nối được → `GET /api/me` trả 503. Phía trình duyệt không phải sửa: `storage.js` đã đổi 5xx thành `NetworkError` và giữ dấu đăng nhập | Daika | Chưa làm |
+| B6 | Đã đăng nhập mà PostgreSQL lỗi (hoặc thiếu `JWT_SECRET`) thì `requireAuth` rơi vào nhánh `catch` và trả **401**. Trình duyệt hiểu là hết phiên: báo "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.", xóa dấu đăng nhập, lần mở trang sau thành khách. Người dùng tưởng bị đăng xuất, trong khi lỗi là ở máy chủ. Tìm khi làm BE5 | `server/auth/middleware.js` `requireAuth`: nhánh `catch` trả **503** `{ error: { code: 'INTERNAL_ERROR', message: 'Máy chủ đang lỗi, vui lòng thử lại sau.' } }`, không gọi `unauthorized`. Giữ 401 cho token sai / hết hạn / `token_version` lệch. Thêm test: DB không kết nối được → `GET /api/me` trả 503. Phía trình duyệt không phải sửa: `storage.js` đã đổi 5xx thành `NetworkError` và giữ dấu đăng nhập | Daika | Xong |

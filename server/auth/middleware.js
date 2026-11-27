@@ -25,7 +25,7 @@ export async function requireAuth(req, res, next) {
     req.user = { id: rows[0].id };
   } catch {
     console.error('Không thể kiểm tra phiên đăng nhập. Kiểm tra cấu hình server và kết nối PostgreSQL.');
-    return unauthorized(res);
+    return res.status(503).json({ error: { code: 'INTERNAL_ERROR', message: 'Máy chủ đang lỗi, vui lòng thử lại sau.' } });
   }
   return next();
 }
