@@ -80,7 +80,7 @@ Một bảng cho mọi việc backend và AI, **gồm cả việc đã xong**, x
 | BE6 | Nút đăng nhập/đăng xuất ở 4 trang | Leader | 3 | BE5 | Bắt buộc | Chưa làm |
 | BE7 | Đưa dữ liệu khách lên tài khoản | Leader | 3 | BE5, BE6 | Nên có | Chưa làm |
 | BE9 | Cloudflare Tunnel, bỏ cache `/api/*`, cron `pg_dump`, thử khôi phục | kakushi | 3 | BE1 | Bắt buộc | Chưa làm |
-| BE8 | Trạng thái tải / lỗi mạng ở trang của mình | Mỗi người: Leader (Trang chủ), Daika (Album), kakushi (Tạo thẻ), At (Học) | 4 | BE5 | Bắt buộc | Chưa làm |
+| BE8 | Trạng thái tải / lỗi mạng ở trang của mình | Mỗi người: Leader (Trang chủ), Daika (Album), kakushi (Tạo thẻ), At (Học) | 4 | BE5 | Bắt buộc | **Trang Học: đã sửa đủ 4 góp ý, chờ review lại PR #47**; các trang khác chưa làm |
 | AI2 | Giao diện xem trước AI + thêm vào bộ (vị trí chốt sau AI3, AI4) | kakushi | 4 | AI1, AI4 | Nên có | Chưa làm |
 | BE11 | Kiểm thử bảo mật cuối trên domain thật | Leader | 4 | BE1–BE10, BE14 | Bắt buộc | Chưa làm |
 

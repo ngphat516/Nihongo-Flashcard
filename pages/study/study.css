@@ -2,6 +2,17 @@
   padding-block-start: var(--space-6);
 }
 
+.study-status {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+
+#retry-queue {
+  margin-bottom: var(--space-4);
+}
+
 .study-heading {
   margin-bottom: var(--space-5);
 }

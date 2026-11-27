@@ -16,6 +16,28 @@
 
 ---
 
+## 2026-11-27 — Sửa theo review PR #47 (BE8)
+
+- **Người làm:** At.
+- **Đã xong:** đọc lại AGENTS và quy ước dự án, đồng bộ commit `fd0c2b3` của nhánh PR (đã chứa B6). Sửa đủ 4 góp ý của Leader: mất thẻ khi chấm/hoàn tác thì tự đọc lại hàng đợi, giữ phiên và thống kê; mất bộ thì về màn chọn bộ và bỏ nút thử lại; truyền cờ `write` riêng thay vì so chữ thông báo; phân biệt yêu cầu chưa rõ kết quả với thao tác đã được xác nhận lưu trước khi lỗi tải hàng đợi.
+- **Cấu trúc:** tách màn chọn bộ và phím tắt thành module trong `pages/study/`; phần tạo nút chấm đặt trong `queue-view.js`, `study.js` còn dưới 300 dòng. Không đổi core/server hoặc quy tắc dữ liệu.
+- **Kiểm tra:** Node 24 + PostgreSQL 16, `npm ci` và `npm test`: **150 pass, 0 fail, 0 skip**. Edge 1440×1000 và 375×812: **36 kiểm tra qua**, gồm xóa thẻ từ nơi khác khi chấm/undo, giữ tổng số thẻ đã học, xóa bộ lúc mở hoặc trong phiên, xác nhận đã lưu khi lỗi đọc sau review/undo; vẫn khóa phím/nút và retry không gửi lại POST. Chế độ khách `?seed`/`?reset` vẫn chạy; ảnh bổ sung `be8-*-deleted-card.jpg`, `be8-*-deleted-deck.jpg`.
+- **Tiếp theo:** Leader review lại PR #47. Các lần sau tách PR theo mã task như góp ý, không gộp việc S3 mới vào BE8.
+
+## 2026-11-27 — Gợi ý phím tắt trên nút chấm (S3)
+
+- **Người làm:** At.
+- **Đã xong:** thêm tooltip khi rê chuột lên từng nút: “Nhấn phím 1 để chọn Lại”, 2 → Khó, 3 → Tốt, 4 → Dễ. Giữ xử lý phím 1–4 đang có, bao gồm khóa khi đang gửi hoặc lỗi mạng.
+- **Kiểm tra:** Edge, lật mặt sau rồi rê chuột và nhấn từng phím 1–4: đủ 4 tooltip đúng và 4 lượt ôn lưu đúng rating, không cần click nút. Thay đổi bổ sung trong PR #47.
+- **Tiếp theo:** Leader review PR #47.
+
+## 2026-11-27 — Trạng thái tải và lỗi mạng ở trang Học (BE8)
+
+- **Người làm:** At.
+- **Đã xong:** nhánh `feature/study-network` từ `main` mới nhất. Hiện trạng thái tải bộ/thẻ, lưu lượt chấm, hoàn tác và lưu chiều học; có `aria-busy` và thông báo trạng thái. Khóa nút chấm, lật/chuyển thẻ, đổi chiều và hoàn tác cùng phím tắt trong lúc gửi. Tách feedback và phần trình bày hàng đợi vào module riêng trong `pages/study/`.
+- **Lỗi và thử lại:** giữ thẻ khi lỗi, khóa thao tác tới khi đọc lại dữ liệu thành công. Nút thử lại chỉ đọc hàng đợi, không tự gửi lại lượt chấm/hoàn tác; lỗi mạng sau ghi nhắc yêu cầu có thể đã lưu. Lỗi 409 hiện thông báo từ core; hết phiên yêu cầu tải lại trang. Giữ thẻ vừa hoàn tác nếu server đã lưu nhưng lần tải hàng đợi tiếp theo bị lỗi.
+- **Kiểm tra:** `npm ci`; `npm test` bằng Node 24.22.3 + PostgreSQL 16: **147 pass, 0 fail, 0 skip**. Edge headless 1440×1000 và 375×812: **22 kiểm tra qua** với API giả lập chậm/mất mạng/409/401, bấm phím liên tục chỉ gửi 1 POST, retry không gửi lại POST, lưu hoặc undo thành công rồi lỗi đọc vẫn phục hồi đúng; không lỗi JS ngoài lỗi mạng HTTP cố ý; không cuộn ngang, nút chấm ≥48px. Chế độ khách thật với `?seed`/`?reset` vẫn chạy. Ảnh `pages/study/screenshots/be8-*`.
+- **Tiếp theo:** Leader review phần Học của BE8; các trang khác theo người phụ trách. BE14 vẫn còn bước kiểm tra Docker sau BE1; lỗi B6 thuộc Daika, không sửa trong PR này.
 ## 2026-11-27 — Giữ phiên khi máy chủ chưa xác thực được (B6)
 
 - **Người làm:** Daika (Banana).
