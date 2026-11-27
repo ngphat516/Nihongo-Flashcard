@@ -16,6 +16,14 @@
 
 ---
 
+## 2026-11-27 — Giữ phiên khi máy chủ chưa xác thực được (B6)
+
+- **Người làm:** Daika (Banana).
+- **Đã xong:** nhánh `fix/b6-auth-server-error`. Sửa `requireAuth`, kiểm tra khóa HS256 và miền giá trị `tv`. Cập nhật hợp đồng lỗi ở `backend-trien-khai.md` và test cả API lẫn dấu đăng nhập của frontend.
+- **Quyết định:** trả 401 khi thiếu phiên hoặc có bằng chứng phiên vô hiệu. Khi cấu hình, bộ xác minh hoặc PostgreSQL lỗi, chặn request bằng 503 để trình duyệt giữ dấu cho lần thử sau.
+- **Kiểm tra:** trên code cũ, thiếu khóa, DB từ chối kết nối và thu quyền `SELECT` đều trả nhầm 401. Vòng phản biện phát hiện thêm khóa PEM, lỗi nội bộ của bộ xác minh và `tv` vượt kiểu `INT`. Sau khi sửa, `npm test` và `REQUIRE_TEST_POSTGRES=1 npm test` đều đạt 150/150 trên Node 24.22.1, PostgreSQL 16.16. Chromium 156 giữ dấu qua lần tải lại khi ngắt TCP, dùng lại cùng cookie khi DB phục hồi và xóa dấu sau khi thu hồi phiên.
+- **Tiếp theo:** Leader review B6. Luồng giao diện đăng nhập thuộc BE6.
+
 ## 2026-11-26 — Ghi lỗi B6 cho Daika
 
 - **Người làm:** Leader.
