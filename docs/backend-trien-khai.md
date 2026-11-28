@@ -49,7 +49,7 @@ server/
     rate-limit.js               # Daika (rate-limit theo CF-Connecting-IP cho /api/auth/google)
   routes/
     health.js                   # At (GET /api/health)
-    auth.js                     # Daika (POST /api/auth/google, POST /api/auth/logout, GET /api/me)
+    auth.js                     # Daika (GET /api/auth/config, POST /api/auth/google, POST /api/auth/logout, GET /api/me)
     collections.js              # At (CRUD /api/:c, batch, delete, DELETE /api/me/data)
     reviews.js                  # At (POST /api/reviews, POST /api/reviews/:id/undo)
     ai.js                       # kakushi (POST /api/ai/cards)
@@ -139,11 +139,12 @@ CLOUDFLARE_TUNNEL_TOKEN=
 
 ## 3. Đặc tả API đầy đủ
 
-Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/api/auth/google`, `/api/auth/logout`, mọi route đều yêu cầu đã đăng nhập (`req.user.id`).
+Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/api/auth/config`, `/api/auth/google`, `/api/auth/logout`, mọi route đều yêu cầu đã đăng nhập (`req.user.id`).
 
 | Nhóm | Method & Path | Query / Body | Response thành công | Ghi chú triển khai |
 |---|---|---|---|---|
 | **Health** | `GET /api/health` | — | `200 { ok: true, db: true }` | Kiểm tra server sống + `SELECT 1` DB |
+| **Auth** | `GET /api/auth/config` | — | `200 { googleClientId }`; thiếu `GOOGLE_CLIENT_ID` thì `503` | Thêm ở BE6 cho nút Google ở trình duyệt; client ID không bí mật, lấy từ `.env` để trình duyệt và bước xác minh dùng cùng một client |
 | **Auth** | `POST /api/auth/google` | `{ idToken }` | `200 { user: { id, email, name, avatarUrl } }` + `Set-Cookie` | Rate-limit theo `CF-Connecting-IP`; xác minh token Google; upsert `users` |
 | **Auth** | `POST /api/auth/logout` | — | `204` + xóa cookie | Xóa cookie JWT (`Max-Age=0`) |
 | **Auth** | `GET /api/me` | — | `200 { user: { id, email, name, avatarUrl } }`, `401` hoặc `503` | Đọc thông tin user từ DB theo `req.user.id` |
@@ -380,7 +381,7 @@ Tất cả route đều nằm dưới prefix `/api`. Trừ `/api/health` và `/a
 
 5. **Nút đăng nhập / đăng xuất & đồng bộ dữ liệu khách** (BE6, BE7)
    - Đăng nhập thành công thì gọi `rememberSignedIn(true)` (`core/storage.js`) rồi tải lại trang; đăng xuất thì `rememberSignedIn(false)`. Thiếu bước này thì app vẫn coi là khách.
-   - Thêm script Google Identity Services vào 4 file HTML (`index.html`, `pages/album/index.html`, `pages/create/index.html`, `pages/study/index.html`).
+   - Script Google Identity Services **chỉ tải khi cần** (mở bảng đăng nhập, bấm Đăng xuất), không đặt trong 4 file HTML, để khách mở trang không gửi request nào tới Google (Leader chốt 2026-11-28, BE6). Client ID lấy từ `GET /api/auth/config`.
    - Thêm khu vực tài khoản ở cột điều hướng `.rail` (cả 4 file HTML + `styles/base.css`): hiển thị nút **"Đăng nhập Google"** khi là khách; khi đã đăng nhập hiện avatar nhỏ + tên + nút **"Đăng xuất"** (`POST /api/auth/logout`). Kiểm tra gọn ở cả `1440px` và `375px` (thanh tab dưới đáy).
    - **Đưa dữ liệu khách lên tài khoản:** khi vừa đăng nhập thành công mà `localStorage` (`nholau:decks`, `nholau:cards`, `nholau:reviewLogs`) có dữ liệu, bật hộp thoại hỏi: *"Bạn đang có dữ liệu trên máy. Đưa lên tài khoản?"*.
      - Nếu đồng ý → validate lại bằng logic nhập của C7 rồi đẩy lên server qua `POST /api/decks/batch`, `POST /api/cards/batch`, `POST /api/reviewLogs/batch` (dùng UUID sẵn có nên bấm lại không nhân đôi). Sau đó xóa hoặc đánh dấu đã chuyển ở localStorage.
