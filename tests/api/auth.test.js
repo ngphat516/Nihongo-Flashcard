@@ -165,6 +165,24 @@ test('chỉ chấp nhận JWT có HS256, chữ ký, thời hạn, UUID và phiê
   assertError(await request('/api/me?token=' + token, { headers: { Authorization: 'Bearer ' + token } }), 401, 'UNAUTHORIZED');
 });
 
+test('GET /api/auth/config trả client ID cho nút Google; thiếu cấu hình thì 503', async t => {
+  const request = await serve(t);
+  const ok = await request('/api/auth/config');
+  assert.equal(ok.status, 200);
+  assert.deepEqual(ok.body, { googleClientId: audience });
+  assert.equal(ok.headers.get('cache-control'), 'no-store');
+  assert.equal(ok.headers.get('set-cookie'), null);
+  for (const value of [undefined, '  ']) {
+    if (value === undefined) delete process.env.GOOGLE_CLIENT_ID;
+    else process.env.GOOGLE_CLIENT_ID = value;
+    try {
+      assertError(await request('/api/auth/config'), 503, 'INTERNAL_ERROR');
+    } finally {
+      process.env.GOOGLE_CLIENT_ID = audience;
+    }
+  }
+});
+
 test('thiếu client ID hoặc không lấy được khóa Google thì không cấp phiên, không lộ token', async t => {
   const request = await serve(t);
   delete process.env.GOOGLE_CLIENT_ID;

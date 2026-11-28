@@ -4,6 +4,7 @@
  * QUY TẮC: nội dung người dùng nhập (tên bộ, mặt thẻ...) chỉ được đưa vào trang bằng h() hoặc
  * textContent. KHÔNG dùng innerHTML với dữ liệu người dùng (lỗi bảo mật XSS).
  */
+import { setupAccount } from './account.js';
 import { isFuriganaOn, setFuriganaOn } from './preferences.js';
 
 /**
@@ -50,11 +51,12 @@ export function getParam(name) {
 
 /**
  * Chạy hàm khởi động của trang. Lỗi chưa bắt sẽ hiện thành hộp thông báo trên trang
- * thay vì chỉ nằm im trong Console. Kèm theo: nối nút bật/tắt furigana ở cột điều hướng (L7),
- * nên trang nào gọi startPage() cũng có nút chạy, không phải tự viết.
+ * thay vì chỉ nằm im trong Console. Kèm theo: nối nút bật/tắt furigana (L7) và khu vực tài khoản (BE6,
+ * core/account.js) ở cột điều hướng, nên trang nào gọi startPage() cũng có 2 nút chạy, không phải tự viết.
  */
 export function startPage(init) {
   setupFuriganaToggle();
+  setupAccount().catch((err) => console.error(err));
   Promise.resolve()
     .then(init)
     .catch((err) => {

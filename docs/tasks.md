@@ -77,7 +77,7 @@ Một bảng cho mọi việc backend và AI, **gồm cả việc đã xong**, x
 | AI3 | `server/ai/*`, `POST /api/ai/cards`, `AI_MOCK=1` | kakushi | 2 | BE13 | Nên có | Chưa làm |
 | AI4 | `002_ai_usage.sql`, hạn mức, 20k ký tự, `429` | kakushi | 2 | AI3, BE2 | Nên có | Chưa làm |
 | BE14 | Test 2 user trên DB thật, rà `409` / idempotency | At + Daika | 3 | BE3, BE4, BE1 | Bắt buộc | **Đang làm**: đã qua 129/129 trên PostgreSQL 16; còn chạy lại trên Docker khi có BE1 |
-| BE6 | Nút đăng nhập/đăng xuất ở 4 trang | Leader | 3 | BE5 | Bắt buộc | Chưa làm |
+| BE6 | Nút đăng nhập/đăng xuất ở 4 trang | Leader | 3 | BE5 | Bắt buộc | **PR #50** (2026-11-28): đã có nút, bảng tài khoản, `GET /api/auth/config`, test; còn thử đăng nhập Google thật trên `localhost:3000` và domain thật (sau BE9) |
 | BE7 | Đưa dữ liệu khách lên tài khoản | Leader | 3 | BE5, BE6 | Nên có | Chưa làm |
 | BE9 | Cloudflare Tunnel, bỏ cache `/api/*`, cron `pg_dump`, thử khôi phục | kakushi | 3 | BE1 | Bắt buộc | Chưa làm |
 | BE8 | Trạng thái tải / lỗi mạng ở trang của mình | Mỗi người: Leader (Trang chủ), Daika (Album), kakushi (Tạo thẻ), At (Học) | 4 | BE5 | Bắt buộc | **Trang Học: đã sửa đủ 4 góp ý, chờ review lại PR #47**; các trang khác chưa làm |

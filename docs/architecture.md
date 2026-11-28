@@ -34,7 +34,8 @@ core/                   phần lõi dùng chung
   storage.js            đọc/ghi localStorage (khách) hoặc gọi /api (đã đăng nhập)
   preferences.js        lựa chọn hiển thị của người học (bật/tắt furigana), key localStorage riêng
   date.js               ngày học (bắt đầu 4h sáng), định dạng thời gian
-  dom.js                h() tạo element an toàn, $(), getParam(), startPage() (kèm nối nút furigana)
+  dom.js                h() tạo element an toàn, $(), getParam(), startPage() (kèm nối nút furigana và nút tài khoản)
+  account.js            nút tài khoản ở cột điều hướng: đăng nhập Google, đăng xuất (startPage() tự gọi)
   routes.js             link giữa các trang
   seed.js               dữ liệu mẫu (test cũng dùng)
 dev/
@@ -78,6 +79,7 @@ core/repo.js ──► core/storage.js ──► localStorage   (khách)
         └─► scheduler.js · queue.js · models.js · date.js   (hàm thuần, có test)
 
 dom.js, routes.js, furigana.js: tiện ích cho trang
+dom.js startPage() ──► account.js ──► fetch /api/auth/* · storage.session() · rememberSignedIn()
 ```
 
 - **Trang** chỉ lo giao diện: đọc dữ liệu qua `repo.js`, vẽ bằng `h()`, gắn sự kiện.
@@ -88,6 +90,11 @@ dom.js, routes.js, furigana.js: tiện ích cho trang
   - Hàm chung: `list(c, filter?)`, `get`, `put(c, item, { expectedUpdatedAt? })`, `putMany`, `remove`, `removeMany`, `clearAll`, và 3 thao tác nhiều bước `review`, `undoReview`, `removeDeck` (chế độ API là 1 transaction trên server). Thêm `session()` / `isSignedIn()` cho biết đang ở chế độ nào.
   - Chế độ API: `putMany` chỉ thêm mới; `put` trả bản server đã lưu (server tự đặt `updatedAt`); `repo.js` gửi `expectedUpdatedAt` khi sửa bộ / thẻ, bản trên server đã đổi thì báo `ConflictError`.
   - Đã đăng nhập thì `?seed`, `?reset`, `dev.seed()`, `dev.reset()` bị bỏ qua (cảnh báo ở Console), `seedDemoData()` ném lỗi, `migrateCards()` không chạy.
+- **`account.js`** (BE6) lo nút tài khoản trong cột điều hướng; `startPage()` tự gọi `setupAccount()`, trang không phải viết gì.
+  - Khách mở trang: không gọi mạng. Bấm nút "Tài khoản" thì mở bảng, lúc đó mới gọi `GET /api/auth/config` (lấy client ID) và tải script Google Identity Services (GIS) để vẽ nút Google.
+  - Google trả `credential` → `POST /api/auth/google { idToken }` → `rememberSignedIn(true)` → chạy các hàm đăng ký bằng `onSignIn(fn)` (chỗ để BE7 nối vào) → tải lại trang, `storage.session()` chọn chế độ API.
+  - Đã đăng nhập: nút là avatar + tên (dựng bằng `h()`, ảnh lỗi thì hiện chữ cái đầu); bảng có tên, email, nút "Đăng xuất": `POST /api/auth/logout` → `rememberSignedIn(false)` → `google.accounts.id.disableAutoSelect()` → tải lại trang. Server không xóa được phiên (mất mạng, lỗi) thì giữ dấu và báo lỗi.
+  - Lỗi hiện trong bảng: `400`/`401` "Đăng nhập không thành công", `429` thử lại sau, mất mạng, `404` (chạy bằng `python -m http.server`, không có API) thì báo cần máy chủ Node.
 - **`scheduler.js`, `queue.js`, `models.js`, `date.js`** là hàm thuần (không đụng DOM hay localStorage), nên test được bằng Node.
 
 Trang được import những module nào: xem [conventions.md › Code](conventions.md#code).

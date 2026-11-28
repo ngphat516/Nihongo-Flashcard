@@ -53,7 +53,8 @@ Chỉ có CSS tự viết: không thư viện, không build, không dark mode. M
 | `toast`, `toast-error` | thông báo nhỏ tự ẩn sau 3 giây |
 | `alert`, `alert-error`, `alert-success` | thông báo nằm trên trang |
 | `empty` > `empty-title`, `empty-text` + nút | trạng thái rỗng |
-| `rail` > `rail-brand`, `rail-nav` > `rail-link` > `rail-label`; `rail-link rail-furigana` > `rail-switch` | cột điều hướng, viết sẵn trong HTML; chỉ Leader sửa ([design.md](design.md#bố-cục-khung)) |
+| `rail` > `rail-brand`, `rail-nav` > `rail-link` > `rail-label`; `rail-link rail-furigana` > `rail-switch`; `rail-link rail-account` + `account-panel` | cột điều hướng, viết sẵn trong HTML; chỉ Leader sửa ([design.md](design.md#bố-cục-khung)) |
+| `account-panel` > `account-title`, `account-text`, `account-google`, `account-user` > `account-avatar` + `account-who` > `account-name`, `account-email`; `account-logout`, `account-status` (`is-error`) | bảng tài khoản, do `core/account.js` dựng; trang không dùng |
 | `container`, `container-narrow`, `page-head`, `page-title`, `section`, `section-title`, `back-link`, `row`, `muted`, `visually-hidden` | khung trang, tiện ích |
 
 Thêm hoặc đổi class chung thì sửa cả bảng này.

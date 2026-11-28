@@ -16,6 +16,19 @@
 
 ---
 
+## 2026-11-28 — Nút đăng nhập/đăng xuất Google (BE6)
+
+- **Người làm:** Leader.
+- **Đã xong:** nhánh `core/dang-nhap-google`, PR #50.
+  - `core/account.js` (mới): nút "Tài khoản" ở cột điều hướng, `startPage()` tự gọi nên không sửa JS trang nào. Khách bấm nút thì mở bảng, tải client ID và script Google, vẽ nút "Đăng nhập bằng Google"; Google trả `credential` → `POST /api/auth/google` → `rememberSignedIn(true)` → tải lại trang. Đã đăng nhập: avatar + tên trên nút, bảng có email và nút "Đăng xuất" (`POST /api/auth/logout` → `rememberSignedIn(false)` → `disableAutoSelect()` → tải lại). Tên, email, avatar dựng bằng `h()`; avatar chỉ nhận `https:`, `referrerpolicy="no-referrer"`, ảnh lỗi thì hiện chữ cái đầu. Có `onSignIn(fn)` để BE7 nối vào sau đăng nhập.
+  - 4 file HTML: thêm nút `rail-account` và `account-panel` sau nút furigana. `styles/base.css`: CSS nút và bảng; điện thoại thành ô thứ 6 trên thanh tab.
+  - `server/routes/auth.js`: thêm `GET /api/auth/config` trả `{ googleClientId }` từ `.env`, thiếu thì `503` (file của Daika, Leader chốt cách này).
+  - Test: `tests/account.test.js` (fetch giả, không gọi Google), thêm test `GET /api/auth/config` trong `tests/api/auth.test.js`.
+- **Quyết định:** client ID lấy từ `GET /api/auth/config`; nút tài khoản ở 375px là ô thứ 6 trên thanh tab; script Google chỉ tải khi mở bảng đăng nhập hoặc bấm Đăng xuất. Ghi ở architecture.md, design.md, backend-trien-khai.md.
+- **Kiểm tra:** `REQUIRE_TEST_POSTGRES=1 npm test` (Docker, PostgreSQL 16): **162 pass, 0 fail, 0 skip**. `python -m http.server`: khách không có request `/api/` hay tới Google, `?seed` chạy như cũ; bấm "Tài khoản" thì báo cần máy chủ Node (Console có dòng 404 của trình duyệt sau khi bấm). Server Node + PostgreSQL trong Docker, phiên thử tạo bằng `signSession`: đã đăng nhập thì dữ liệu đọc từ `/api/*`, nút và bảng đúng ở 1440px, 375px, 320px, không cuộn ngang; Đăng xuất xóa cookie và dấu, trang về khách không gọi `/api`. Ở 320px nhãn "Trang chủ", "Tài khoản" bị cắt "…".
+- **Tiếp theo:** thử đăng nhập Google thật trên `localhost:3000` (cần `GOOGLE_CLIENT_ID` có origin `http://localhost:3000`), BE7 nối vào `onSignIn()`.
+- **Vướng mắc:** chưa thử được nút Google thật vì máy chưa có OAuth client ID. Domain thật chưa có (BE1, BE9 chưa xong), nên BE6 chưa đánh Xong.
+
 ## 2026-11-27 — Sửa theo review PR #47 (BE8)
 
 - **Người làm:** At.

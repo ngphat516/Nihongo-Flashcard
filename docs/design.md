@@ -116,7 +116,7 @@ Task L12, đã làm. Mọi trang có **cột điều hướng** `<header class="
 - Nội dung trang nằm bên phải cột, vẫn trong `.container`.
 
 **Màn hình hẹp dưới 768px:**
-- Cột chuyển thành thanh tab cố định ở đáy, cao `--tabbar-height` (64px), nền `--surface`, viền trên. Gồm 5 ô bằng nhau: 4 mục điều hướng và nút furigana. Logo ẩn.
+- Cột chuyển thành thanh tab cố định ở đáy, cao `--tabbar-height` (64px), nền `--surface`, viền trên. Gồm 6 ô bằng nhau: 4 mục điều hướng, nút furigana và nút tài khoản. Logo ẩn. Ở 320px, nhãn dài ("Trang chủ", "Tài khoản") có thể bị cắt "…".
 - Mỗi ô có icon và **nhãn chữ** bên dưới, vì điện thoại không rê chuột được.
 - Ô đang chọn: icon nằm trong viên thuốc nền `--primary`, nhãn đậm màu `--primary-strong`.
 - `body` chừa khoảng trống ở dưới bằng chiều cao thanh tab; toast nổi lên trên thanh tab.
@@ -126,6 +126,12 @@ Task L12, đã làm. Mọi trang có **cột điều hướng** `<header class="
 - Điện thoại: `rail-switch` là công tắc, đứng thay chỗ icon, để người dùng không nhầm với link chuyển trang.
 
 Hiện nút chưa có tác dụng: L7 viết JS bật/tắt và lưu lựa chọn qua `core/`, trang không gọi `localStorage` trực tiếp. Nút làm gì: xem [product.md › Furigana](product.md#furigana-bậttắt).
+
+**Nút tài khoản (BE6):** `<button class="rail-link rail-account" aria-expanded aria-controls="account-panel">`, nằm sau nút furigana; JS ở `core/account.js`.
+- Khách: icon `circle-user-round`, nhãn "Tài khoản". Đã đăng nhập: avatar Google tròn lấp cả nút (ảnh lỗi thì chữ cái đầu trên nền `--surface-2`), nhãn là tên.
+- Bấm thì mở **bảng tài khoản** `.account-panel`: màn rộng nổi bên phải cột, sát đáy, rộng 300px; điện thoại nổi trên thanh tab, rộng gần hết màn. Nền `--surface`, `--shadow-lg`. Bấm ra ngoài hoặc Esc thì đóng.
+- Khách: tiêu đề "Lưu thẻ lên tài khoản", một dòng giải thích, nút "Đăng nhập bằng Google" do Google vẽ (theo mẫu của Google, không dùng `--primary`). Đã đăng nhập: avatar 44px, tên, email, nút "Đăng xuất" (`btn`, icon `log-out`).
+- Lỗi hiện ở dòng trạng thái cuối bảng, chữ `--danger`.
 
 ### Trang chủ
 

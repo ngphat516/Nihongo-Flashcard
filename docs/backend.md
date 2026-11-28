@@ -185,7 +185,7 @@ Prefix `/api`. `:c` là collection, chỉ nhận đúng 3 giá trị `decks` | `
 - `POST /api/reviews/:id/undo`: khôi phục thẻ + xóa lượt ôn.
 - Xóa bộ: xóa bộ + thẻ trong bộ.
 
-**Đăng nhập:** `POST /api/auth/google`, `POST /api/auth/logout`, `GET /api/me`.
+**Đăng nhập:** `GET /api/auth/config` (client ID cho nút Google), `POST /api/auth/google`, `POST /api/auth/logout`, `GET /api/me`.
 
 **AI:** `POST /api/ai/cards` (xem [AI tạo thẻ từ PDF](#ai-tạo-thẻ-từ-pdf)).
 

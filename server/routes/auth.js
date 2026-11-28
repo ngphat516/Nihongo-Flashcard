@@ -12,6 +12,16 @@ function publicUser({ id, email, name, avatar_url }) {
 /** Gắn vào app.use('/api', createAuthRouter()) trước router /:c. */
 export function createAuthRouter({ googleClient } = {}) {
   const router = Router();
+  // Client ID cho nút Google ở trình duyệt (BE6). Không bí mật: Google cũng hiện nó trong mọi trang đăng nhập.
+  // Lấy từ .env để trình duyệt và bước xác minh token luôn dùng cùng một client.
+  router.get('/auth/config', (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    const googleClientId = process.env.GOOGLE_CLIENT_ID?.trim();
+    if (!googleClientId) {
+      return res.status(503).json({ error: { code: 'INTERNAL_ERROR', message: 'Máy chủ chưa cấu hình đăng nhập Google.' } });
+    }
+    return res.json({ googleClientId });
+  });
   router.post('/auth/google', createLoginLimiter(), async (req, res) => {
     res.set('Cache-Control', 'no-store');
     const idToken = req.body?.idToken;
