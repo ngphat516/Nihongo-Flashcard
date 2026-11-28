@@ -97,7 +97,7 @@ async function startSession(deckId) {
       h('span', { class: 'study-card-text study-card-meaning', lang: reverse ? 'ja' : 'vi' },
         reverse ? renderFurigana(card.term) : card.meaning),
       card.reading && h('span', { class: 'study-card-reading', lang: 'ja' }, card.reading),
-      card.example && h('span', { class: 'study-card-example' }, renderFurigana(card.example)),
+      card.example && h('span', { class: 'study-card-example', lang: 'ja' }, renderFurigana(card.example)),
     );
     front.removeAttribute('aria-hidden');
     back.setAttribute('aria-hidden', 'true');
@@ -175,6 +175,7 @@ async function startSession(deckId) {
       }
     }
     direction = queue.deck.direction;
+    session.className = `study-session cover-${queue.deck.color}`;
     directionButton.textContent = direction === 'vi-ja' ? 'Việt → Nhật' : 'Nhật → Việt';
     $('#deck-name').textContent = queue.deck.name;
     $('#study-counts').replaceChildren(...countItems(queue.counts));

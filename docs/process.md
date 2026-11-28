@@ -16,6 +16,15 @@
 
 ---
 
+## 2026-11-28 — Giao diện Học ưu tiên mobile và màu bộ (S14)
+
+- **Điều chỉnh theo người dùng:** câu ví dụ căn giữa trên cả PC/mobile. Edge: câu ngắn và dài ở 375, 1366, 2560px đều căn giữa và không tràn ngang; cập nhật ảnh mặt sau trong PR #49.
+- **Người làm:** At.
+- **Đã xong:** nhánh `feature/study-mobile-design` từ `main` sau PR #47, theo đề xuất người dùng đã duyệt. Mobile gộp tiêu đề/Thoát và chiều học/bộ đếm thành hai hàng, bỏ khung bộ đếm và khung chấm dư thừa; giữ 4 nút chấm luôn hiện, ≥48px và khoảng tránh thanh điều hướng. Chữ Nhật 40–48px, nghĩa Việt 24–28px, furigana 16–18px, ví dụ 18–20px theo token hiện có. Câu dài được xuống dòng và cuộn trang để đọc đủ.
+- **Màu và cấu trúc:** lấy 6 màu từ `deck.color` bằng class `cover-*` có sẵn cho chấm cạnh tên và dải đầu thẻ. Hai mặt trắng, chữ đậm; màu 4 nút đánh giá cố định. Ví dụ gắn `lang="ja"`; gợi ý Space dành cho desktop, mobile hiện lời nhắc chạm. Chỉ sửa `pages/study/` và tài liệu tiến độ, không đổi token chung hoặc luồng dữ liệu.
+- **Kiểm tra:** Node 24 + PostgreSQL 16, `npm ci` và `npm test`: **150 pass, 0 fail, 0 skip**. Edge headless: **35 kiểm tra thiết kế qua**, các chiều rộng 320/360/375/390/430/768/1366/1920/2560 và ngang 812×375; cả hai mặt, 6 màu bộ, 2 chiều học và tải lại, ví dụ dài, chữ phóng 200%, giảm chuyển động. Không cuộn ngang; ở 375×812 với nội dung ngắn thấy thẻ và 4 nút trên thanh điều hướng. **36 kiểm tra hồi quy BE8 qua**, gồm chậm/mất mạng, lỗi 409/401, xóa thẻ/bộ và retry; thử riêng đủ 4 tooltip/phím 1–4 lưu đúng mức đánh giá. Ảnh `pages/study/screenshots/design-*`.
+- **Tiếp theo:** Leader review S14. Chưa thử Safari hoặc điện thoại thật; câu ví dụ dài/chữ phóng lớn có thể cần cuộn trang theo thiết kế.
+
 ## 2026-11-27 — Sửa theo review PR #47 (BE8)
 
 - **Người làm:** At.
