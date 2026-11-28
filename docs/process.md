@@ -18,6 +18,7 @@
 
 ## 2026-11-28 — Giao diện Học ưu tiên mobile và màu bộ (S14)
 
+- **Điều chỉnh theo người dùng:** câu ví dụ căn giữa trên cả PC/mobile. Edge: câu ngắn và dài ở 375, 1366, 2560px đều căn giữa và không tràn ngang; cập nhật ảnh mặt sau trong PR #49.
 - **Người làm:** At.
 - **Đã xong:** nhánh `feature/study-mobile-design` từ `main` sau PR #47, theo đề xuất người dùng đã duyệt. Mobile gộp tiêu đề/Thoát và chiều học/bộ đếm thành hai hàng, bỏ khung bộ đếm và khung chấm dư thừa; giữ 4 nút chấm luôn hiện, ≥48px và khoảng tránh thanh điều hướng. Chữ Nhật 40–48px, nghĩa Việt 24–28px, furigana 16–18px, ví dụ 18–20px theo token hiện có. Câu dài được xuống dòng và cuộn trang để đọc đủ.
 - **Màu và cấu trúc:** lấy 6 màu từ `deck.color` bằng class `cover-*` có sẵn cho chấm cạnh tên và dải đầu thẻ. Hai mặt trắng, chữ đậm; màu 4 nút đánh giá cố định. Ví dụ gắn `lang="ja"`; gợi ý Space dành cho desktop, mobile hiện lời nhắc chạm. Chỉ sửa `pages/study/` và tài liệu tiến độ, không đổi token chung hoặc luồng dữ liệu.

@@ -224,7 +224,7 @@
   font-size: var(--text-lg);
   padding-top: var(--space-3);
   border-top: 1px solid var(--border);
-  text-align: start;
+  text-align: center;
   line-height: 2;
 }
 
