@@ -102,6 +102,16 @@
   overflow-wrap: anywhere;
 }
 
+.study-bar h1::before {
+  content: '';
+  display: inline-block;
+  width: var(--space-3);
+  height: var(--space-3);
+  margin-inline-end: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--cover-ink);
+}
+
 .study-bar .btn {
   flex: none;
 }
@@ -167,10 +177,11 @@
   min-height: clamp(15rem, 40vh, 22rem);
   gap: var(--space-4);
   box-shadow: var(--shadow);
+  border-top: var(--space-1) solid var(--cover-bg);
 }
 
 .study-card .flashcard-back {
-  background: var(--primary-soft);
+  background: var(--surface);
 }
 
 .study-card-label {
@@ -211,9 +222,10 @@
 
 .study-card-example {
   font-size: var(--text-lg);
-  max-block-size: 6em;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+  text-align: start;
+  line-height: 2;
 }
 
 .study-card-hint {
@@ -417,41 +429,57 @@
   .study-session,
   .study-workspace { gap: var(--space-2); }
 
+  .study-session {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'title title exit' 'direction queue queue' 'card card card';
+    align-items: center;
+  }
+
+  .study-bar { display: contents; }
+  .study-bar h1 { grid-area: title; }
+  #exit-session { grid-area: exit; }
+  #study-direction { grid-area: direction; }
+  .study-workspace { grid-area: card; }
+
   .study-shortcuts { display: none; }
 
   .study-queue {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2) var(--space-3);
+    grid-area: queue;
+    padding: 0;
+    background: none;
+    border: 0;
+    box-shadow: none;
   }
 
-  .study-queue h2 {
-    max-width: 5rem;
-    font-size: var(--text-xs);
-  }
+  .study-queue h2 { display: none; }
 
   .study-queue-counts {
-    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     margin: 0;
-    gap: var(--space-1);
+    gap: var(--space-1) var(--space-2);
   }
 
   .study-queue-counts .count {
-    display: grid;
-    align-content: start;
-    justify-items: center;
+    display: inline-flex;
+    flex-direction: row-reverse;
+    align-items: baseline;
     gap: var(--space-1);
-    padding: var(--space-1);
+    padding: 0;
     min-width: 0;
-    white-space: normal;
-    text-align: center;
-    font-size: var(--text-xs);
+    background: none;
+    white-space: nowrap;
+    font-size: var(--text-sm);
   }
 
-  .study-queue-counts b { font-size: var(--text-base); }
+  .study-queue-counts b { font-size: inherit; }
 
-  /* Hai mặt dùng chung ô grid; đổi mặt tức thì để thẻ luôn nằm phẳng. */
+  .study-card-nav .btn,
+  .study-bar .btn { min-height: calc(var(--space-6) + var(--space-1)); }
+
+  .study-card-nav .btn { min-width: calc(var(--space-6) + var(--space-1)); }
+
   .study-card,
   .study-card .flashcard-inner,
   .study-card.is-flipped .flashcard-inner,
@@ -467,19 +495,40 @@
 
   .study-card .flashcard-face {
     min-height: 40vh;
+    min-height: 40svh;
     padding: var(--space-4);
     gap: var(--space-2);
   }
 
   .study-card .flashcard-face[aria-hidden='true'] { visibility: hidden; }
-  .study-card-text { font-size: clamp(1.75rem, 7vw, 2.25rem); }
-  .study-card-meaning { font-size: clamp(1.75rem, 7vw, 2.25rem); }
-  .study-card-example { font-size: 1.25rem; max-block-size: 5rem; }
+  .study-card-text {
+    font-size: clamp(calc(var(--text-base) * 2.5), 11vw, calc(var(--text-base) * 3));
+  }
+  .study-card-text[lang='vi'],
+  .study-card-meaning[lang='vi'] { font-size: clamp(var(--text-xl), 7vw, var(--text-2xl)); }
+  .study-card-text rt { font-size: clamp(var(--text-base), 4vw, var(--text-lg)); }
+  .study-card-reading { font-size: var(--text-base); }
+  .study-card-example { font-size: clamp(var(--text-lg), 5vw, calc(var(--text-base) * 1.25)); }
+  .study-card-example rt { font-size: var(--text-xs); }
+  .study-card-hint {
+    padding: 0;
+    border: 0;
+    color: var(--muted);
+  }
+  .study-hint-key { display: none; }
 
-  .study-rate-panel { padding: var(--space-3); gap: var(--space-2); }
-  .study-rate-heading p { display: none; }
+  .study-rate-panel {
+    padding: 0;
+    gap: var(--space-2);
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .study-rate-panel > .btn { justify-self: center; }
+  .study-rate-heading { display: none; }
   .study-ratings { gap: var(--space-2); }
-  .study-ratings .btn { min-height: 48px; }
+  .study-ratings .btn { min-height: calc(var(--space-6) + var(--space-2)); }
+  .study-ratings .btn small { font-size: var(--text-sm); }
 }
 
 #empty-title {

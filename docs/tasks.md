@@ -286,7 +286,7 @@ Bấm để mở. Mô tả giữ nguyên lúc giao việc, dùng để tra lại
 </details>
 
 <details>
-<summary><b>Học: `pages/study/` (At)</b> — S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11</summary>
+<summary><b>Học: `pages/study/` (At)</b> — S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S14</summary>
 
 | Mã | Việc cần làm | Mô tả / tiêu chí xong | Hàm core | Ưu tiên | Trạng thái |
 |---|---|---|---|---|---|
@@ -299,6 +299,7 @@ Bấm để mở. Mô tả giữ nguyên lúc giao việc, dùng để tra lại
 | S7 | Hoàn tác | Nút / phím **Z** hoàn tác lần chấm vừa rồi, thẻ đó hiện lại (lưu ý lỗi B3) | `undo()` trả về từ `reviewCard` | Nên có | Xong |
 | S8 | Hiệu ứng lật | Lật trên–dưới bằng CSS 3D; chuyển thẻ bằng mũi tên trượt/nghiêng nhẹ, reset khi đổi thẻ. Tắt khi người dùng bật giảm chuyển động. Nút to, dễ bấm trên điện thoại | — | Nên có | Xong |
 | S9 | Phát âm | Nút đọc mặt trước bằng `speechSynthesis` | — | — | Bỏ: app không có âm thanh ([product.md](product.md#không-làm)) |
+| S14 | Bố cục mobile, độ dễ đọc và màu bộ | Theo đề xuất người dùng duyệt ngày 2026-11-28: thu gọn phần đầu và bộ đếm, 4 nút chấm ≥48px, chữ Nhật/Việt và ví dụ dễ đọc, nhận diện bộ bằng 6 màu sẵn có, mặt thẻ trắng. Câu dài hoặc chữ phóng to được cuộn để đọc đủ; giữ thao tác, sidebar desktop và màu đánh giá | `deck.color`, `renderFurigana()` | Theo yêu cầu | Xong, chờ review (`feature/study-mobile-design`) |
 | S10 | Thẻ tiếng Nhật khi học | Cần L6. **Mặt trước:** từ có furigana. **Mặt sau:** nghĩa, kèm cách đọc và câu ví dụ có furigana nếu có. Trường trống thì không hiện. Câu ví dụ dài thì xuống dòng trong thẻ, không đẩy 4 nút chấm điểm ra khỏi màn hình ở bề rộng 375px. **Hoàn tác** dùng thẳng thẻ do `await undo()` trả về, bỏ biến `restoredCard` (B3 đã sửa). **Bìa** dùng `deck.color` thay cho hằng `COVER_COLORS`. **Xong khi:** học hết một lượt với `?seed`; phím Space, 1–4, ← →, Z vẫn chạy như cũ | `renderFurigana()`, `reviewCard()`, `undo()` | Bắt buộc | Xong |
 | S11 | Đổi chiều học | Đảo mặt thẻ theo `deck.direction` ([product.md › Đổi chiều học](product.md#đổi-chiều-học)): `'ja-vi'` (Nhật → Việt, mặc định) mặt trước là từ có furigana, mặt sau là nghĩa kèm cách đọc và ví dụ; `'vi-ja'` (Việt → Nhật) mặt trước là nghĩa, mặt sau là từ có furigana kèm cách đọc và ví dụ. **Nút đổi chiều** trên trang Học (màn chọn bộ hoặc thanh trên phiên học): bấm thì lưu bằng `updateDeck(id, { direction })` và đổi ngay thẻ đang hiện. **Lịch ôn dùng chung:** chấm điểm vẫn gọi `reviewCard()` như cũ. **Xong khi:** với `?seed`, bộ 挨拶 (`'vi-ja'`) hiện nghĩa ở mặt trước; đổi chiều xong tải lại vẫn giữ; Space, 1–4, ← →, Z và hoàn tác đúng ở cả 2 chiều; ví dụ dài ở 375px không đẩy 4 nút chấm ra khỏi màn hình | `getDeck()`, `updateDeck()`, `renderFurigana()` | Nên có | Xong |
 
