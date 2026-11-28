@@ -73,7 +73,7 @@ p {
    HTML viết sẵn ở cả 4 trang (<header class="rail">), sửa thì sửa cả 4 file.
    Từ 768px: cột nổi bên trái, mỗi mục là một nút tròn chỉ có icon; tên mục (.rail-label) hiện thành
    tooltip khi rê chuột hoặc Tab tới, và vẫn là tên của link cho trình đọc màn hình.
-   Dưới 768px: thanh tab cố định ở đáy, 5 ô bằng nhau, icon có nhãn chữ bên dưới.
+   Dưới 768px: thanh tab cố định ở đáy, 6 ô bằng nhau, icon có nhãn chữ bên dưới.
 
    <header class="rail">
      <a class="rail-brand" href="…" aria-label="Nhớ Lâu"><span lang="ja">覚</span></a>
@@ -83,7 +83,13 @@ p {
      <button class="rail-link rail-furigana" type="button" aria-pressed="false">
        <svg …/><span class="rail-label">Furigana</span><span class="rail-switch" aria-hidden="true"></span>
      </button>
-   </header> */
+     <button class="rail-link rail-account" type="button" aria-expanded="false" aria-controls="account-panel">
+       <svg …/><span class="rail-label">Tài khoản</span>
+     </button>
+     <div class="account-panel" id="account-panel" role="region" aria-label="Tài khoản" hidden></div>
+   </header>
+   Nút tài khoản và bảng tài khoản do core/account.js điền (BE6): khách thấy nút Google,
+   đã đăng nhập thì nút là avatar + tên, bảng có tên, email và nút Đăng xuất. */
 body {
   padding-left: calc(var(--rail-width) + var(--space-3));
 }
@@ -196,6 +202,101 @@ body {
   display: block;
 }
 
+/* Tài khoản (BE6): nút tròn dưới nút furigana; đã đăng nhập thì avatar lấp cả nút.
+   Bảng tài khoản nổi bên phải cột, sát đáy; điện thoại thì nổi trên thanh tab. */
+.rail-account {
+  margin-top: var(--space-3);
+}
+.account-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 1;
+  object-fit: cover;
+}
+.rail-account .account-avatar {
+  width: 100%;
+  height: 100%;
+}
+.account-panel {
+  position: fixed;
+  bottom: var(--space-3);
+  left: calc(var(--rail-width) + var(--space-3) * 2);
+  width: 300px;
+  max-width: calc(100vw - var(--rail-width) - var(--space-3) * 3);
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+.account-title {
+  margin: 0;
+  font-weight: 600;
+}
+.account-text {
+  margin: var(--space-1) 0 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+/* Nút của Google (iframe) cao 44px; chừa sẵn chỗ để bảng không nhảy khi nút hiện ra */
+.account-google {
+  min-height: 44px;
+  margin-top: var(--space-3);
+}
+.account-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.account-user .account-avatar {
+  width: 44px;
+  height: 44px;
+  font-size: var(--text-lg);
+}
+.account-who {
+  min-width: 0;
+}
+.account-name,
+.account-email {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.account-name {
+  font-weight: 600;
+}
+.account-email {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.account-logout {
+  width: 100%;
+}
+.account-logout svg {
+  width: 20px;
+  height: 20px;
+}
+.account-status {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+.account-status:not(:empty) {
+  margin-top: var(--space-3);
+}
+.account-status.is-error {
+  color: var(--danger);
+}
+
 /* Điện thoại: thanh tab ở đáy. Mục đang chọn: icon nằm trong viên thuốc xanh đậm, nhãn đậm. */
 @media (max-width: 767.98px) {
   body {
@@ -273,6 +374,22 @@ body {
   }
   .rail-link[aria-current='page'] .rail-label {
     font-weight: 600;
+  }
+  /* Ô tài khoản: ô thứ 6. Avatar cao bằng viên thuốc của icon (28px) để nhãn 6 ô thẳng hàng */
+  .rail-account {
+    margin-top: 0;
+  }
+  .rail-account .account-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: var(--text-xs);
+  }
+  .account-panel {
+    right: var(--space-3);
+    bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom, 0px) + var(--space-2));
+    left: var(--space-3);
+    width: auto;
+    max-width: none;
   }
   /* Ô furigana: công tắc thay chỗ icon, cao bằng viên thuốc của icon (28px) để nhãn 5 ô thẳng hàng */
   .rail-furigana {
